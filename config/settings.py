@@ -13,13 +13,20 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret")
 DEBUG = os.getenv("DEBUG", "1") == "1"
 
-ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",") if h.strip()]
+# --------------------
+# Hosts / CSRF (Render-safe)
+# --------------------
+raw_hosts = os.getenv("ALLOWED_HOSTS", "").strip()
 
-CSRF_TRUSTED_ORIGINS = [
-    o.strip()
-    for o in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
-    if o.strip()
-]
+if raw_hosts:
+    ALLOWED_HOSTS = [h.strip() for h in raw_hosts.split(",") if h.strip()]
+else:
+    # fallback seguro pra produção no Render
+    ALLOWED_HOSTS = ["*"] if not DEBUG else ["127.0.0.1", "localhost"]
+
+raw_csrf = os.getenv("CSRF_TRUSTED_ORIGINS", "").strip()
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in raw_csrf.split(",") if o.strip()]
+
 
 # --------------------
 # Apps
