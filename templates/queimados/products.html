@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Queimados - Produtos{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="card grow">
+    <h2>Queimados • Produtos</h2>
+    <p class="muted">Escolha quantidades e adicione ao carrinho.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Produto</th>
+          <th>SKU</th>
+          <th>Unid.</th>
+          <th>Qtd</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+        <tr>
+          <td><strong>{{ p.name }}</strong></td>
+          <td class="muted">{{ p.sku }}</td>
+          <td class="muted">{{ p.unit }}</td>
+          <td>
+            <form method="post" style="display:flex; gap:10px; align-items:center;">
+              {% csrf_token %}
+              <input type="hidden" name="product_id" value="{{ p.id }}">
+              <input type="number" name="qty" min="1" value="1">
+              <button class="btn btn-primary" type="submit">Adicionar</button>
+            </form>
+          </td>
+          <td></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">Nenhum produto cadastrado.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="row" style="margin-top:14px;">
+      <a class="btn btn-secondary" href="/queimados/carrinho/">Ver carrinho</a>
+      <a class="btn btn-secondary" href="/queimados/pedidos/">Meus pedidos</a>
+    </div>
+  </div>
+
+  <div class="card" style="min-width: 280px;">
+    <h3>Carrinho</h3>
+    <p class="muted">Pedido rascunho atual</p>
+    <p><strong>ID:</strong> {{ cart.id }}</p>
+    <p><strong>Status:</strong> <span class="pill pill-gray">{{ cart.status }}</span></p>
+    <p><strong>Itens:</strong> {{ cart.items.count }}</p>
+    <a class="btn btn-primary" href="/queimados/carrinho/">Abrir carrinho</a>
+  </div>
+</div>
+{% endblock %}

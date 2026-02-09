@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Queimados - Pedido #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="row">
+    <div class="grow">
+      <h2>Queimados • Pedido #{{ order.id }}</h2>
+      <p class="muted">Aqui você vê o que pediu x o que Austin enviou.</p>
+    </div>
+    <div class="right">
+      <p><strong>Status:</strong> <span class="pill pill-gray">{{ order.status }}</span></p>
+      {% if order.status == "DISPATCHED" %}
+        <a class="btn btn-primary" href="/queimados/pedidos/{{ order.id }}/receber/" onclick="return confirm('Confirmar recebimento do pedido?');">Confirmar recebimento</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Produto</th>
+        <th>Pedido (Queimados)</th>
+        <th>Enviado (Austin)</th>
+        <th>Resultado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for it in items %}
+      <tr>
+        <td><strong>{{ it.product.name }}</strong> <span class="muted">({{ it.product.sku }})</span></td>
+        <td>{{ it.qty_requested }}</td>
+        <td>{{ it.qty_sent }}</td>
+        <td>
+          {% if it.qty_sent >= it.qty_requested %}
+            ✅ Completo
+          {% else %}
+            ⚠ Faltou {{ it.qty_requested|add:-it.qty_sent }}
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4">Pedido sem itens.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if order.notes_from_austin %}
+    <div class="card" style="margin-top:14px;">
+      <h3>Observação de Austin</h3>
+      <p>{{ order.notes_from_austin }}</p>
+    </div>
+  {% endif %}
+
+  <div class="row" style="margin-top:14px;">
+    <a class="btn btn-secondary" href="/queimados/pedidos/">Voltar</a>
+  </div>
+</div>
+{% endblock %}
