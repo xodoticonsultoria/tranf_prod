@@ -1,12 +1,12 @@
 import os
 from pathlib import Path
 
-from dotenv import load_dotenv
+
 import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-if os.getenv("RENDER") is None:
-    load_dotenv()
+
+
 
 
 # --------------------
@@ -20,18 +20,9 @@ DEBUG = os.getenv("DEBUG", "1") == "1"
 # --------------------
 raw_hosts = os.getenv("ALLOWED_HOSTS", "").strip()
 
-if raw_hosts:
-    if DEBUG:
-        ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
-    else:
-        ALLOWED_HOSTS = ["tranf-prod.onrender.com"]
+ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = ["https://tranf-prod.onrender.com"]
 
-else:
-    # fallback seguro pra produção no Render
-    ALLOWED_HOSTS = ["*"] if not DEBUG else ["127.0.0.1", "localhost"]
-
-raw_csrf = os.getenv("CSRF_TRUSTED_ORIGINS", "").strip()
-CSRF_TRUSTED_ORIGINS = [o.strip() for o in raw_csrf.split(",") if o.strip()]
 
 
 # --------------------
