@@ -5,7 +5,9 @@ from dotenv import load_dotenv
 import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv()
+if os.getenv("RENDER") is None:
+    load_dotenv()
+
 
 # --------------------
 # Básico
@@ -19,7 +21,11 @@ DEBUG = os.getenv("DEBUG", "1") == "1"
 raw_hosts = os.getenv("ALLOWED_HOSTS", "").strip()
 
 if raw_hosts:
-    ALLOWED_HOSTS = [h.strip() for h in raw_hosts.split(",") if h.strip()]
+    if DEBUG:
+        ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+    else:
+        ALLOWED_HOSTS = ["tranf-prod.onrender.com"]
+
 else:
     # fallback seguro pra produção no Render
     ALLOWED_HOSTS = ["*"] if not DEBUG else ["127.0.0.1", "localhost"]
