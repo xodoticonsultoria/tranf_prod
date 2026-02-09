@@ -2,35 +2,23 @@ import os
 from pathlib import Path
 import dj_database_url
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-DEBUG = os.getenv("DEBUG", "0") == "1"
-
-if DEBUG:
-    ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
-else:
-    ALLOWED_HOSTS = ["tranf-prod.onrender.com"]
-
-CSRF_TRUSTED_ORIGINS = ["https://tranf-prod.onrender.com"]
-
-
 
 # --------------------
 # Básico
 # --------------------
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret")
-DEBUG = os.getenv("DEBUG", "1") == "1"
+DEBUG = os.getenv("DEBUG", "0") == "1"
 
 # --------------------
-# Hosts / CSRF (Render-safe)
+# Hosts / CSRF
 # --------------------
-raw_hosts = os.getenv("ALLOWED_HOSTS", "").strip()
-
-ALLOWED_HOSTS = ["*"]
-CSRF_TRUSTED_ORIGINS = ["https://tranf-prod.onrender.com"]
-
-
+if DEBUG:
+    ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+    CSRF_TRUSTED_ORIGINS = []
+else:
+    ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+    CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
 
 # --------------------
 # Apps
@@ -42,7 +30,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "core",
 ]
 
@@ -51,7 +38,7 @@ INSTALLED_APPS = [
 # --------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # static no Render
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -65,7 +52,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],  # templates fora do app (auth/login etc.)
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -81,21 +68,19 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 # --------------------
-# Banco (SQLite local / Postgres no Render)
+# Banco
 # --------------------
 db_url = os.getenv("DATABASE_URL", "").strip()
 
 if db_url:
-    # Postgres (Supabase / Render)
     DATABASES = {
         "default": dj_database_url.parse(
             db_url,
             conn_max_age=600,
-            ssl_require=not DEBUG,  # aqui é seguro porque é Postgres
+            ssl_require=not DEBUG,
         )
     }
 else:
-    # SQLite (local)
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -135,4 +120,3 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/login/"
-
