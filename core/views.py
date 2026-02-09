@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -227,3 +228,17 @@ def a_dispatch(request, order_id):
 
     messages.success(request, f"Pedido #{order.id} despachado para Queimados.")
     return redirect("a_order_detail", order_id=order.id)
+
+
+@login_required
+def home(request):
+    user = request.user
+
+    if user.groups.filter(name="QUEIMADOS").exists():
+        return redirect("/queimados/produtos/")
+
+    if user.groups.filter(name="AUSTIN").exists():
+        return redirect("/austin/pedidos/")
+
+    # fallback (caso esteja logado mas sem grupo)
+    return redirect("/admin/")
