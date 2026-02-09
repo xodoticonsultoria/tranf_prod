@@ -1,14 +1,58 @@
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from django.db import transaction
-from django.contrib import messages
 
 from .models import Product, TransferOrder, TransferOrderItem, OrderStatus, Branch
 from .permissions import require_austin, require_queimados
 
 
-# -------- QUEIMADOS --------
+# --------------------
+# Auth + Home
+# --------------------
+def _has_group(user, name: str) -> bool:
+    return user.is_authenticated and user.groups.filter(name=name).exists()
 
+def home(request):
+    if not request.user.is_authenticated:
+        return redirect("login")
+
+    if _has_group(request.user, "AUSTIN"):
+        return redirect("a_orders")
+
+    if _has_group(request.user, "QUEIMADOS"):
+        return redirect("q_products")
+
+    messages.error(request, "Seu usuário não está em nenhum grupo (AUSTIN ou QUEIMADOS).")
+    return redirect("login")
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect("home")
+
+    if request.method == "POST":
+        username = request.POST.get("username", "").strip()
+        password = request.POST.get("password", "").strip()
+
+        user = authenticate(request, username=username, password=password)
+        if user is None:
+            messages.error(request, "Usuário ou senha inválidos.")
+            return redirect("login")
+
+        login(request, user)
+        return redirect("home")
+
+    return render(request, "auth/login.html")
+
+def logout_view(request):
+    logout(request)
+    return redirect("login")
+
+
+# --------------------
+# Queimados
+# --------------------
 def _get_or_create_cart(user):
     cart, _ = TransferOrder.objects.get_or_create(
         created_by=user,
@@ -49,7 +93,6 @@ def q_cart(request):
     items = cart.items.select_related("product").order_by("product__name")
 
     if request.method == "POST":
-        # atualizar quantidades no carrinho
         for item in items:
             field = f"qty_{item.id}"
             if field in request.POST:
@@ -79,18 +122,17 @@ def q_submit_order(request):
 
 @require_queimados
 def q_orders(request):
-    orders = TransferOrder.objects.filter(
-        created_by=request.user
-    ).exclude(status=OrderStatus.DRAFT).order_by("-created_at")
+    orders = (
+        TransferOrder.objects
+        .filter(created_by=request.user)
+        .exclude(status=OrderStatus.DRAFT)
+        .order_by("-created_at")
+    )
     return render(request, "queimados/orders.html", {"orders": orders})
 
 @require_queimados
 def q_order_detail(request, order_id):
-    order = get_object_or_404(
-        TransferOrder,
-        id=order_id,
-        created_by=request.user,
-    )
+    order = get_object_or_404(TransferOrder, id=order_id, created_by=request.user)
     items = order.items.select_related("product").order_by("product__name")
     return render(request, "queimados/order_detail.html", {"order": order, "items": items})
 
@@ -109,8 +151,9 @@ def q_receive_order(request, order_id):
     return redirect("q_order_detail", order_id=order.id)
 
 
-# -------- AUSTIN --------
-
+# --------------------
+# Austin
+# --------------------
 @require_austin
 def a_orders(request):
     orders = TransferOrder.objects.exclude(status=OrderStatus.DRAFT).order_by("-created_at")
@@ -122,7 +165,6 @@ def a_order_detail(request, order_id):
     items = order.items.select_related("product").order_by("product__name")
 
     if request.method == "POST":
-        # atualizar qty_sent por item (somente em separação)
         if order.status != OrderStatus.PICKING:
             messages.error(request, "Você só pode alterar quantidades quando o pedido está em separação.")
             return redirect("a_order_detail", order_id=order.id)
@@ -179,7 +221,6 @@ def a_dispatch(request, order_id):
         messages.error(request, "Só dá pra despachar quando está em separação.")
         return redirect("a_order_detail", order_id=order.id)
 
-    # regra simples: exige que todo item tenha qty_sent definido (>=0 já tem por default)
     order.status = OrderStatus.DISPATCHED
     order.dispatched_at = timezone.now()
     order.save()

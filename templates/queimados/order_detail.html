@@ -6,7 +6,7 @@
   <div class="row">
     <div class="grow">
       <h2>Queimados • Pedido #{{ order.id }}</h2>
-      <p class="muted">Aqui você vê o que pediu x o que Austin enviou.</p>
+      <p class="muted">Comparativo: pedido x enviado.</p>
     </div>
     <div class="right">
       <p><strong>Status:</strong> <span class="pill pill-gray">{{ order.status }}</span></p>
@@ -20,8 +20,8 @@
     <thead>
       <tr>
         <th>Produto</th>
-        <th>Pedido (Queimados)</th>
-        <th>Enviado (Austin)</th>
+        <th class="wrap">Pedido</th>
+        <th class="wrap">Enviado</th>
         <th>Resultado</th>
       </tr>
     </thead>
@@ -32,10 +32,10 @@
         <td>{{ it.qty_requested }}</td>
         <td>{{ it.qty_sent }}</td>
         <td>
-          {% if it.qty_sent >= it.qty_requested %}
+          {% if it.is_fulfilled %}
             ✅ Completo
           {% else %}
-            ⚠ Faltou {{ it.qty_requested|add:-it.qty_sent }}
+            ⚠ Faltou {{ it.missing_qty }}
           {% endif %}
         </td>
       </tr>

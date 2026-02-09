@@ -9,6 +9,7 @@ class TransferOrderItemInline(admin.TabularInline):
 class TransferOrderAdmin(admin.ModelAdmin):
     list_display = ("id", "status", "from_branch", "to_branch", "created_by", "created_at")
     list_filter = ("status", "from_branch", "to_branch")
+    search_fields = ("id", "created_by__username")
     inlines = [TransferOrderItemInline]
 
 @admin.register(Product)

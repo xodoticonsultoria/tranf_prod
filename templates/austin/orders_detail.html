@@ -26,8 +26,8 @@
       <thead>
         <tr>
           <th>Produto</th>
-          <th>Pedido (Queimados)</th>
-          <th>Enviado (Austin)</th>
+          <th class="wrap">Pedido</th>
+          <th class="wrap">Enviado</th>
           <th></th>
         </tr>
       </thead>
@@ -36,7 +36,7 @@
         <tr>
           <td><strong>{{ it.product.name }}</strong> <span class="muted">({{ it.product.sku }})</span></td>
           <td>{{ it.qty_requested }}</td>
-          <td>
+          <td class="num">
             {% if order.status == "PICKING" %}
               <input type="number" name="sent_{{ it.id }}" min="0" value="{{ it.qty_sent }}">
             {% else %}

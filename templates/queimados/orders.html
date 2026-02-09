@@ -4,6 +4,7 @@
 {% block content %}
 <div class="card">
   <h2>Queimados • Meus pedidos</h2>
+
   <div class="row" style="margin-bottom:12px;">
     <a class="btn btn-secondary" href="/queimados/produtos/">Produtos</a>
     <a class="btn btn-secondary" href="/queimados/carrinho/">Carrinho</a>
@@ -29,7 +30,7 @@
           {% if o.status == "DISPATCHED" %}<span class="pill pill-green">DESPACHADO</span>{% endif %}
           {% if o.status == "RECEIVED" %}<span class="pill pill-green">RECEBIDO</span>{% endif %}
           {% if o.status == "CANCELLED" %}<span class="pill pill-red">CANCELADO</span>{% endif %}
-          {% if o.status != "SUBMITTED" and o.status != "PICKING" and o.status != "DISPATCHED" and o.status != "RECEIVED" and o.status != "CANCELLED" %}
+          {% if o.status not in "SUBMITTED PICKING DISPATCHED RECEIVED CANCELLED" %}
             <span class="pill pill-gray">{{ o.status }}</span>
           {% endif %}
         </td>

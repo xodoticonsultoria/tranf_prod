@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 520px; margin: 0 auto;">
+  <h2>Entrar</h2>
+  <p class="muted">Use seu usuário e senha.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <div style="margin-bottom: 10px;">
+      <label class="muted"><strong>Usuário</strong></label>
+      <input name="username" />
+    </div>
+
+    <div style="margin-bottom: 14px;">
+      <label class="muted"><strong>Senha</strong></label>
+      <input type="password" name="password" />
+    </div>
+
+    <button class="btn btn-primary" type="submit" style="width:100%;">Entrar</button>
+  </form>
+</div>
+{% endblock %}

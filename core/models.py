@@ -17,13 +17,12 @@ class Product(models.Model):
     sku = models.CharField(max_length=50, unique=True)
     name = models.CharField(max_length=200)
     active = models.BooleanField(default=True)
-    unit = models.CharField(max_length=20, default="un")  # un, kg, cx etc.
+    unit = models.CharField(max_length=20, default="un")
 
     def __str__(self):
         return f"{self.name} ({self.sku})"
 
 class TransferOrder(models.Model):
-    # sempre de Queimados -> Austin (pelo seu caso)
     from_branch = models.CharField(max_length=20, choices=Branch.choices, default=Branch.QUEIMADOS)
     to_branch = models.CharField(max_length=20, choices=Branch.choices, default=Branch.AUSTIN)
 
@@ -32,7 +31,6 @@ class TransferOrder(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="orders_created")
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # quem começou a separação (Austin)
     picking_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True, related_name="orders_picking")
     picking_at = models.DateTimeField(null=True, blank=True)
 
@@ -51,11 +49,14 @@ class TransferOrderItem(models.Model):
     qty_requested = models.PositiveIntegerField()
     qty_sent = models.PositiveIntegerField(default=0)
 
-    # opcional: Austin pode justificar item a item
     note = models.CharField(max_length=255, blank=True, default="")
 
     class Meta:
         unique_together = [("order", "product")]
+
+    @property
+    def missing_qty(self):
+        return max(0, self.qty_requested - self.qty_sent)
 
     @property
     def is_fulfilled(self):
