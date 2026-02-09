@@ -1,8 +1,9 @@
 import os
 from pathlib import Path
-
-
 import dj_database_url
+
+raise Exception("SETTINGS NOVOS CARREGADOS")
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
