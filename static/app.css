@@ -1,9 +1,7 @@
-/* ===== BASE ===== */
-
 body{
   margin:0;
   font-family: Inter, system-ui, Arial;
-  background:#fff8ef; /* creme */
+  background:#fff8ef;
   color:#222;
 }
 
@@ -13,7 +11,7 @@ body{
   padding:20px;
 }
 
-/* ===== NAVBAR ===== */
+/* NAVBAR */
 
 .topbar{
   display:flex;
@@ -36,44 +34,39 @@ body{
 }
 
 .userbox{
-  text-align:right;
-  line-height:1.1;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:2px;
 }
 
-.user{
-  font-weight:600;
-  font-size:14px;
-}
+.user{ font-size:14px; font-weight:600; }
+.branch{ font-size:12px; opacity:.9; }
 
-.branch{
-  font-size:12px;
-  opacity:.9;
-}
-
-/* ===== CARDS ===== */
+/* CARDS */
 
 .card{
   background:white;
   border-radius:14px;
-  padding:18px;
-  margin-bottom:18px;
+  padding:16px;
+  margin-bottom:16px;
   box-shadow:0 2px 8px rgba(0,0,0,.05);
 }
 
-/* ===== CATEGORIA ===== */
+/* CATEGORIA */
 
 .cat-head{
   display:flex;
   align-items:center;
-  gap:14px;
+  gap:12px;
   cursor:pointer;
 }
 
 .cat-head img{
   width:42px;
   height:42px;
-  object-fit:cover;
   border-radius:10px;
+  object-fit:cover;
 }
 
 .cat-body{
@@ -81,7 +74,7 @@ body{
   margin-top:12px;
 }
 
-/* ===== GRID PRODUTOS ===== */
+/* GRID */
 
 .grid{
   display:grid;
@@ -89,92 +82,75 @@ body{
   gap:14px;
 }
 
-/* ===== CARD PRODUTO ===== */
+/* PRODUTO */
 
 .prod-card{
   display:flex;
   align-items:center;
-  gap:14px;
-  padding:12px;
+  gap:12px;
+  padding:10px 12px;
   border:1px solid #eee;
   border-radius:12px;
-  background:#fff;
 }
 
-/* ✅ imagem menor igual categoria */
 .prod-img{
-  width:56px;
-  height:56px;
+  width:44px;
+  height:44px;
+  border-radius:8px;
   object-fit:cover;
-  border-radius:10px;
 }
 
-/* ===== TEXTO PROD ===== */
+.prod-title{ font-size:14px; font-weight:700; }
+.prod-sku{ font-size:12px; color:#666; }
 
-.prod-info{
-  flex:1;
-}
-
-.prod-title{
-  font-weight:700;
-  font-size:14px;
-}
-
-.prod-sku{
-  font-size:12px;
-  color:#666;
-}
-
-/* ===== QTD ===== */
+/* QTD */
 
 .qty-box{
   display:flex;
   align-items:center;
   gap:6px;
+  margin-top:6px;
 }
 
 .qty-box input{
-  width:48px;
-  height:32px;
+  width:42px;
+  height:28px;
   text-align:center;
-  font-size:14px;
+  font-size:13px;
   border:1px solid #ddd;
   border-radius:6px;
 }
 
-/* ===== BOTÕES ===== */
+/* remove spinner */
+input::-webkit-inner-spin-button{
+  -webkit-appearance:none;
+}
+
+/* BOTÕES */
 
 .btn{
   background:#2563eb;
   color:white;
   border:none;
   border-radius:8px;
-  padding:8px 14px;
+  padding:7px 12px;
   font-size:14px;
   cursor:pointer;
 }
 
-.btn:hover{
-  opacity:.9;
-}
+.btn-danger{ background:#ef4444; }
 
-.btn-danger{
-  background:#ef4444;
-}
-
-/* botões + - */
 .btn-qty{
-  width:28px;
-  height:28px;
-  border-radius:6px;
-  border:none;
+  width:26px;
+  height:26px;
   background:#ef4444;
   color:white;
-  font-weight:700;
-  cursor:pointer;
+  border:none;
+  border-radius:6px;
+  font-weight:800;
 }
 
-/* ===== BADGE ===== */
+/* BADGE */
 
 .badge{
   background:#ef4444;
@@ -182,10 +158,9 @@ body{
   padding:3px 8px;
   border-radius:999px;
   font-size:12px;
-  font-weight:700;
 }
 
-/* ===== TOAST ===== */
+/* TOAST */
 
 .toast{
   background:#16a34a;
@@ -195,19 +170,8 @@ body{
   margin-bottom:10px;
 }
 
-/* ===== MOBILE ===== */
+/* MOBILE */
 
 @media(max-width:640px){
-  .grid{
-    grid-template-columns:1fr;
-  }
-
-  .prod-card{
-    flex-direction:row;
-  }
-
-  .prod-img{
-    width:48px;
-    height:48px;
-  }
+  .grid{ grid-template-columns:1fr; }
 }

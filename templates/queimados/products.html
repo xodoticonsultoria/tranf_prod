@@ -1,27 +1,69 @@
-{% for p in cat.products.all %}
-{% if p.active %}
+{% extends "base.html" %}
+{% block title %}Produtos{% endblock %}
+{% block content %}
 
-<form method="post" action="{% url 'q_products' %}" class="prod-card">
-{% csrf_token %}
-<input type="hidden" name="product_id" value="{{ p.id }}">
-
-{% if p.image and p.image.name %}
-<img src="{{ p.image.url }}" class="prod-img">
-{% endif %}
-
-<div class="prod-info">
-  <div class="prod-title">{{ p.name }}</div>
-  <div class="prod-sku">SKU {{ p.sku }}</div>
-
-  <div class="qty-box">
-    <button type="button" class="btn-qty" onclick="dec(this)">−</button>
-    <input name="qty" value="1" min="1">
-    <button type="button" class="btn-qty" onclick="inc(this)">+</button>
-    <button class="btn">Adicionar</button>
-  </div>
+<div class="card">
+  <h2>Produtos</h2>
+  <p class="muted">Clique na categoria para abrir.</p>
 </div>
 
-</form>
+<div class="card">
+  🛒 Carrinho
+  <span class="badge">{{ cart.items.count }}</span>
+  <br><br>
+  <a href="{% url 'q_cart' %}" class="btn">Abrir carrinho</a>
+</div>
 
-{% endif %}
+{% for cat in categories %}
+<div class="card">
+
+  <div class="cat-head" onclick="toggleCat({{ cat.id }})">
+    {% if cat.image and cat.image.name %}
+      <img src="{{ cat.image.url }}">
+    {% endif %}
+
+    <div>
+      <strong>{{ cat.name }}</strong><br>
+      {{ cat.products.count }} produtos
+    </div>
+  </div>
+
+  <div id="cat-body-{{ cat.id }}" class="cat-body">
+
+    <div class="grid">
+
+    {% for p in cat.products.all %}
+    {% if p.active %}
+
+    <form method="post" action="{% url 'q_products' %}" class="prod-card">
+      {% csrf_token %}
+      <input type="hidden" name="product_id" value="{{ p.id }}">
+
+      {% if p.image and p.image.name %}
+        <img src="{{ p.image.url }}" class="prod-img">
+      {% endif %}
+
+      <div class="prod-info">
+        <div class="prod-title">{{ p.name }}</div>
+        <div class="prod-sku">SKU {{ p.sku }}</div>
+
+        <div class="qty-box">
+          <button type="button" class="btn-qty" onclick="dec(this)">−</button>
+          <input name="qty" value="1" min="1">
+          <button type="button" class="btn-qty" onclick="inc(this)">+</button>
+
+          <button class="btn">Adicionar</button>
+        </div>
+      </div>
+
+    </form>
+
+    {% endif %}
+    {% endfor %}
+
+    </div>
+  </div>
+</div>
 {% endfor %}
+
+{% endblock %}

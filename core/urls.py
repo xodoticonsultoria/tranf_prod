@@ -26,5 +26,4 @@ urlpatterns = [
     path("austin/api/poll/", views.austin_poll, name="austin_poll"),
 
     path("teste/", lambda r: render(r, "test.html")),
-
 ]
