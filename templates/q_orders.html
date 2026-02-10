@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Meus pedidos{% endblock %}
+
+{% block content %}
+
+<div class="card">
+  <h2>Queimados • Meus pedidos</h2>
+
+  <div class="toolbar">
+    <a href="{% url 'q_products' %}" class="btn btn-secondary">Produtos</a>
+    <a href="{% url 'q_cart' %}" class="btn btn-secondary">Carrinho</a>
+  </div>
+</div>
+
+
+<div class="card">
+
+  <div class="order-table">
+
+    <div class="order-head">
+      <div>ID</div>
+      <div>Criado</div>
+      <div>Status</div>
+      <div></div>
+    </div>
+
+    {% for o in orders %}
+    <div class="order-row">
+
+      <div class="col-id">#{{ o.id }}</div>
+
+      <div class="col-date">
+        {{ o.created_at|date:"d/m/Y H:i" }}
+      </div>
+
+      <div>
+        <span class="status {{ o.status|lower }}">
+          {{ o.status }}
+        </span>
+      </div>
+
+      <div class="right">
+        <a href="{% url 'q_order_detail' o.id %}" class="btn btn-sm">
+          Abrir
+        </a>
+      </div>
+
+    </div>
+    {% empty %}
+      <div class="muted">Nenhum pedido ainda.</div>
+    {% endfor %}
+
+  </div>
+
+</div>
+
+{% endblock %}
