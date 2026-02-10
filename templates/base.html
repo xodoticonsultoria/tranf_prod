@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -17,15 +18,14 @@
     <div class="topbar-right">
         {% if request.user.is_authenticated %}
             <span class="user">Olá, {{ request.user.username }}</span>
-
             <a href="/admin/" class="btn-mini">Admin</a>
-
             <a href="{% url 'logout' %}" class="btn-mini btn-danger">Sair</a>
         {% endif %}
     </div>
 </header>
 
 <main class="page">
+
     {% if messages %}
         {% for m in messages %}
             <div class="alert">{{ m }}</div>
@@ -33,12 +33,19 @@
     {% endif %}
 
     {% block content %}{% endblock %}
+
 </main>
 
 <script>
-function toggleCat(id){
-  const el = document.getElementById("cat-body-"+id);
-  el.classList.toggle("open");
+function checkBadge(){
+    const badgeUrl = "/austin/api/badge/";
+
+    fetch(badgeUrl)
+        .then(r => r.json())
+        .then(data => {
+            console.log("badge:", data);
+        })
+        .catch(err => console.log("badge error", err));
 }
 </script>
 
