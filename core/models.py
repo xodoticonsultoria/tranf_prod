@@ -1,9 +1,11 @@
 from django.db import models
 from django.conf import settings
 
+
 class Branch(models.TextChoices):
     AUSTIN = "AUSTIN", "Austin (Base)"
     QUEIMADOS = "QUEIMADOS", "Queimados (Filial)"
+
 
 class OrderStatus(models.TextChoices):
     DRAFT = "DRAFT", "Rascunho"
@@ -13,14 +15,41 @@ class OrderStatus(models.TextChoices):
     RECEIVED = "RECEIVED", "Recebido (confirmado)"
     CANCELLED = "CANCELLED", "Cancelado"
 
+
+class Category(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    image = models.ImageField(upload_to="categories/", null=True, blank=True)
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
 class Product(models.Model):
     sku = models.CharField(max_length=50, unique=True)
     name = models.CharField(max_length=200)
     active = models.BooleanField(default=True)
     unit = models.CharField(max_length=20, default="un")
 
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="products",
+    )
+
+    image = models.ImageField(upload_to="products/", null=True, blank=True)
+
+    class Meta:
+        ordering = ["name"]
+
     def __str__(self):
         return f"{self.name} ({self.sku})"
+
 
 class TransferOrder(models.Model):
     from_branch = models.CharField(max_length=20, choices=Branch.choices, default=Branch.QUEIMADOS)
@@ -41,6 +70,7 @@ class TransferOrder(models.Model):
 
     def __str__(self):
         return f"Pedido #{self.id} {self.from_branch}->{self.to_branch} ({self.status})"
+
 
 class TransferOrderItem(models.Model):
     order = models.ForeignKey(TransferOrder, on_delete=models.CASCADE, related_name="items")

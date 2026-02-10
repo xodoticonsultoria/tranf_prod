@@ -5,11 +5,8 @@ from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
-from .models import Product, TransferOrder, TransferOrderItem, OrderStatus, Branch
+from .models import Category, Product, TransferOrder, TransferOrderItem, OrderStatus, Branch
 from .permissions import require_austin, require_queimados
-
-import traceback
-import sys
 
 
 # --------------------
@@ -47,7 +44,7 @@ def logout_view(request):
 
 
 # --------------------
-# Home (ÚNICA — sem duplicação)
+# Home
 # --------------------
 @login_required
 def home(request):
@@ -77,8 +74,17 @@ def _get_or_create_cart(user):
 
 @require_queimados
 def q_products(request):
-    products = Product.objects.filter(active=True).order_by("name")
     cart = _get_or_create_cart(request.user)
+
+    # categorias ativas + produtos ativos
+    categories = (
+        Category.objects.filter(active=True)
+        .prefetch_related("products")
+        .order_by("name")
+    )
+
+    # produtos sem categoria (opcional)
+    uncategorized = Product.objects.filter(active=True, category__isnull=True).order_by("name")
 
     if request.method == "POST":
         product_id = int(request.POST["product_id"])
@@ -88,7 +94,7 @@ def q_products(request):
             messages.error(request, "Quantidade inválida.")
             return redirect("q_products")
 
-        product = get_object_or_404(Product, id=product_id)
+        product = get_object_or_404(Product, id=product_id, active=True)
 
         item, created = TransferOrderItem.objects.get_or_create(
             order=cart,
@@ -103,10 +109,15 @@ def q_products(request):
         messages.success(request, f"Adicionado: {product.name} (+{qty})")
         return redirect("q_products")
 
-    return render(request, "queimados/products.html", {
-        "products": products,
-        "cart": cart
-    })
+    return render(
+        request,
+        "queimados/products.html",
+        {
+            "cart": cart,
+            "categories": categories,
+            "uncategorized": uncategorized,
+        },
+    )
 
 
 @require_queimados
@@ -128,10 +139,7 @@ def q_cart(request):
         messages.success(request, "Carrinho atualizado.")
         return redirect("q_cart")
 
-    return render(request, "queimados/cart.html", {
-        "cart": cart,
-        "items": items
-    })
+    return render(request, "queimados/cart.html", {"cart": cart, "items": items})
 
 
 @require_queimados
@@ -158,43 +166,29 @@ def q_orders(request):
         .exclude(status=OrderStatus.DRAFT)
         .order_by("-created_at")
     )
-
     return render(request, "queimados/orders.html", {"orders": orders})
 
 
 @require_queimados
 def q_order_detail(request, order_id):
-    order = get_object_or_404(
-        TransferOrder,
-        id=order_id,
-        created_by=request.user
-    )
-
+    order = get_object_or_404(TransferOrder, id=order_id, created_by=request.user)
     items = order.items.select_related("product").order_by("product__name")
-
-    return render(request, "queimados/order_detail.html", {
-        "order": order,
-        "items": items
-    })
+    return render(request, "queimados/order_detail.html", {"order": order, "items": items})
 
 
 @require_queimados
 def q_receive_order(request, order_id):
-    order = get_object_or_404(
-        TransferOrder,
-        id=order_id,
-        created_by=request.user
-    )
+    order = get_object_or_404(TransferOrder, id=order_id, created_by=request.user)
 
     if order.status != OrderStatus.DISPATCHED:
-        messages.error(request, "Ainda não foi despachado.")
+        messages.error(request, "Só dá pra confirmar recebimento quando Austin despacha.")
         return redirect("q_order_detail", order_id=order.id)
 
     order.status = OrderStatus.RECEIVED
     order.received_at = timezone.now()
     order.save()
 
-    messages.success(request, "Recebimento confirmado.")
+    messages.success(request, f"Pedido #{order.id} confirmado como recebido.")
     return redirect("q_order_detail", order_id=order.id)
 
 
@@ -203,17 +197,8 @@ def q_receive_order(request, order_id):
 # --------------------
 @require_austin
 def a_orders(request):
-    orders = (
-        TransferOrder.objects
-        .exclude(status=OrderStatus.DRAFT)
-        .order_by("-created_at")
-    )
-
-    return render(request, "austin/orders.html", {
-        "orders": orders
-    })
-
-
+    orders = TransferOrder.objects.exclude(status=OrderStatus.DRAFT).order_by("-created_at")
+    return render(request, "austin/orders.html", {"orders": orders})
 
 
 @require_austin
@@ -223,26 +208,23 @@ def a_order_detail(request, order_id):
 
     if request.method == "POST":
         if order.status != OrderStatus.PICKING:
-            messages.error(request, "Pedido não está em separação.")
+            messages.error(request, "Você só pode alterar quantidades quando o pedido está em separação.")
             return redirect("a_order_detail", order_id=order.id)
 
         for item in items:
             field = f"sent_{item.id}"
             if field in request.POST:
-                val = max(0, int(request.POST[field]))
-                item.qty_sent = val
+                val = int(request.POST[field])
+                item.qty_sent = max(0, val)
                 item.save()
 
         order.notes_from_austin = request.POST.get("notes_from_austin", "")
         order.save()
 
-        messages.success(request, "Atualizado.")
+        messages.success(request, "Quantidades atualizadas.")
         return redirect("a_order_detail", order_id=order.id)
 
-    return render(request, "austin/order_detail.html", {
-        "order": order,
-        "items": items
-    })
+    return render(request, "austin/order_detail.html", {"order": order, "items": items})
 
 
 @require_austin
@@ -250,7 +232,7 @@ def a_start_picking(request, order_id):
     order = get_object_or_404(TransferOrder, id=order_id)
 
     if order.status != OrderStatus.SUBMITTED:
-        messages.error(request, "Status inválido.")
+        messages.error(request, "Só dá pra iniciar separação quando o pedido está enviado.")
         return redirect("a_order_detail", order_id=order.id)
 
     order.status = OrderStatus.PICKING
@@ -258,7 +240,7 @@ def a_start_picking(request, order_id):
     order.picking_at = timezone.now()
     order.save()
 
-    messages.success(request, "Separação iniciada.")
+    messages.success(request, f"Pedido #{order.id} em separação.")
     return redirect("a_order_detail", order_id=order.id)
 
 
@@ -268,7 +250,7 @@ def a_item_ok(request, order_id, item_id):
     item = get_object_or_404(TransferOrderItem, id=item_id, order=order)
 
     if order.status != OrderStatus.PICKING:
-        messages.error(request, "Pedido não está em separação.")
+        messages.error(request, "Só dá pra marcar OK durante a separação.")
         return redirect("a_order_detail", order_id=order.id)
 
     item.qty_sent = item.qty_requested
@@ -283,12 +265,12 @@ def a_dispatch(request, order_id):
     order = get_object_or_404(TransferOrder, id=order_id)
 
     if order.status != OrderStatus.PICKING:
-        messages.error(request, "Status inválido.")
+        messages.error(request, "Só dá pra despachar quando está em separação.")
         return redirect("a_order_detail", order_id=order.id)
 
     order.status = OrderStatus.DISPATCHED
     order.dispatched_at = timezone.now()
     order.save()
 
-    messages.success(request, "Despachado.")
+    messages.success(request, f"Pedido #{order.id} despachado para Queimados.")
     return redirect("a_order_detail", order_id=order.id)

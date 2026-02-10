@@ -2,56 +2,123 @@
 {% block title %}Queimados - Produtos{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="card grow">
-    <h2>Queimados • Produtos</h2>
-    <p class="muted">Escolha quantidades e adicione ao carrinho.</p>
+<div class="card">
+  <h2>Queimados • Produtos</h2>
+  <p class="muted">Clique em uma categoria para abrir/fechar a lista. Selecione quantidade e adicione ao carrinho.</p>
+</div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Produto</th>
-          <th>SKU</th>
-          <th>Unid.</th>
-          <th>Qtd</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for p in products %}
-        <tr>
-          <td><strong>{{ p.name }}</strong></td>
-          <td class="muted">{{ p.sku }}</td>
-          <td class="muted">{{ p.unit }}</td>
-          <td>
-            <form method="post" style="display:flex; gap:10px; align-items:center;">
-              {% csrf_token %}
-              <input type="hidden" name="product_id" value="{{ p.id }}">
-              <input type="number" name="qty" min="1" value="1">
-              <button class="btn btn-primary" type="submit">Adicionar</button>
-            </form>
-          </td>
-          <td></td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="5">Nenhum produto cadastrado.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+<div class="grid" style="grid-template-columns: 2fr 1fr; gap: 16px;">
+  <div class="card">
 
-    <div class="row" style="margin-top:14px;">
-      <a class="btn btn-secondary" href="/queimados/carrinho/">Ver carrinho</a>
-      <a class="btn btn-secondary" href="/queimados/pedidos/">Meus pedidos</a>
+    {% if categories %}
+      {% for cat in categories %}
+        <details class="cat" style="margin-bottom: 12px;">
+          <summary style="display:flex; align-items:center; gap:12px; cursor:pointer;">
+            {% if cat.image %}
+              <img src="{{ cat.image.url }}" alt="{{ cat.name }}" style="width:42px;height:42px;object-fit:cover;border-radius:10px;">
+            {% endif %}
+            <div>
+              <strong>{{ cat.name }}</strong>
+              <div class="muted" style="font-size: 12px;">
+                {{ cat.products.all|length }} produto(s)
+              </div>
+            </div>
+          </summary>
+
+          <div style="margin-top: 10px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th>SKU</th>
+                  <th>Unid.</th>
+                  <th>Qtd</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for p in cat.products.all %}
+                  {% if p.active %}
+                  <tr>
+                    <td style="display:flex; gap:10px; align-items:center;">
+                      {% if p.image %}
+                        <img src="{{ p.image.url }}" alt="{{ p.name }}" style="width:42px;height:42px;object-fit:cover;border-radius:10px;">
+                      {% endif %}
+                      <div>
+                        <strong>{{ p.name }}</strong>
+                      </div>
+                    </td>
+                    <td class="muted">{{ p.sku }}</td>
+                    <td class="muted">{{ p.unit }}</td>
+                    <td>
+                      <form method="post" style="display:flex; gap:10px; align-items:center;">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_id" value="{{ p.id }}">
+                        <input type="number" name="qty" value="1" min="1" style="width:80px;">
+                        <button class="btn" type="submit">Adicionar</button>
+                      </form>
+                    </td>
+                    <td></td>
+                  </tr>
+                  {% endif %}
+                {% empty %}
+                  <tr><td colspan="5">Nenhum produto nesta categoria.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </details>
+      {% endfor %}
+    {% else %}
+      <div class="muted">Nenhuma categoria cadastrada.</div>
+    {% endif %}
+
+    {% if uncategorized %}
+      <h3 style="margin-top:16px;">Sem categoria</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Produto</th><th>SKU</th><th>Unid.</th><th>Qtd</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in uncategorized %}
+          <tr>
+            <td><strong>{{ p.name }}</strong></td>
+            <td class="muted">{{ p.sku }}</td>
+            <td class="muted">{{ p.unit }}</td>
+            <td>
+              <form method="post" style="display:flex; gap:10px; align-items:center;">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ p.id }}">
+                <input type="number" name="qty" value="1" min="1" style="width:80px;">
+                <button class="btn" type="submit">Adicionar</button>
+              </form>
+            </td>
+            <td></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+
+    <div style="margin-top: 14px; display:flex; gap:10px;">
+      <a class="btn btn-secondary" href="{% url 'q_cart' %}">Ver carrinho</a>
+      <a class="btn btn-secondary" href="{% url 'q_orders' %}">Meus pedidos</a>
     </div>
   </div>
 
-  <div class="card" style="min-width: 280px;">
+  <div class="card">
     <h3>Carrinho</h3>
     <p class="muted">Pedido rascunho atual</p>
-    <p><strong>ID:</strong> {{ cart.id }}</p>
-    <p><strong>Status:</strong> <span class="pill pill-gray">{{ cart.status }}</span></p>
-    <p><strong>Itens:</strong> {{ cart.items.count }}</p>
-    <a class="btn btn-primary" href="/queimados/carrinho/">Abrir carrinho</a>
+
+    <div style="margin: 10px 0;">
+      <div><strong>ID:</strong> {{ cart.id }}</div>
+      <div style="margin-top:6px;"><strong>Status:</strong> <span class="pill pill-gray">{{ cart.status }}</span></div>
+      <div style="margin-top:6px;"><strong>Itens:</strong> {{ cart.items.count }}</div>
+    </div>
+
+    <a class="btn" href="{% url 'q_cart' %}">Abrir carrinho</a>
   </div>
 </div>
 {% endblock %}
