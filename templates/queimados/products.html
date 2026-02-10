@@ -35,23 +35,24 @@
       {% for p in cat.products.all %}
       {% if p.active %}
       <form method="post" action="{% url 'q_products' %}" class="prod-card">
-        {% csrf_token %}
-        <input type="hidden" name="product_id" value="{{ p.id }}">
+          {% csrf_token %}
+          <input type="hidden" name="product_id" value="{{ p.id }}">
 
-        {% if p.image and p.image.name %}
-          <img src="{{ p.image.url }}" class="prod-img">
-        {% endif %}
+          {% if p.image and p.image.name %}
+            <img src="{{ p.image.url }}" class="prod-img">
+          {% endif %}
 
-        <div class="prod-info">
-          <div class="prod-name">{{ p.name }}</div>
-          <div class="prod-sku">SKU {{ p.sku }}</div>
+          <div class="prod-info">
+            <div class="prod-title">{{ p.name }}</div>
+            <div class="prod-sku">SKU {{ p.sku }}</div>
 
-          <div class="prod-actions">
-            <input type="number" name="qty" value="1" min="1">
+            <br>
+
+            <input class="qty" type="number" name="qty" value="1" min="1">
             <button class="btn">Adicionar</button>
           </div>
-        </div>
-      </form>
+        </form>
+
       {% endif %}
       {% endfor %}
 

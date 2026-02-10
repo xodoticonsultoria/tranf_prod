@@ -23,19 +23,15 @@
     Sistema de Pedidos Xodó
   </div>
 
-  <div class="topbar-right">
-
-    {% if request.user.is_authenticated %}
-
+    <div class="topbar-right">
       <div class="userbox">
         <div class="user">{{ request.user.username }}</div>
-
-        {% if request.user.groups.first %}
-          <div class="branch">
-            {{ request.user.groups.first.name }}
-          </div>
-        {% endif %}
+        <div class="branch">{{ request.user.groups.first.name }}</div>
       </div>
+
+      <a href="{% url 'logout' %}" class="btn btn-danger">Sair</a>
+    </div>
+
 
       <!-- badge Austin realtime -->
       <div id="badgeAustin" class="badge hidden">0</div>

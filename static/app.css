@@ -1,169 +1,245 @@
+*{box-sizing:border-box}
 body{
-font-family:system-ui;
-margin:0;
-background:#f3f4f6;
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  background:#f5f6f8;
+  color:#222;
 }
+
+/* =======================
+TOPBAR
+======================= */
 
 .topbar{
-background:linear-gradient(90deg,#991b1b,#ea580c);
-color:white;
-padding:14px 18px;
-display:flex;
-justify-content:space-between;
-align-items:center;
+  background: linear-gradient(90deg,#991b1b,#ea580c);
+  color:white;
+  padding:12px 18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
-.brand{font-weight:700;font-size:18px;}
+.brand{
+  font-weight:700;
+  font-size:18px;
+}
 
-.userbox{text-align:right;font-size:13px}
-.branch{opacity:.8;font-size:12px}
+.topbar-right{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.userbox{
+  text-align:right;
+  line-height:1.1;
+}
+
+.user{
+  font-size:14px;
+  font-weight:600;
+}
+
+.branch{
+  font-size:12px;
+  opacity:.85;
+}
+
+/* =======================
+LAYOUT
+======================= */
 
 .page{
-max-width:1100px;
-margin:auto;
-padding:16px;
+  max-width:1100px;
+  margin:20px auto;
+  padding:0 14px;
 }
 
 .card{
-background:white;
-border-radius:14px;
-padding:18px;
-margin-bottom:16px;
-box-shadow:0 4px 12px rgba(0,0,0,.06);
+  background:white;
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);
 }
 
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-gap:14px;
+.muted{
+  color:#666;
+  font-size:14px;
 }
 
-/* categoria */
-
-.cat-head{
-display:flex;
-gap:14px;
-align-items:center;
-cursor:pointer;
-}
-
-.cat-img{
-width:56px;
-height:56px;
-object-fit:contain;
-background:#f3f4f6;
-border-radius:10px;
-padding:6px;
-}
-
-.cat-body{display:none;margin-top:14px}
-
-/* produto */
-
-.prod-card{
-display:flex;
-gap:12px;
-border:1px solid #e5e7eb;
-border-radius:12px;
-padding:10px;
-}
-
-.prod-img{
-width:72px;
-height:72px;
-object-fit:cover;
-border-radius:10px;
-}
-
-.prod-info{flex:1}
-
-.prod-name{font-weight:700}
-.prod-sku{font-size:12px;color:#6b7280}
-
-.prod-actions{
-display:flex;
-gap:8px;
-margin-top:6px;
-}
-
-/* carrinho */
-
-.cart-row{
-display:flex;
-gap:12px;
-align-items:center;
-margin-bottom:12px;
-}
-
-.cart-info{
-display:flex;
-flex-direction:column;
-gap:6px;
-}
-
-/* botões */
+/* =======================
+BOTÕES PADRONIZADOS
+======================= */
 
 .btn{
-background:#2563eb;
-color:white;
-padding:10px 14px;
-border-radius:10px;
-border:none;
-font-size:14px;
-cursor:pointer;
-text-decoration:none;
-display:inline-block;
+  display:inline-block;
+  background:#2563eb;
+  color:white;
+  border:none;
+  border-radius:8px;
+  padding:8px 14px;
+  font-size:14px;
+  font-weight:600;
+  text-decoration:none;
+  cursor:pointer;
 }
 
 .btn:hover{opacity:.9}
 
 .btn-secondary{
-background:#e5e7eb;
-color:#111827;
-}
-
-.btn-success{
-background:#16a34a;
+  background:#e5e7eb;
+  color:#111;
 }
 
 .btn-danger{
-background:#ef4444;
+  background:#ef4444;
 }
 
-/* badge */
+/* =======================
+GRID PRODUTO
+======================= */
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:12px;
+}
+
+/* =======================
+CARD PRODUTO — IMAGEM PEQUENA LATERAL
+======================= */
+
+.prod-card{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  padding:12px;
+  background:white;
+}
+
+.prod-img{
+  width:72px;
+  height:72px;
+  object-fit:cover;
+  border-radius:10px;
+  flex-shrink:0;
+}
+
+.prod-info{
+  flex:1;
+}
+
+.prod-title{
+  font-size:14px;
+  font-weight:700;
+}
+
+.prod-sku{
+  font-size:12px;
+  color:#666;
+}
+
+/* =======================
+INPUT QTD — MENOR
+======================= */
+
+.qty{
+  width:70px;
+  padding:6px;
+  font-size:13px;
+  border-radius:6px;
+  border:1px solid #d1d5db;
+}
+
+/* =======================
+CATEGORIA
+======================= */
+
+.cat-head{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+}
+
+.cat-head img{
+  width:48px;
+  height:48px;
+  object-fit:contain;
+}
+
+.cat-body{
+  display:none;
+  margin-top:12px;
+}
+
+/* =======================
+BADGE
+======================= */
 
 .badge{
-background:#ef4444;
-color:white;
-border-radius:999px;
-padding:4px 8px;
-font-size:12px;
+  background:#ef4444;
+  color:white;
+  font-size:12px;
+  padding:2px 8px;
+  border-radius:999px;
+  font-weight:700;
 }
 
-/* misc */
-
-.row-gap{display:flex;gap:10px;flex-wrap:wrap}
+/* =======================
+TOAST
+======================= */
 
 .toast{
-background:#111827;
-color:white;
-padding:10px;
-border-radius:8px;
-margin-bottom:10px;
+  background:#111;
+  color:white;
+  padding:10px 14px;
+  border-radius:10px;
+  margin-bottom:10px;
+  font-size:14px;
 }
 
-.pill{
-background:#e5e7eb;
-padding:4px 8px;
-border-radius:999px;
-font-size:12px;
+/* =======================
+TABLE (Austin)
+======================= */
+
+.table{
+  width:100%;
+  border-collapse:collapse;
 }
 
-.muted{color:#6b7280;font-size:13px}
+.table th{
+  text-align:left;
+  font-size:12px;
+  color:#666;
+  padding-bottom:8px;
+}
 
-/* mobile */
+.table td{
+  padding:10px 0;
+  border-top:1px solid #eee;
+}
 
-@media(max-width:640px){
-.grid{grid-template-columns:1fr}
-.prod-card{flex-direction:row}
+/* =======================
+MOBILE
+======================= */
+
+@media(max-width:600px){
+
+  .brand{
+    font-size:15px;
+  }
+
+  .prod-card{
+    flex-direction:row;
+  }
+
+  .prod-img{
+    width:60px;
+    height:60px;
+  }
+
 }
