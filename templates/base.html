@@ -7,8 +7,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link rel="stylesheet" href="{% static 'app.css' %}">
-<link rel="manifest" href="{% static 'manifest.json' %}">
-<meta name="theme-color" content="#c2410c">
 </head>
 
 <body>
@@ -16,18 +14,20 @@
 <header class="topbar">
   <div class="brand">Sistema de Pedidos Xodó</div>
 
+  {% if request.user.is_authenticated %}
   <div class="topbar-right">
-    {% if request.user.is_authenticated %}
-      <div class="userbox">
-        <div class="user">{{ request.user.username }}</div>
-        {% if request.user.groups.first %}
-          <div class="branch">{{ request.user.groups.first.name }}</div>
-        {% endif %}
-      </div>
 
-      <a href="{% url 'logout' %}" class="btn btn-danger">Sair</a>
-    {% endif %}
+    <div class="userbox">
+      <div class="user">{{ request.user.username }}</div>
+      {% if request.user.groups.first %}
+        <div class="branch">{{ request.user.groups.first.name }}</div>
+      {% endif %}
+    </div>
+
+    <a href="{% url 'logout' %}" class="btn btn-danger">Sair</a>
+
   </div>
+  {% endif %}
 </header>
 
 <main class="page">
@@ -40,12 +40,5 @@
 </main>
 
 <script src="{% static 'app.js' %}"></script>
-
-<script>
-if ('serviceWorker' in navigator){
- navigator.serviceWorker.register('/static/sw.js');
-}
-</script>
-
 </body>
 </html>
