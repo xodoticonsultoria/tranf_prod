@@ -16,4 +16,6 @@ urlpatterns = [
     path("austin/pedidos/<int:order_id>/iniciar-separacao/", views.a_start_picking, name="a_start_picking"),
     path("austin/pedidos/<int:order_id>/despachar/", views.a_dispatch, name="a_dispatch"),
     path("austin/pedidos/<int:order_id>/item/<int:item_id>/ok/", views.a_item_ok, name="a_item_ok"),
+    path("queimados/categorias/", views.q_categories, name="q_categories"),
+
 ]

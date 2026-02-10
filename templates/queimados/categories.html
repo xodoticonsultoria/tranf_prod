@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Categorias{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <h2>Categorias</h2>
+    <p class="muted">Escolha uma categoria para ver os produtos</p>
+
+    <div class="grid">
+
+        {% for c in categories %}
+        <a href="/queimados/produtos/?cat={{ c.id }}" style="text-decoration:none;color:inherit;">
+            <div style="display:flex;align-items:center;gap:14px;padding:14px;border-radius:10px;background:#fafafa;border:1px solid #eee;">
+
+                {% if c.image %}
+                    <img src="{{ c.image.url }}"
+                         style="width:64px;height:64px;object-fit:cover;border-radius:10px;">
+                {% else %}
+                    <div style="width:64px;height:64px;background:#eee;border-radius:10px;"></div>
+                {% endif %}
+
+                <div>
+                    <div style="font-weight:bold;font-size:18px;">
+                        {{ c.name|upper }}
+                    </div>
+                    <div class="muted">
+                        {{ c.products.count }} produto(s)
+                    </div>
+                </div>
+
+            </div>
+        </a>
+        {% endfor %}
+
+    </div>
+</div>
+
+{% endblock %}

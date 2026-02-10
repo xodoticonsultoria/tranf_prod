@@ -274,3 +274,11 @@ def a_dispatch(request, order_id):
 
     messages.success(request, f"Pedido #{order.id} despachado para Queimados.")
     return redirect("a_order_detail", order_id=order.id)
+
+
+@require_queimados
+def q_categories(request):
+    categories = Category.objects.filter(active=True)
+    return render(request, "queimados/categories.html", {
+        "categories": categories
+    })
