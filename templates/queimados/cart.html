@@ -1,16 +1,13 @@
 {% extends "base.html" %}
-
-{% block title %}Carrinho{% endblock %}
-
 {% block content %}
 
 <div class="card">
-    <h2>Carrinho (Rascunho)</h2>
+<h2>Carrinho</h2>
 
-    <div class="btn-row">
-        <a href="{% url 'q_products' %}" class="btn-sec">← Voltar produtos</a>
-        <a href="{% url 'q_orders' %}" class="btn-sec">Meus pedidos</a>
-    </div>
+<div class="row-gap">
+<a href="{% url 'q_products' %}" class="btn btn-secondary">← Produtos</a>
+<a href="{% url 'q_orders' %}" class="btn btn-secondary">Pedidos</a>
+</div>
 </div>
 
 <form method="post">
@@ -18,31 +15,25 @@
 
 <div class="card">
 
-<table class="table">
-<tr>
-    <th>Produto</th>
-    <th>Qtd</th>
-</tr>
-
 {% for item in items %}
-<tr>
-    <td>{{ item.product.name }}</td>
-    <td>
-        <input type="number"
-               name="qty_{{ item.id }}"
-               value="{{ item.qty_requested }}"
-               min="0">
-    </td>
-</tr>
+<div class="cart-row">
+  {% if item.product.image %}
+    <img src="{{ item.product.image.url }}" class="prod-img">
+  {% endif %}
+
+  <div class="cart-info">
+    <strong>{{ item.product.name }}</strong>
+    <input type="number" name="qty_{{ item.id }}" value="{{ item.qty_requested }}">
+  </div>
+</div>
 {% endfor %}
 
-</table>
-
+<div class="row-gap">
 <button class="btn">Salvar alterações</button>
-<a href="{% url 'q_submit_order' %}" class="btn">Enviar pedido</a>
-
+<a href="{% url 'q_submit_order' %}" class="btn btn-success">Enviar pedido</a>
 </div>
 
+</div>
 </form>
 
 {% endblock %}

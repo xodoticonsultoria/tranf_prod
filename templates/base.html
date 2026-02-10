@@ -2,118 +2,108 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+
 <meta charset="UTF-8">
 <title>{% block title %}Sistema{% endblock %}</title>
-
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link rel="stylesheet" href="{% static 'app.css' %}">
+
+<!-- PWA -->
 <link rel="manifest" href="{% static 'manifest.json' %}">
 <meta name="theme-color" content="#c2410c">
 
 </head>
+
 <body>
 
 <header class="topbar">
 
-    <div class="brand">
-        Sistema de Pedidos Xodó
-    </div>
+  <div class="brand">
+    Sistema de Pedidos Xodó
+  </div>
 
-    <div class="topbar-right">
+  <div class="topbar-right">
 
-        {% if request.user.is_authenticated %}
-            <span class="user">
-                👤 {{ request.user.username }}
-                {% if request.user.groups.first %}
-                    • 🏬 {{ request.user.groups.first.name }}
-                {% endif %}
-            </span>
+    {% if request.user.is_authenticated %}
 
-            {# 🔔 Badge Austin — só aparece se for grupo AUSTIN #}
-            {% if request.user.groups.first.name == "AUSTIN" %}
-                <a href="{% url 'a_orders' %}" class="badge-link">
-                    📦 Pedidos
-                    <span id="austin-badge" class="badge-red">0</span>
-                </a>
-            {% endif %}
+      <div class="userbox">
+        <div class="user">{{ request.user.username }}</div>
 
-            <a href="{% url 'logout' %}" class="btn btn-danger">Sair</a>
+        {% if request.user.groups.first %}
+          <div class="branch">
+            {{ request.user.groups.first.name }}
+          </div>
         {% endif %}
+      </div>
 
-    </div>
+      <!-- badge Austin realtime -->
+      <div id="badgeAustin" class="badge hidden">0</div>
+
+      <a href="{% url 'logout' %}" class="btn btn-danger">
+        Sair
+      </a>
+
+    {% endif %}
+
+  </div>
 
 </header>
 
+
 <main class="page">
 
-    {% for m in messages %}
-        <div class="toast">{{ m }}</div>
-    {% endfor %}
+{% for m in messages %}
+<div class="toast">{{ m }}</div>
+{% endfor %}
 
-    {% block content %}{% endblock %}
+{% block content %}{% endblock %}
+
 </main>
 
-<!-- 🔊 som pedido novo -->
-<audio id="ping-sound">
-  <source src="{% static 'ping.mp3' %}" type="audio/mpeg">
-</audio>
+
+<!-- áudio novo pedido -->
+<audio id="ding" src="{% static 'ding.mp3' %}" preload="auto"></audio>
 
 <script src="{% static 'app.js' %}"></script>
 
 <script>
-/* =========================
-   Austin badge + toast + som
-   ========================= */
+/* ---------- BADGE REALTIME AUSTIN ---------- */
 
-let lastNewestId = 0;
+function checkAustinBadge(){
 
-function showToast(msg){
-  const el = document.createElement("div");
-  el.className = "toast toast-live";
-  el.innerText = msg;
-  document.body.appendChild(el);
+ fetch("/austin/api/badge/")
+   .then(r=>r.json())
+   .then(data=>{
 
-  setTimeout(()=> el.remove(), 4000);
+      const b = document.getElementById("badgeAustin");
+      if(!b) return;
+
+      if(data.count > 0){
+          b.classList.remove("hidden");
+          b.innerText = data.count;
+
+          document.getElementById("ding").play().catch(()=>{});
+      } else {
+          b.classList.add("hidden");
+      }
+
+   }).catch(()=>{});
+
 }
 
-function pollAustin(){
-  fetch("/austin/api/poll/")
-    .then(r=>r.json())
-    .then(data=>{
-
-        const badge = document.getElementById("austin-badge");
-        if(badge){
-            badge.innerText = data.count;
-            badge.style.display = data.count > 0 ? "inline-block" : "none";
-        }
-
-        if(data.newest_id > lastNewestId){
-            if(lastNewestId !== 0){
-                showToast("📣 Novo pedido recebido!");
-                const snd = document.getElementById("ping-sound");
-                if(snd) snd.play().catch(()=>{});
-            }
-            lastNewestId = data.newest_id;
-        }
-
-    })
-    .catch(()=>{});
-}
-
-/* roda só se badge existir (ou seja: Austin logado) */
-if(document.getElementById("austin-badge")){
-    pollAustin();
-    setInterval(pollAustin, 8000);
-}
+/* só roda se usuário for Austin */
+{% if request.user.groups.first and request.user.groups.first.name == "AUSTIN" %}
+setInterval(checkAustinBadge, 8000);
+{% endif %}
 
 
-/* =========================
-   Service Worker (PWA)
-   ========================= */
+/* ---------- PWA ---------- */
+
 if ('serviceWorker' in navigator){
  navigator.serviceWorker.register('/static/sw.js');
 }
+
 </script>
 
 </body>
