@@ -1,40 +1,37 @@
 {% extends "base.html" %}
-{% block title %}Queimados - Carrinho{% endblock %}
 
 {% block content %}
+
 <div class="card">
-  <h2>Queimados • Carrinho (Rascunho)</h2>
-  <p class="muted">Ajuste as quantidades. Coloque 0 para remover.</p>
+<h2>Carrinho</h2>
 
-  <form method="post">
-    {% csrf_token %}
-    <table>
-      <thead>
-        <tr>
-          <th>Produto</th>
-          <th>Qtd pedida</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for it in items %}
-        <tr>
-          <td><strong>{{ it.product.name }}</strong> <span class="muted">({{ it.product.sku }})</span></td>
-          <td>
-            <input type="number" name="qty_{{ it.id }}" min="0" value="{{ it.qty_requested }}">
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="2">Carrinho vazio.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+<form method="post">
+{% csrf_token %}
 
-    <div class="row" style="margin-top:14px;">
-      <button class="btn btn-secondary" type="submit">Salvar alterações</button>
-      <a class="btn btn-secondary" href="/queimados/produtos/">Continuar escolhendo</a>
-      <span class="grow"></span>
-      <a class="btn btn-primary" href="/queimados/carrinho/enviar/" onclick="return confirm('Enviar pedido para Austin?');">Enviar pedido</a>
-    </div>
-  </form>
+<table>
+<tr>
+<th>Produto</th>
+<th>Qtd</th>
+</tr>
+
+{% for i in items %}
+<tr>
+<td>{{ i.product.name }}</td>
+<td>
+<input type="number" name="qty_{{ i.id }}" value="{{ i.qty_requested }}">
+</td>
+</tr>
+{% endfor %}
+
+</table>
+
+<br>
+
+<button class="btn">Salvar</button>
+<a href="{% url 'q_submit_order' %}" class="btn btn-sec">Enviar pedido</a>
+
+</form>
+
 </div>
+
 {% endblock %}

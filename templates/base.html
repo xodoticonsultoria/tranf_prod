@@ -1,171 +1,46 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>Sistema Xodó</title>
+    <meta charset="UTF-8">
+    <title>{% block title %}Sistema{% endblock %}</title>
 
-<style>
-
-body {
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:#f5f6f8;
-}
-
-/* TOPBAR */
-.topbar {
-    background:linear-gradient(90deg,#7a0f0f,#e0a11a);
-    color:white;
-    padding:14px 22px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-.topbar a {
-    color:white;
-    text-decoration:none;
-    margin-left:12px;
-    font-weight:bold;
-}
-
-.container {
-    max-width:1100px;
-    margin:auto;
-    padding:20px;
-}
-
-.card {
-    background:white;
-    padding:18px;
-    border-radius:14px;
-    box-shadow:0 2px 6px rgba(0,0,0,.06);
-}
-
-/* BADGE CARRINHO */
-
-.cart-btn {
-    position:relative;
-}
-
-.badge {
-    position:absolute;
-    top:-6px;
-    right:-10px;
-    background:#22c55e;
-    color:white;
-    border-radius:999px;
-    padding:2px 6px;
-    font-size:11px;
-}
-
-/* CATEGORIAS */
-
-.cat-card {
-    border:1px solid #eee;
-    border-radius:12px;
-    margin-bottom:14px;
-    background:white;
-}
-
-.cat-header {
-    display:flex;
-    gap:12px;
-    align-items:center;
-    padding:12px;
-    cursor:pointer;
-}
-
-.cat-img {
-    width:56px;
-    height:56px;
-    object-fit:cover;
-    border-radius:10px;
-}
-
-/* animação abrir */
-
-.cat-products {
-    max-height:0;
-    overflow:hidden;
-    transition:max-height .35s ease;
-}
-
-.cat-products.open {
-    max-height:1200px;
-}
-
-/* GRID PRODUTOS */
-
-.prod-grid {
-    display:grid;
-    grid-template-columns: repeat(auto-fill,minmax(160px,1fr));
-    gap:12px;
-    padding:12px;
-}
-
-.prod-card {
-    background:#fafafa;
-    border-radius:10px;
-    padding:10px;
-    text-align:center;
-    border:1px solid #eee;
-}
-
-.prod-img {
-    width:100%;
-    height:110px;
-    object-fit:cover;
-    border-radius:8px;
-    margin-bottom:6px;
-}
-
-.btn {
-    background:#2563eb;
-    color:white;
-    border:none;
-    padding:8px;
-    border-radius:8px;
-    cursor:pointer;
-    width:100%;
-}
-
-/* TABLET */
-
-@media (max-width: 900px){
-    .prod-grid {
-        grid-template-columns: repeat(2,1fr);
-    }
-}
-
-</style>
+    <link rel="stylesheet" href="{% static 'app.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-
 <body>
 
-<div class="topbar">
-    <div><strong>Sistema de Pedidos Prontos Xodó</strong></div>
+<header class="topbar">
+    <div class="topbar-left">
+        Sistema de Pedidos Xodó
+    </div>
 
-    <div>
-        {% if user.is_authenticated %}
-            Olá, {{ user.username }}
-            <a href="/admin/">Admin</a>
+    <div class="topbar-right">
+        {% if request.user.is_authenticated %}
+            <span class="user">Olá, {{ request.user.username }}</span>
 
-            <a href="/queimados/carrinho/" class="cart-btn">
-                🛒
-                <span class="badge">
-                    {{ cart.items.count|default:0 }}
-                </span>
-            </a>
+            <a href="/admin/" class="btn-mini">Admin</a>
 
-            <a href="/logout/">Sair</a>
+            <a href="{% url 'logout' %}" class="btn-mini btn-danger">Sair</a>
         {% endif %}
     </div>
-</div>
+</header>
 
-<div class="container">
-{% block content %}{% endblock %}
-</div>
+<main class="page">
+    {% if messages %}
+        {% for m in messages %}
+            <div class="alert">{{ m }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<script>
+function toggleCat(id){
+  const el = document.getElementById("cat-body-"+id);
+  el.classList.toggle("open");
+}
+</script>
 
 </body>
 </html>
