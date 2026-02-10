@@ -9,55 +9,34 @@
 <link rel="stylesheet" href="{% static 'app.css' %}">
 <link rel="manifest" href="{% static 'manifest.json' %}">
 <meta name="theme-color" content="#c2410c">
-
 </head>
+
 <body>
 
 <header class="topbar">
-
-  <div class="brand">
-    Sistema de Pedidos Xodó
-  </div>
+  <div class="brand">Sistema de Pedidos Xodó</div>
 
   <div class="topbar-right">
-
     {% if request.user.is_authenticated %}
-
       <div class="userbox">
-        <div class="user">
-          {{ request.user.username }}
-        </div>
-
+        <div class="user">{{ request.user.username }}</div>
         {% if request.user.groups.first %}
-          <div class="branch">
-            {{ request.user.groups.first.name }}
-          </div>
+          <div class="branch">{{ request.user.groups.first.name }}</div>
         {% endif %}
       </div>
 
-      <!-- badge Austin realtime -->
-      <div id="badgeAustin" class="badge" style="display:none;">0</div>
-
-      <a href="{% url 'logout' %}" class="btn btn-danger">
-        Sair
-      </a>
-
+      <a href="{% url 'logout' %}" class="btn btn-danger">Sair</a>
     {% endif %}
-
   </div>
-
 </header>
 
 <main class="page">
 
-  {% if messages %}
-    {% for m in messages %}
-      <div class="toast">{{ m }}</div>
-    {% endfor %}
-  {% endif %}
+{% for m in messages %}
+<div class="toast">{{ m }}</div>
+{% endfor %}
 
-  {% block content %}{% endblock %}
-
+{% block content %}{% endblock %}
 </main>
 
 <script src="{% static 'app.js' %}"></script>

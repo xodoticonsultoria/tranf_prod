@@ -1,11 +1,8 @@
 {
-"name":"Pedidos Xodó",
-"short_name":"Xodó",
-"display":"standalone",
-"start_url":"/",
-"background_color":"#ea580c",
-"theme_color":"#ea580c",
-"icons":[
-{"src":"/static/icon.png","sizes":"192x192","type":"image/png"}
-]
+ "name":"Pedidos Xodó",
+ "short_name":"Pedidos",
+ "start_url":"/",
+ "display":"standalone",
+ "background_color":"#fff7ed",
+ "theme_color":"#ea580c"
 }
