@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import queimados_categorias
 
 urlpatterns = [
     # Queimados
@@ -9,6 +10,8 @@ urlpatterns = [
     path("queimados/pedidos/", views.q_orders, name="q_orders"),
     path("queimados/pedidos/<int:order_id>/", views.q_order_detail, name="q_order_detail"),
     path("queimados/pedidos/<int:order_id>/receber/", views.q_receive_order, name="q_receive_order"),
+    path("queimados/", queimados_categorias),
+
 
     # Austin
     path("austin/pedidos/", views.a_orders, name="a_orders"),

@@ -1,39 +1,55 @@
 {% extends "base.html" %}
-{% block title %}Categorias{% endblock %}
-
 {% block content %}
 
 <div class="card">
-    <h2>Categorias</h2>
-    <p class="muted">Escolha uma categoria para ver os produtos</p>
+<h2>Categorias</h2>
 
-    <div class="grid">
+{% for c in categories %}
+<div class="cat-card">
 
-        {% for c in categories %}
-        <a href="/queimados/produtos/?cat={{ c.id }}" style="text-decoration:none;color:inherit;">
-            <div style="display:flex;align-items:center;gap:14px;padding:14px;border-radius:10px;background:#fafafa;border:1px solid #eee;">
+    <div class="cat-header" onclick="toggleCat({{ c.id }})">
+        {% if c.image %}
+            <img src="{{ c.image.url }}" class="cat-img">
+        {% endif %}
 
-                {% if c.image %}
-                    <img src="{{ c.image.url }}"
-                         style="width:64px;height:64px;object-fit:cover;border-radius:10px;">
-                {% else %}
-                    <div style="width:64px;height:64px;background:#eee;border-radius:10px;"></div>
-                {% endif %}
+        <div>
+            <strong>{{ c.name|upper }}</strong>
+            <div>{{ c.products.count }} produto(s)</div>
+        </div>
+    </div>
 
-                <div>
-                    <div style="font-weight:bold;font-size:18px;">
-                        {{ c.name|upper }}
-                    </div>
-                    <div class="muted">
-                        {{ c.products.count }} produto(s)
-                    </div>
-                </div>
+    <div id="cat-{{ c.id }}" class="cat-products">
+        <div class="prod-grid">
 
-            </div>
-        </a>
+        {% for p in c.products.all %}
+        <form method="post" class="prod-card">
+            {% csrf_token %}
+            <input type="hidden" name="product_id" value="{{ p.id }}">
+
+            {% if p.image %}
+                <img src="{{ p.image.url }}" class="prod-img">
+            {% endif %}
+
+            <div>{{ p.name }}</div>
+
+            <input type="number" name="qty" value="1" min="1">
+
+            <button class="btn">Adicionar</button>
+        </form>
         {% endfor %}
 
+        </div>
     </div>
+
 </div>
+{% endfor %}
+
+</div>
+
+<script>
+function toggleCat(id){
+  document.getElementById("cat-"+id).classList.toggle("open")
+}
+</script>
 
 {% endblock %}

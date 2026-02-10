@@ -9,6 +9,8 @@ from .models import Category, Product, TransferOrder, TransferOrderItem, OrderSt
 from .permissions import require_austin, require_queimados
 
 
+
+
 # --------------------
 # Helpers
 # --------------------
@@ -276,9 +278,12 @@ def a_dispatch(request, order_id):
     return redirect("a_order_detail", order_id=order.id)
 
 
-@require_queimados
-def q_categories(request):
-    categories = Category.objects.filter(active=True)
-    return render(request, "queimados/categories.html", {
-        "categories": categories
-    })
+@login_required
+def queimados_categorias(request):
+    categories = Category.objects.filter(active=True).prefetch_related("products")
+
+    return render(
+        request,
+        "queimados/categories.html",
+        {"categories": categories},
+    )

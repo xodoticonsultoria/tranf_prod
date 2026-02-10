@@ -1,102 +1,170 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <title>{% block title %}Sistema{% endblock %}</title>
+<meta charset="UTF-8">
+<title>Sistema Xodó</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f6f8;
-        }
+<style>
 
-        /* HEADER */
-        .topbar {
-            background: linear-gradient(90deg, #8b0000, #d97706);
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+body {
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#f5f6f8;
+}
 
-        .topbar-title {
-            font-weight: bold;
-            font-size: 14px;
-        }
+/* TOPBAR */
+.topbar {
+    background:linear-gradient(90deg,#7a0f0f,#e0a11a);
+    color:white;
+    padding:14px 22px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
 
-        .topbar-right {
-            font-size: 13px;
-        }
+.topbar a {
+    color:white;
+    text-decoration:none;
+    margin-left:12px;
+    font-weight:bold;
+}
 
-        .topbar-right a {
-            color: white;
-            text-decoration: none;
-            margin-left: 12px;
-            background: #dc2626;
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
+.container {
+    max-width:1100px;
+    margin:auto;
+    padding:20px;
+}
 
-        /* CONTENT */
-        .container {
-            max-width: 1100px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
+.card {
+    background:white;
+    padding:18px;
+    border-radius:14px;
+    box-shadow:0 2px 6px rgba(0,0,0,.06);
+}
 
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
+/* BADGE CARRINHO */
 
-        .btn {
-            background: #2563eb;
-            color: white;
-            padding: 8px 14px;
-            border-radius: 8px;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-        }
+.cart-btn {
+    position:relative;
+}
 
-        .btn-secondary {
-            background: #e5e7eb;
-            color: #111;
-        }
+.badge {
+    position:absolute;
+    top:-6px;
+    right:-10px;
+    background:#22c55e;
+    color:white;
+    border-radius:999px;
+    padding:2px 6px;
+    font-size:11px;
+}
 
-        .muted {
-            color: #6b7280;
-            font-size: 14px;
-        }
+/* CATEGORIAS */
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 16px;
-        }
+.cat-card {
+    border:1px solid #eee;
+    border-radius:12px;
+    margin-bottom:14px;
+    background:white;
+}
 
-    </style>
+.cat-header {
+    display:flex;
+    gap:12px;
+    align-items:center;
+    padding:12px;
+    cursor:pointer;
+}
+
+.cat-img {
+    width:56px;
+    height:56px;
+    object-fit:cover;
+    border-radius:10px;
+}
+
+/* animação abrir */
+
+.cat-products {
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .35s ease;
+}
+
+.cat-products.open {
+    max-height:1200px;
+}
+
+/* GRID PRODUTOS */
+
+.prod-grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fill,minmax(160px,1fr));
+    gap:12px;
+    padding:12px;
+}
+
+.prod-card {
+    background:#fafafa;
+    border-radius:10px;
+    padding:10px;
+    text-align:center;
+    border:1px solid #eee;
+}
+
+.prod-img {
+    width:100%;
+    height:110px;
+    object-fit:cover;
+    border-radius:8px;
+    margin-bottom:6px;
+}
+
+.btn {
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:8px;
+    border-radius:8px;
+    cursor:pointer;
+    width:100%;
+}
+
+/* TABLET */
+
+@media (max-width: 900px){
+    .prod-grid {
+        grid-template-columns: repeat(2,1fr);
+    }
+}
+
+</style>
 </head>
 
 <body>
 
 <div class="topbar">
-    <div class="topbar-title">
-        🍗 Sistema de Pedidos Prontos Xodó
-    </div>
+    <div><strong>Sistema de Pedidos Prontos Xodó</strong></div>
 
-    <div class="topbar-right">
-        Olá, {{ request.user.username }}
-        <a href="/logout/">Sair</a>
+    <div>
+        {% if user.is_authenticated %}
+            Olá, {{ user.username }}
+            <a href="/admin/">Admin</a>
+
+            <a href="/queimados/carrinho/" class="cart-btn">
+                🛒
+                <span class="badge">
+                    {{ cart.items.count|default:0 }}
+                </span>
+            </a>
+
+            <a href="/logout/">Sair</a>
+        {% endif %}
     </div>
 </div>
 
 <div class="container">
-    {% block content %}{% endblock %}
+{% block content %}{% endblock %}
 </div>
 
 </body>
