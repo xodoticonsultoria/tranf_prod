@@ -203,18 +203,16 @@ def q_receive_order(request, order_id):
 # --------------------
 @require_austin
 def a_orders(request):
-    orders = TransferOrder.objects.exclude(
-        status=OrderStatus.DRAFT
-    ).order_by("-created_at")
+    orders = (
+        TransferOrder.objects
+        .exclude(status=OrderStatus.DRAFT)
+        .order_by("-created_at")
+    )
 
-    # DEBUG TEMP — imprime dados crus
-    from django.http import HttpResponse
+    return render(request, "austin/orders.html", {
+        "orders": orders
+    })
 
-    txt = []
-    for o in orders:
-        txt.append(f"{o.id} | {o.status} | {o.created_at}")
-
-    return HttpResponse("<br>".join(txt))
 
 
 
