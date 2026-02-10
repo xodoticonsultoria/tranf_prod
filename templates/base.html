@@ -2,19 +2,15 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-
 <meta charset="UTF-8">
 <title>{% block title %}Sistema{% endblock %}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link rel="stylesheet" href="{% static 'app.css' %}">
-
-<!-- PWA -->
 <link rel="manifest" href="{% static 'manifest.json' %}">
 <meta name="theme-color" content="#c2410c">
 
 </head>
-
 <body>
 
 <header class="topbar">
@@ -23,18 +19,24 @@
     Sistema de Pedidos Xodó
   </div>
 
-    <div class="topbar-right">
+  <div class="topbar-right">
+
+    {% if request.user.is_authenticated %}
+
       <div class="userbox">
-        <div class="user">{{ request.user.username }}</div>
-        <div class="branch">{{ request.user.groups.first.name }}</div>
+        <div class="user">
+          {{ request.user.username }}
+        </div>
+
+        {% if request.user.groups.first %}
+          <div class="branch">
+            {{ request.user.groups.first.name }}
+          </div>
+        {% endif %}
       </div>
 
-      <a href="{% url 'logout' %}" class="btn btn-danger">Sair</a>
-    </div>
-
-
       <!-- badge Austin realtime -->
-      <div id="badgeAustin" class="badge hidden">0</div>
+      <div id="badgeAustin" class="badge" style="display:none;">0</div>
 
       <a href="{% url 'logout' %}" class="btn btn-danger">
         Sair
@@ -46,60 +48,24 @@
 
 </header>
 
-
 <main class="page">
 
-{% for m in messages %}
-<div class="toast">{{ m }}</div>
-{% endfor %}
+  {% if messages %}
+    {% for m in messages %}
+      <div class="toast">{{ m }}</div>
+    {% endfor %}
+  {% endif %}
 
-{% block content %}{% endblock %}
+  {% block content %}{% endblock %}
 
 </main>
-
-
-<!-- áudio novo pedido -->
-<audio id="ding" src="{% static 'ding.mp3' %}" preload="auto"></audio>
 
 <script src="{% static 'app.js' %}"></script>
 
 <script>
-/* ---------- BADGE REALTIME AUSTIN ---------- */
-
-function checkAustinBadge(){
-
- fetch("/austin/api/badge/")
-   .then(r=>r.json())
-   .then(data=>{
-
-      const b = document.getElementById("badgeAustin");
-      if(!b) return;
-
-      if(data.count > 0){
-          b.classList.remove("hidden");
-          b.innerText = data.count;
-
-          document.getElementById("ding").play().catch(()=>{});
-      } else {
-          b.classList.add("hidden");
-      }
-
-   }).catch(()=>{});
-
-}
-
-/* só roda se usuário for Austin */
-{% if request.user.groups.first and request.user.groups.first.name == "AUSTIN" %}
-setInterval(checkAustinBadge, 8000);
-{% endif %}
-
-
-/* ---------- PWA ---------- */
-
 if ('serviceWorker' in navigator){
  navigator.serviceWorker.register('/static/sw.js');
 }
-
 </script>
 
 </body>
