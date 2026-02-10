@@ -126,9 +126,12 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    }
+    },
 }
 
 # --------------------
@@ -149,7 +152,7 @@ CLOUDINARY_STORAGE = {
     "API_SECRET": os.getenv("CLOUDINARY_API_SECRET"),
 }
 
-DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+
 
 
 cloudinary.config(
