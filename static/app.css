@@ -384,4 +384,7 @@ input::-webkit-inner-spin-button{
     justify-content:flex-end;
   }
 }
+body{
+  outline: 6px solid red;
+}
 
