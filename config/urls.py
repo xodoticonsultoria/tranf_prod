@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from core.views import home
+from core.views import logout_view
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -14,7 +16,8 @@ urlpatterns = [
         ),
         name="login",
     ),
-    path("logout/", auth_views.LogoutView.as_view(), name="logout"),
+    path("logout/", logout_view, name="logout"),
+
 
     # 👇 HOME
     path("", home, name="home"),
