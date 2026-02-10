@@ -1,72 +1,53 @@
 {% extends "base.html" %}
-{% load static %}
-
-{% block title %}Produtos{% endblock %}
-
 {% block content %}
 
 <div class="card">
-    <h2>Queimados • Produtos</h2>
-    <p>Clique na categoria para abrir.</p>
+<h2>Produtos</h2>
 </div>
 
-<div class="card cart-box">
-    🛒 Carrinho
-    <span class="badge">{{ cart.items.count }}</span>
-
-    <div class="btn-row">
-        <a href="{% url 'q_cart' %}" class="btn">Abrir carrinho</a>
-        <a href="{% url 'q_orders' %}" class="btn-sec">Meus pedidos</a>
-    </div>
-</div>
+<div class="grid">
 
 {% for cat in categories %}
 <div class="card">
 
-    <div class="cat-head" onclick="toggleCat({{ cat.id }})">
+<div class="cat-head" onclick="toggleCat({{cat.id}})">
+{% if cat.image %}
+<img src="{{cat.image.url}}">
+{% endif %}
+<div>
+<strong>{{cat.name}}</strong><br>
+{{cat.products.count}} produto(s)
+</div>
+</div>
 
-        {% if cat.image and cat.image.name %}
-            <img src="{{ cat.image.url }}" width="48">
-        {% endif %}
+<div id="cat-body-{{cat.id}}" class="cat-body">
 
-        <div>
-            <strong>{{ cat.name }}</strong><br>
-            {{ cat.products.count }} produto(s)
-        </div>
+{% for p in cat.products.all %}
+{% if p.active %}
+<form method="post" action="{% url 'q_products' %}" class="prod-card">
+{% csrf_token %}
+<input type="hidden" name="product_id" value="{{p.id}}">
 
-    </div>
+{% if p.image %}
+<img src="{{p.image.url}}" class="prod-img">
+{% endif %}
 
-    <div id="cat-body-{{ cat.id }}" class="cat-body">
+<div class="prod-info">
+<strong>{{p.name}}</strong><br>
+SKU {{p.sku}}<br>
 
-        <div class="grid">
+<input type="number" name="qty" value="1" min="1">
 
-        {% for p in cat.products.all %}
-        {% if p.active %}
-
-        <form method="post" action="{% url 'q_products' %}" class="prod-card">
-            {% csrf_token %}
-            <input type="hidden" name="product_id" value="{{ p.id }}">
-
-            {% if p.image and p.image.name %}
-                <img src="{{ p.image.url }}" class="prod-img">
-            {% endif %}
-
-            <strong>{{ p.name }}</strong>
-            <small>SKU {{ p.sku }}</small>
-
-            <input type="number" name="qty" value="1" min="1">
-
-            <button class="btn">Adicionar</button>
-        </form>
-
-        {% endif %}
-        {% endfor %}
-
-        </div>
-
-    </div>
+<button class="btn">Adicionar</button>
+</div>
+</form>
+{% endif %}
+{% endfor %}
 
 </div>
+</div>
 {% endfor %}
+
+</div>
 
 {% endblock %}

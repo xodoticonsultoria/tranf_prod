@@ -8,6 +8,9 @@ from django.utils import timezone
 from .models import Category, Product, TransferOrder, TransferOrderItem, OrderStatus, Branch
 from .permissions import require_austin, require_queimados
 
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
+
 
 
 
@@ -287,3 +290,26 @@ def queimados_categories(request):
         "queimados/categories.html",
         {"categories": categories},
     )
+
+@require_austin
+@require_GET
+def austin_badge(request):
+    # "Novos" = pedidos SUBMITTED (aguardando iniciar separação)
+    count = TransferOrder.objects.filter(status=OrderStatus.SUBMITTED).count()
+    return JsonResponse({"count": count})
+
+
+@require_austin
+@require_GET
+def austin_poll(request):
+    """
+    Retorna:
+      - count: total de SUBMITTED
+      - newest_id: maior id entre SUBMITTED (pra detectar novidade)
+    O front guarda o last_id e toca som/mostra toast quando aumenta.
+    """
+    qs = TransferOrder.objects.filter(status=OrderStatus.SUBMITTED)
+    count = qs.count()
+    newest = qs.order_by("-id").first()
+    newest_id = newest.id if newest else 0
+    return JsonResponse({"count": count, "newest_id": newest_id})

@@ -10,7 +10,7 @@ urlpatterns = [
     path("queimados/pedidos/<int:order_id>/", views.q_order_detail, name="q_order_detail"),
     path("queimados/pedidos/<int:order_id>/receber/", views.q_receive_order, name="q_receive_order"),
 
-    # 🔥 categorias (layout novo)
+    # categorias (layout novo)
     path("queimados/categorias/", views.queimados_categories, name="q_categories"),
 
     # Austin
@@ -19,4 +19,8 @@ urlpatterns = [
     path("austin/pedidos/<int:order_id>/iniciar-separacao/", views.a_start_picking, name="a_start_picking"),
     path("austin/pedidos/<int:order_id>/despachar/", views.a_dispatch, name="a_dispatch"),
     path("austin/pedidos/<int:order_id>/item/<int:item_id>/ok/", views.a_item_ok, name="a_item_ok"),
+
+    # ✅ API (badge + toast/som) - sem migrations
+    path("austin/api/badge/", views.austin_badge, name="austin_badge"),
+    path("austin/api/poll/", views.austin_poll, name="austin_poll"),
 ]

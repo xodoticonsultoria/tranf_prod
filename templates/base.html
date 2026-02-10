@@ -2,49 +2,117 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <title>{% block title %}Sistema{% endblock %}</title>
+<meta charset="UTF-8">
+<title>{% block title %}Sistema{% endblock %}</title>
 
-    <link rel="stylesheet" href="{% static 'app.css' %}">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="{% static 'app.css' %}">
+<link rel="manifest" href="{% static 'manifest.json' %}">
+<meta name="theme-color" content="#c2410c">
+
 </head>
 <body>
 
 <header class="topbar">
-    <div class="topbar-left">
+
+    <div class="brand">
         Sistema de Pedidos Xodó
     </div>
 
     <div class="topbar-right">
-        {% if request.user.is_authenticated %}
-            <span class="user">Olá, {{ request.user.username }}</span>
 
-            {% if request.user.is_staff %}
-                <a href="/admin/" class="btn-mini">Admin</a>
+        {% if request.user.is_authenticated %}
+            <span class="user">
+                👤 {{ request.user.username }}
+                {% if request.user.groups.first %}
+                    • 🏬 {{ request.user.groups.first.name }}
+                {% endif %}
+            </span>
+
+            {# 🔔 Badge Austin — só aparece se for grupo AUSTIN #}
+            {% if request.user.groups.first.name == "AUSTIN" %}
+                <a href="{% url 'a_orders' %}" class="badge-link">
+                    📦 Pedidos
+                    <span id="austin-badge" class="badge-red">0</span>
+                </a>
             {% endif %}
 
-            <a href="{% url 'logout' %}" class="btn-mini btn-danger">Sair</a>
+            <a href="{% url 'logout' %}" class="btn btn-danger">Sair</a>
         {% endif %}
+
     </div>
+
 </header>
 
 <main class="page">
 
-    {% if messages %}
-        {% for m in messages %}
-            <div class="alert">{{ m }}</div>
-        {% endfor %}
-    {% endif %}
+    {% for m in messages %}
+        <div class="toast">{{ m }}</div>
+    {% endfor %}
 
     {% block content %}{% endblock %}
-
 </main>
 
+<!-- 🔊 som pedido novo -->
+<audio id="ping-sound">
+  <source src="{% static 'ping.mp3' %}" type="audio/mpeg">
+</audio>
+
+<script src="{% static 'app.js' %}"></script>
+
 <script>
-function toggleCat(id){
-    const el = document.getElementById("cat-body-"+id);
-    if(!el) return;
-    el.classList.toggle("open");
+/* =========================
+   Austin badge + toast + som
+   ========================= */
+
+let lastNewestId = 0;
+
+function showToast(msg){
+  const el = document.createElement("div");
+  el.className = "toast toast-live";
+  el.innerText = msg;
+  document.body.appendChild(el);
+
+  setTimeout(()=> el.remove(), 4000);
+}
+
+function pollAustin(){
+  fetch("/austin/api/poll/")
+    .then(r=>r.json())
+    .then(data=>{
+
+        const badge = document.getElementById("austin-badge");
+        if(badge){
+            badge.innerText = data.count;
+            badge.style.display = data.count > 0 ? "inline-block" : "none";
+        }
+
+        if(data.newest_id > lastNewestId){
+            if(lastNewestId !== 0){
+                showToast("📣 Novo pedido recebido!");
+                const snd = document.getElementById("ping-sound");
+                if(snd) snd.play().catch(()=>{});
+            }
+            lastNewestId = data.newest_id;
+        }
+
+    })
+    .catch(()=>{});
+}
+
+/* roda só se badge existir (ou seja: Austin logado) */
+if(document.getElementById("austin-badge")){
+    pollAustin();
+    setInterval(pollAustin, 8000);
+}
+
+
+/* =========================
+   Service Worker (PWA)
+   ========================= */
+if ('serviceWorker' in navigator){
+ navigator.serviceWorker.register('/static/sw.js');
 }
 </script>
 
