@@ -1,37 +1,48 @@
 {% extends "base.html" %}
 
+{% block title %}Carrinho{% endblock %}
+
 {% block content %}
 
 <div class="card">
-<h2>Carrinho</h2>
+    <h2>Carrinho (Rascunho)</h2>
+
+    <div class="btn-row">
+        <a href="{% url 'q_products' %}" class="btn-sec">← Voltar produtos</a>
+        <a href="{% url 'q_orders' %}" class="btn-sec">Meus pedidos</a>
+    </div>
+</div>
 
 <form method="post">
 {% csrf_token %}
 
-<table>
+<div class="card">
+
+<table class="table">
 <tr>
-<th>Produto</th>
-<th>Qtd</th>
+    <th>Produto</th>
+    <th>Qtd</th>
 </tr>
 
-{% for i in items %}
+{% for item in items %}
 <tr>
-<td>{{ i.product.name }}</td>
-<td>
-<input type="number" name="qty_{{ i.id }}" value="{{ i.qty_requested }}">
-</td>
+    <td>{{ item.product.name }}</td>
+    <td>
+        <input type="number"
+               name="qty_{{ item.id }}"
+               value="{{ item.qty_requested }}"
+               min="0">
+    </td>
 </tr>
 {% endfor %}
 
 </table>
 
-<br>
-
-<button class="btn">Salvar</button>
-<a href="{% url 'q_submit_order' %}" class="btn btn-sec">Enviar pedido</a>
-
-</form>
+<button class="btn">Salvar alterações</button>
+<a href="{% url 'q_submit_order' %}" class="btn">Enviar pedido</a>
 
 </div>
+
+</form>
 
 {% endblock %}

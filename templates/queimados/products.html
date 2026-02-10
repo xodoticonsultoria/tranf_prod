@@ -14,8 +14,10 @@
     🛒 Carrinho
     <span class="badge">{{ cart.items.count }}</span>
 
-    <br><br>
-    <a href="{% url 'q_cart' %}" class="btn-sec btn">Abrir carrinho</a>
+    <div class="btn-row">
+        <a href="{% url 'q_cart' %}" class="btn">Abrir carrinho</a>
+        <a href="{% url 'q_orders' %}" class="btn-sec">Meus pedidos</a>
+    </div>
 </div>
 
 {% for cat in categories %}
@@ -34,7 +36,7 @@
 
     </div>
 
-    <div id="cat-body-{{ cat.id }}" class="cat-body" style="display:none;">
+    <div id="cat-body-{{ cat.id }}" class="cat-body">
 
         <div class="grid">
 
@@ -49,8 +51,8 @@
                 <img src="{{ p.image.url }}" class="prod-img">
             {% endif %}
 
-            <strong>{{ p.name }}</strong><br>
-            SKU {{ p.sku }}<br><br>
+            <strong>{{ p.name }}</strong>
+            <small>SKU {{ p.sku }}</small>
 
             <input type="number" name="qty" value="1" min="1">
 
@@ -66,13 +68,5 @@
 
 </div>
 {% endfor %}
-
-<script>
-function toggleCat(id){
-    const el = document.getElementById("cat-body-"+id);
-    if(!el) return;
-    el.style.display = el.style.display === "block" ? "none" : "block";
-}
-</script>
 
 {% endblock %}

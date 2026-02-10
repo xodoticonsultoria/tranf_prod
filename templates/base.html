@@ -18,7 +18,11 @@
     <div class="topbar-right">
         {% if request.user.is_authenticated %}
             <span class="user">Olá, {{ request.user.username }}</span>
-            <a href="/admin/" class="btn-mini">Admin</a>
+
+            {% if request.user.is_staff %}
+                <a href="/admin/" class="btn-mini">Admin</a>
+            {% endif %}
+
             <a href="{% url 'logout' %}" class="btn-mini btn-danger">Sair</a>
         {% endif %}
     </div>
@@ -37,15 +41,10 @@
 </main>
 
 <script>
-function checkBadge(){
-    const badgeUrl = "/austin/api/badge/";
-
-    fetch(badgeUrl)
-        .then(r => r.json())
-        .then(data => {
-            console.log("badge:", data);
-        })
-        .catch(err => console.log("badge error", err));
+function toggleCat(id){
+    const el = document.getElementById("cat-body-"+id);
+    if(!el) return;
+    el.classList.toggle("open");
 }
 </script>
 
