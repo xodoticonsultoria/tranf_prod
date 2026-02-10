@@ -157,8 +157,14 @@ def q_receive_order(request, order_id):
 # --------------------
 @require_austin
 def a_orders(request):
-    orders = TransferOrder.objects.exclude(status=OrderStatus.DRAFT).order_by("-created_at")
-    return render(request, "austin/orders.html", {"orders": orders})
+    orders = TransferOrder.objects.exclude(
+        status=OrderStatus.DRAFT
+    ).order_by("-created_at")
+
+    return render(request, "austin/orders.html", {
+        "orders": []   # <- vazio
+    })
+
 
 @require_austin
 def a_order_detail(request, order_id):
