@@ -203,19 +203,19 @@ def q_receive_order(request, order_id):
 # --------------------
 @require_austin
 def a_orders(request):
-    try:
-        orders = (
-            TransferOrder.objects
-            .exclude(status=OrderStatus.DRAFT)
-            .order_by("-created_at")
-        )
+    orders = TransferOrder.objects.exclude(
+        status=OrderStatus.DRAFT
+    ).order_by("-created_at")
 
-        return render(request, "austin/orders.html", {"orders": orders})
+    # DEBUG TEMP — imprime dados crus
+    from django.http import HttpResponse
 
-    except Exception as e:
-        print("🔥 ERRO A_ORDERS 🔥", file=sys.stderr)
-        traceback.print_exc()
-        raise
+    txt = []
+    for o in orders:
+        txt.append(f"{o.id} | {o.status} | {o.created_at}")
+
+    return HttpResponse("<br>".join(txt))
+
 
 
 @require_austin
