@@ -279,7 +279,7 @@ def a_dispatch(request, order_id):
 
 
 @login_required
-def queimados_categorias(request):
+def queimados_categories(request):
     categories = Category.objects.filter(active=True).prefetch_related("products")
 
     return render(
