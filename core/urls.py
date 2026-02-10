@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import queimados_categorias
+from .views import queimados_categories
 
 urlpatterns = [
     # Queimados
@@ -10,7 +10,7 @@ urlpatterns = [
     path("queimados/pedidos/", views.q_orders, name="q_orders"),
     path("queimados/pedidos/<int:order_id>/", views.q_order_detail, name="q_order_detail"),
     path("queimados/pedidos/<int:order_id>/receber/", views.q_receive_order, name="q_receive_order"),
-    path("queimados/", queimados_categorias),
+    path("queimados/", queimados_categories),
 
 
     # Austin
@@ -19,6 +19,7 @@ urlpatterns = [
     path("austin/pedidos/<int:order_id>/iniciar-separacao/", views.a_start_picking, name="a_start_picking"),
     path("austin/pedidos/<int:order_id>/despachar/", views.a_dispatch, name="a_dispatch"),
     path("austin/pedidos/<int:order_id>/item/<int:item_id>/ok/", views.a_item_ok, name="a_item_ok"),
-    path("queimados/categorias/", views.q_categories, name="q_categories"),
+    path("queimados/categorias/", queimados_categories, name="q_categories"),
+
 
 ]
