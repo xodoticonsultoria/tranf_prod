@@ -13,12 +13,25 @@ DEBUG = os.getenv("DEBUG", "0") == "1"
 # --------------------
 # Hosts / CSRF
 # --------------------
-if DEBUG:
-    ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
-    CSRF_TRUSTED_ORIGINS = []
+# --------------------
+# Hosts / CSRF
+# --------------------
+DEBUG = os.getenv("DEBUG", "0") == "1"
+
+allowed_hosts_env = os.getenv("ALLOWED_HOSTS", "").strip()
+
+if allowed_hosts_env:
+    ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_env.split(",") if h.strip()]
 else:
-    ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
-    CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+    # fallback seguro
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "tranf-prod.onrender.com"]
+
+csrf_env = os.getenv("CSRF_TRUSTED_ORIGINS", "").strip()
+if csrf_env:
+    CSRF_TRUSTED_ORIGINS = [o.strip() for o in csrf_env.split(",") if o.strip()]
+else:
+    CSRF_TRUSTED_ORIGINS = ["https://tranf-prod.onrender.com"]
+
 
 # --------------------
 # Apps
