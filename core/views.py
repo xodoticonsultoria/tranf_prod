@@ -8,6 +8,9 @@ from django.utils import timezone
 from .models import Product, TransferOrder, TransferOrderItem, OrderStatus, Branch
 from .permissions import require_austin, require_queimados
 
+import traceback
+import sys
+
 
 # --------------------
 # Helpers
@@ -200,13 +203,19 @@ def q_receive_order(request, order_id):
 # --------------------
 @require_austin
 def a_orders(request):
-    orders = (
-        TransferOrder.objects
-        .exclude(status=OrderStatus.DRAFT)
-        .order_by("-created_at")
-    )
+    try:
+        orders = (
+            TransferOrder.objects
+            .exclude(status=OrderStatus.DRAFT)
+            .order_by("-created_at")
+        )
 
-    return render(request, "austin/orders.html", {"orders": orders})
+        return render(request, "austin/orders.html", {"orders": orders})
+
+    except Exception as e:
+        print("🔥 ERRO A_ORDERS 🔥", file=sys.stderr)
+        traceback.print_exc()
+        raise
 
 
 @require_austin
