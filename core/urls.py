@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from django.urls import path
 from . import views
 
@@ -23,4 +24,7 @@ urlpatterns = [
     # ✅ API (badge + toast/som) - sem migrations
     path("austin/api/badge/", views.austin_badge, name="austin_badge"),
     path("austin/api/poll/", views.austin_poll, name="austin_poll"),
+
+    path("teste/", lambda r: render(r, "test.html")),
+
 ]
