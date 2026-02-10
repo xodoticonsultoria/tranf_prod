@@ -1,3 +1,5 @@
+/* ========= BASE ========= */
+
 body{
   margin:0;
   font-family: Inter, system-ui, Arial;
@@ -8,10 +10,10 @@ body{
 .page{
   max-width:1100px;
   margin:auto;
-  padding:20px;
+  padding:22px;
 }
 
-/* NAVBAR */
+/* ========= NAV ========= */
 
 .topbar{
   display:flex;
@@ -30,30 +32,29 @@ body{
 .topbar-right{
   display:flex;
   align-items:center;
-  gap:16px;
+  gap:14px;
 }
 
 .userbox{
-  display:flex;
-  flex-direction:column;
-  align-items:flex-end;
-  gap:2px;
+  text-align:right;
 }
 
-.user{ font-size:14px; font-weight:600; }
-.branch{ font-size:12px; opacity:.9; }
+.user{font-size:14px;font-weight:600;}
+.branch{font-size:12px;opacity:.9;}
 
-/* CARDS */
+
+/* ========= CARD ========= */
 
 .card{
   background:white;
   border-radius:14px;
-  padding:16px;
-  margin-bottom:16px;
+  padding:18px;
+  margin-bottom:18px;
   box-shadow:0 2px 8px rgba(0,0,0,.05);
 }
 
-/* CATEGORIA */
+
+/* ========= CATEGORIA ========= */
 
 .cat-head{
   display:flex;
@@ -74,36 +75,47 @@ body{
   margin-top:12px;
 }
 
-/* GRID */
+
+/* ========= GRID PROD ========= */
 
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(360px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
   gap:14px;
 }
 
-/* PRODUTO */
+
+/* ========= PRODUTO ========= */
 
 .prod-card{
   display:flex;
   align-items:center;
   gap:12px;
-  padding:10px 12px;
+  padding:10px;
   border:1px solid #eee;
   border-radius:12px;
+  background:white;
 }
 
 .prod-img{
-  width:44px;
-  height:44px;
+  width:40px;
+  height:40px;
   border-radius:8px;
   object-fit:cover;
 }
 
-.prod-title{ font-size:14px; font-weight:700; }
-.prod-sku{ font-size:12px; color:#666; }
+.prod-title{
+  font-size:14px;
+  font-weight:700;
+}
 
-/* QTD */
+.prod-sku{
+  font-size:12px;
+  color:#666;
+}
+
+
+/* ========= QTD ========= */
 
 .qty-box{
   display:flex;
@@ -116,275 +128,9 @@ body{
   width:42px;
   height:28px;
   text-align:center;
-  font-size:13px;
   border:1px solid #ddd;
   border-radius:6px;
-}
-
-/* remove spinner */
-input::-webkit-inner-spin-button{
-  -webkit-appearance:none;
-}
-
-/* BOTÕES */
-
-.btn{
-  background:#2563eb;
-  color:white;
-  border:none;
-  border-radius:8px;
-  padding:7px 12px;
-  font-size:14px;
-  cursor:pointer;
-}
-
-.btn-danger{ background:#ef4444; }
-
-.btn-qty{
-  width:26px;
-  height:26px;
-  background:#ef4444;
-  color:white;
-  border:none;
-  border-radius:6px;
-  font-weight:800;
-}
-
-/* BADGE */
-
-.badge{
-  background:#ef4444;
-  color:white;
-  padding:3px 8px;
-  border-radius:999px;
-  font-size:12px;
-}
-
-/* TOAST */
-
-.toast{
-  background:#16a34a;
-  color:white;
-  padding:10px;
-  border-radius:8px;
-  margin-bottom:10px;
-}
-
-/* MOBILE */
-
-@media(max-width:640px){
-  .grid{ grid-template-columns:1fr; }
-}
-/* ===== TOOLBAR ===== */
-
-.toolbar{
-  display:flex;
-  gap:10px;
-  margin-top:10px;
-}
-
-
-/* ===== PEDIDOS GRID ===== */
-
-.order-table{
-  width:100%;
-}
-
-.order-head,
-.order-row{
-  display:grid;
-  grid-template-columns: 90px 1fr 140px 100px;
-  gap:12px;
-  align-items:center;
-}
-
-.order-head{
-  font-weight:700;
-  font-size:13px;
-  color:#666;
-  padding-bottom:8px;
-  border-bottom:1px solid #eee;
-}
-
-.order-row{
-  padding:10px 0;
-  border-bottom:1px solid #f1f1f1;
-  font-size:14px;
-}
-
-.col-id{
-  font-weight:700;
-}
-
-.col-date{
-  color:#555;
-}
-
-
-/* ===== STATUS ===== */
-
-.status{
-  padding:4px 10px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:700;
-  display:inline-block;
-}
-
-.status.enviado{
-  background:#dbeafe;
-  color:#1d4ed8;
-}
-
-.status.recebido{
-  background:#dcfce7;
-  color:#15803d;
-}
-
-.status.submitted{
-  background:#fef3c7;
-  color:#92400e;
-}
-
-
-/* ===== BOTÕES ===== */
-
-.btn-secondary{
-  background:#e5e7eb;
-  color:#111;
-}
-
-.btn-sm{
-  padding:6px 10px;
   font-size:13px;
 }
 
-
-/* ===== MOBILE ===== */
-
-@media(max-width:640px){
-
-  .order-head{
-    display:none;
-  }
-
-  .order-row{
-    grid-template-columns:1fr;
-    background:#fafafa;
-    border-radius:10px;
-    padding:12px;
-    margin-bottom:10px;
-  }
-
-  .right{
-    margin-top:6px;
-  }
-}
-
-
-/* ===== TABELA PEDIDOS XODÓ ===== */
-
-.table-xodo{
-  width:100%;
-  border-collapse:separate;
-  border-spacing:0;
-  font-size:14px;
-}
-
-.table-xodo thead th{
-  text-align:left;
-  padding:12px 14px;
-  font-size:13px;
-  color:#666;
-  border-bottom:2px solid #eee;
-}
-
-.table-xodo tbody td{
-  padding:14px;
-  border-bottom:1px solid #f1f1f1;
-  vertical-align:middle;
-}
-
-.table-xodo tbody tr:hover{
-  background:#fff7ed;
-}
-
-/* colunas */
-
-.td-id{
-  font-weight:700;
-  font-size:15px;
-}
-
-.td-action{
-  text-align:right;
-}
-
-/* ===== STATUS BADGE ===== */
-
-.status{
-  padding:6px 12px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:700;
-}
-
-.status.enviado{
-  background:#dbeafe;
-  color:#1d4ed8;
-}
-
-.status.recebido{
-  background:#dcfce7;
-  color:#15803d;
-}
-
-.status.submitted{
-  background:#fef3c7;
-  color:#92400e;
-}
-
-/* ===== BOTÕES ===== */
-
-.btn-secondary{
-  background:#e5e7eb;
-  color:#111;
-}
-
-.btn-sm{
-  padding:7px 12px;
-  font-size:13px;
-  border-radius:8px;
-}
-
-/* ===== MOBILE ===== */
-
-@media(max-width:640px){
-
-  .table-xodo thead{
-    display:none;
-  }
-
-  .table-xodo tr{
-    display:block;
-    background:white;
-    border-radius:12px;
-    margin-bottom:12px;
-    box-shadow:0 2px 6px rgba(0,0,0,.05);
-  }
-
-  .table-xodo td{
-    display:flex;
-    justify-content:space-between;
-    padding:10px 14px;
-    border:none;
-  }
-
-  .td-action{
-    justify-content:flex-end;
-  }
-}
-body{
-  outline: 6px solid red;
-}
-
+input::-webkit-inner-spin-b
