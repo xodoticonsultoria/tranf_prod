@@ -22,27 +22,30 @@
 <div class="card">
 
     <div class="cat-head" onclick="toggleCat({{ cat.id }})">
-        {% if cat.image %}
+
+        {% if cat.image and cat.image.name %}
             <img src="{{ cat.image.url }}" width="48">
         {% endif %}
 
         <div>
             <strong>{{ cat.name }}</strong><br>
-            {{ cat.products.all|length }} produto(s)
+            {{ cat.products.count }} produto(s)
         </div>
+
     </div>
 
-    <div id="cat-body-{{ cat.id }}" class="cat-body">
+    <div id="cat-body-{{ cat.id }}" class="cat-body" style="display:none;">
 
         <div class="grid">
 
         {% for p in cat.products.all %}
         {% if p.active %}
-        <form method="post" class="prod-card">
+
+        <form method="post" action="{% url 'q_products' %}" class="prod-card">
             {% csrf_token %}
             <input type="hidden" name="product_id" value="{{ p.id }}">
 
-            {% if p.image %}
+            {% if p.image and p.image.name %}
                 <img src="{{ p.image.url }}" class="prod-img">
             {% endif %}
 
@@ -53,6 +56,7 @@
 
             <button class="btn">Adicionar</button>
         </form>
+
         {% endif %}
         {% endfor %}
 
@@ -62,5 +66,13 @@
 
 </div>
 {% endfor %}
+
+<script>
+function toggleCat(id){
+    const el = document.getElementById("cat-body-"+id);
+    if(!el) return;
+    el.style.display = el.style.display === "block" ? "none" : "block";
+}
+</script>
 
 {% endblock %}
