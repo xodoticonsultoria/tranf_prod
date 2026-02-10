@@ -280,3 +280,108 @@ input::-webkit-inner-spin-button{
     margin-top:6px;
   }
 }
+
+
+/* ===== TABELA PEDIDOS XODÓ ===== */
+
+.table-xodo{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  font-size:14px;
+}
+
+.table-xodo thead th{
+  text-align:left;
+  padding:12px 14px;
+  font-size:13px;
+  color:#666;
+  border-bottom:2px solid #eee;
+}
+
+.table-xodo tbody td{
+  padding:14px;
+  border-bottom:1px solid #f1f1f1;
+  vertical-align:middle;
+}
+
+.table-xodo tbody tr:hover{
+  background:#fff7ed;
+}
+
+/* colunas */
+
+.td-id{
+  font-weight:700;
+  font-size:15px;
+}
+
+.td-action{
+  text-align:right;
+}
+
+/* ===== STATUS BADGE ===== */
+
+.status{
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+}
+
+.status.enviado{
+  background:#dbeafe;
+  color:#1d4ed8;
+}
+
+.status.recebido{
+  background:#dcfce7;
+  color:#15803d;
+}
+
+.status.submitted{
+  background:#fef3c7;
+  color:#92400e;
+}
+
+/* ===== BOTÕES ===== */
+
+.btn-secondary{
+  background:#e5e7eb;
+  color:#111;
+}
+
+.btn-sm{
+  padding:7px 12px;
+  font-size:13px;
+  border-radius:8px;
+}
+
+/* ===== MOBILE ===== */
+
+@media(max-width:640px){
+
+  .table-xodo thead{
+    display:none;
+  }
+
+  .table-xodo tr{
+    display:block;
+    background:white;
+    border-radius:12px;
+    margin-bottom:12px;
+    box-shadow:0 2px 6px rgba(0,0,0,.05);
+  }
+
+  .table-xodo td{
+    display:flex;
+    justify-content:space-between;
+    padding:10px 14px;
+    border:none;
+  }
+
+  .td-action{
+    justify-content:flex-end;
+  }
+}
+

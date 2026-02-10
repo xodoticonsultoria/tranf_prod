@@ -12,45 +12,49 @@
   </div>
 </div>
 
-
 <div class="card">
 
-  <div class="order-table">
+<table class="table-xodo">
+  <thead>
+    <tr>
+      <th style="width:90px">Pedido</th>
+      <th>Criado em</th>
+      <th style="width:140px">Status</th>
+      <th style="width:110px"></th>
+    </tr>
+  </thead>
 
-    <div class="order-head">
-      <div>ID</div>
-      <div>Criado</div>
-      <div>Status</div>
-      <div></div>
-    </div>
-
+  <tbody>
     {% for o in orders %}
-    <div class="order-row">
+    <tr>
 
-      <div class="col-id">#{{ o.id }}</div>
+      <td class="td-id">#{{ o.id }}</td>
 
-      <div class="col-date">
+      <td>
         {{ o.created_at|date:"d/m/Y H:i" }}
-      </div>
+      </td>
 
-      <div>
+      <td>
         <span class="status {{ o.status|lower }}">
           {{ o.status }}
         </span>
-      </div>
+      </td>
 
-      <div class="right">
+      <td class="td-action">
         <a href="{% url 'q_order_detail' o.id %}" class="btn btn-sm">
           Abrir
         </a>
-      </div>
+      </td>
 
-    </div>
+    </tr>
     {% empty %}
-      <div class="muted">Nenhum pedido ainda.</div>
+      <tr>
+        <td colspan="4" class="muted">Nenhum pedido ainda.</td>
+      </tr>
     {% endfor %}
+  </tbody>
 
-  </div>
+</table>
 
 </div>
 
