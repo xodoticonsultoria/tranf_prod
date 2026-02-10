@@ -11,27 +11,25 @@ SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret")
 DEBUG = os.getenv("DEBUG", "0") == "1"
 
 # --------------------
-# Hosts / CSRF
+# Hosts / CSRF (Render-safe)
 # --------------------
-# --------------------
-# Hosts / CSRF
-# --------------------
-DEBUG = os.getenv("DEBUG", "0") == "1"
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "tranf-prod.onrender.com",
+]
 
-allowed_hosts_env = os.getenv("ALLOWED_HOSTS", "").strip()
+extra_hosts = os.getenv("ALLOWED_HOSTS", "").strip()
+if extra_hosts:
+    ALLOWED_HOSTS += [h.strip() for h in extra_hosts.split(",") if h.strip()]
 
-if allowed_hosts_env:
-    ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_env.split(",") if h.strip()]
-else:
-    # fallback seguro
-    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "tranf-prod.onrender.com"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://tranf-prod.onrender.com",
+]
 
-csrf_env = os.getenv("CSRF_TRUSTED_ORIGINS", "").strip()
-if csrf_env:
-    CSRF_TRUSTED_ORIGINS = [o.strip() for o in csrf_env.split(",") if o.strip()]
-else:
-    CSRF_TRUSTED_ORIGINS = ["https://tranf-prod.onrender.com"]
-
+extra_csrf = os.getenv("CSRF_TRUSTED_ORIGINS", "").strip()
+if extra_csrf:
+    CSRF_TRUSTED_ORIGINS += [o.strip() for o in extra_csrf.split(",") if o.strip()]
 
 # --------------------
 # Apps
@@ -111,6 +109,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# --------------------
+# Locale
+# --------------------
 LANGUAGE_CODE = "pt-br"
 TIME_ZONE = "America/Sao_Paulo"
 USE_I18N = True
@@ -130,6 +131,9 @@ STORAGES = {
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# --------------------
+# Auth redirects
+# --------------------
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/login/"
