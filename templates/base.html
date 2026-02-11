@@ -3,7 +3,7 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>{% block title %}Sistema Xodó{% endblock %}</title>
+<title>{% block title %}Xodó{% endblock %}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link rel="stylesheet" href="{% static 'app.css' %}">
@@ -11,36 +11,41 @@
 
 <body>
 
-<header class="x-topbar">
+<header class="x-header">
 
-  <div class="x-logo">
-    <img src="{% static 'logo_xodo.png' %}" alt="Xodó">
+  <div class="x-logo-box">
+    <img src="{% static 'logo_xodo.png' %}" class="x-logo">
   </div>
 
   {% if request.user.is_authenticated %}
-  <div class="x-user-right">
-
-    <div class="x-chip">
-      Nome: {{ request.user.username }}
-    </div>
-
-    <div class="x-chip">
-      Filial: {{ request.user.groups.first.name|upper }}
-    </div>
-
-    <a href="{% url 'logout' %}" class="x-btn-exit">
-      sair
-    </a>
-
+  <div class="x-user-bar">
+    <span class="pill">Nome: {{ request.user.username }}</span>
+    {% if request.user.groups.first %}
+      <span class="pill">Filial: {{ request.user.groups.first.name }}</span>
+    {% endif %}
+    <a href="{% url 'logout' %}" class="pill pill-light">sair</a>
   </div>
   {% endif %}
 
 </header>
 
+<div class="x-layout">
 
-<main class="xodo-page">
-{% block content %}{% endblock %}
-</main>
+  <!-- MENU LATERAL GLOBAL -->
+  <aside class="x-side">
+    <div class="x-cart-icon">🛒</div>
+
+    <a href="{% url 'q_cart' %}" class="x-side-btn">Abrir Carrinho</a>
+    <a href="{% url 'q_products' %}" class="x-side-btn">Produtos</a>
+    <a href="{% url 'q_orders' %}" class="x-side-btn">Meus Pedidos</a>
+  </aside>
+
+  <!-- CONTEÚDO -->
+  <main class="x-main">
+    {% block content %}{% endblock %}
+  </main>
+
+</div>
 
 <script src="{% static 'app.js' %}"></script>
 </body>
