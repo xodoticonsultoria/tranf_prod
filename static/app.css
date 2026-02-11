@@ -313,3 +313,78 @@ body{
     grid-template-columns:1fr;
   }
 }
+
+
+/* ===== XODÓ CARRINHO ===== */
+
+.x-cart-wrap{
+  display:flex;
+  justify-content:center;
+  margin-top:20px;
+}
+
+.x-cart-box{
+  background:#facc15;
+  border:2px solid #333;
+  padding:18px;
+  border-radius:4px;
+  width:760px;
+  max-width:100%;
+  box-shadow:0 6px 14px rgba(0,0,0,.15);
+}
+
+/* item */
+
+.x-cart-item{
+  background:white;
+  border:2px solid #b91c1c;
+  border-radius:4px;
+  padding:10px;
+  display:grid;
+  grid-template-columns:48px 1fr auto auto;
+  gap:10px;
+  align-items:center;
+}
+
+.x-cart-img{
+  width:42px;
+  height:42px;
+  object-fit:cover;
+  border-radius:50%;
+}
+
+.x-cart-name{
+  font-size:13px;
+  font-weight:700;
+}
+
+/* salvar */
+
+.x-save{
+  background:#991b1b;
+  color:white;
+  border:none;
+  padding:6px 10px;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+/* botão enviar */
+
+.x-submit-form{
+  text-align:center;
+  margin-top:40px;
+}
+
+.x-submit{
+  background:#991b1b;
+  color:white;
+  border:none;
+  padding:14px 28px;
+  font-size:16px;
+  font-weight:900;
+  border-radius:4px;
+  cursor:pointer;
+  box-shadow:0 4px 10px rgba(0,0,0,.25);
+}

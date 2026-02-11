@@ -2,26 +2,49 @@
 {% block title %}Carrinho{% endblock %}
 {% block content %}
 
-<div class="card">
-<h2>Seu Carrinho</h2>
+<h2 class="area-title">CARRINHO</h2>
 
-{% for item in items %}
-<div class="cart-row">
-  <div>{{ item.product.name }}</div>
-  <div>{{ item.qty_requested }}</div>
-</div>
-{% empty %}
-<p>Vazio</p>
-{% endfor %}
+<div class="x-cart-wrap">
 
-<div class="cart-actions">
-  <a href="{% url 'q_products' %}" class="btn btn-secondary">Voltar</a>
-  <form method="post" action="{% url 'q_submit_order' %}">
-    {% csrf_token %}
-    <button class="btn btn-primary">Enviar Pedido</button>
-  </form>
-</div>
+  <div class="x-cart-box">
+
+    <div class="x-grid">
+
+      {% for item in items %}
+      <form method="post" action="{% url 'q_cart' %}" class="x-cart-item">
+        {% csrf_token %}
+        <input type="hidden" name="item_id" value="{{ item.id }}">
+
+        {% if item.product.image %}
+          <img src="{{ item.product.image.url }}" class="x-cart-img">
+        {% endif %}
+
+        <div class="x-cart-name">
+          {{ item.product.name|upper }}
+        </div>
+
+        <div class="x-qty">
+          <button type="button" onclick="dec(this)">−</button>
+          <input name="qty" value="{{ item.qty }}">
+          <button type="button" onclick="inc(this)">+</button>
+        </div>
+
+        <button class="x-save">SALVAR</button>
+
+      </form>
+      {% empty %}
+        <div>Carrinho vazio</div>
+      {% endfor %}
+
+    </div>
+
+  </div>
 
 </div>
+
+<form method="post" action="{% url 'q_submit_order' %}" class="x-submit-form">
+  {% csrf_token %}
+  <button class="x-submit">ENVIAR PEDIDO</button>
+</form>
 
 {% endblock %}
