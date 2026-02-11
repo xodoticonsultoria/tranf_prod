@@ -3,7 +3,7 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>{% block title %}Xodó{% endblock %}</title>
+<title>{% block title %}Sistema Xodó{% endblock %}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link rel="stylesheet" href="{% static 'app.css' %}">
@@ -11,34 +11,30 @@
 
 <body>
 
-<header class="topbar">
-  <div class="brand">
-    <img src="{% static 'logo_xodo.png' %}" class="logo">
-    <span>Sistema Xodó</span>
+<header class="xodo-topbar">
+
+  <div class="xodo-left">
+    <img src="{% static 'logo_xodo.png' %}" class="xodo-logo">
+    <div class="xodo-sub">Sistema Xodó</div>
   </div>
 
   {% if request.user.is_authenticated %}
-  <div class="topbar-right">
+  <div class="xodo-userbar">
 
-    <div class="userbox">
-      <div class="user">{{ request.user.username }}</div>
-      {% if request.user.groups.first %}
-        <div class="branch">{{ request.user.groups.first.name }}</div>
-      {% endif %}
-    </div>
+    <div class="pill">Nome: {{ request.user.username }}</div>
 
-    <a href="{% url 'logout' %}" class="btn btn-danger">Sair</a>
+    {% if request.user.groups.first %}
+      <div class="pill">Filial: {{ request.user.groups.first.name }}</div>
+    {% endif %}
+
+    <a href="{% url 'logout' %}" class="btn-exit">sair</a>
 
   </div>
   {% endif %}
+
 </header>
 
-<main class="page">
-
-{% for m in messages %}
-<div class="toast">{{ m }}</div>
-{% endfor %}
-
+<main class="xodo-page">
 {% block content %}{% endblock %}
 </main>
 
