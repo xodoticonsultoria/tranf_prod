@@ -4,6 +4,23 @@
 
 <h2 class="area-title">ÁREA DE PEDIDOS</h2>
 
+<div class="x-side-menu">
+
+  <a href="{% url 'q_cart' %}" class="x-side-btn">
+    Abrir Carrinho
+  </a>
+
+  <a href="{% url 'q_products' %}" class="x-side-btn">
+    PRODUTOS
+  </a>
+
+  <a href="{% url 'q_orders' %}" class="x-side-btn">
+    MEUS PEDIDOS
+  </a>
+
+</div>
+
+
 {% for cat in categories %}
 <div class="x-cat">
 

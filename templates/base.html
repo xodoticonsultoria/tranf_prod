@@ -11,28 +11,32 @@
 
 <body>
 
-<header class="xodo-topbar">
+<header class="x-topbar">
 
-  <div class="xodo-left">
-    <img src="{% static 'logo_xodo.png' %}" class="xodo-logo">
-    <div class="xodo-sub">Sistema Xodó</div>
+  <div class="x-logo">
+    <img src="{% static 'logo_xodo.png' %}" alt="Xodó">
   </div>
 
   {% if request.user.is_authenticated %}
-  <div class="xodo-userbar">
+  <div class="x-user-right">
 
-    <div class="pill">Nome: {{ request.user.username }}</div>
+    <div class="x-chip">
+      Nome: {{ request.user.username }}
+    </div>
 
-    {% if request.user.groups.first %}
-      <div class="pill">Filial: {{ request.user.groups.first.name }}</div>
-    {% endif %}
+    <div class="x-chip">
+      Filial: {{ request.user.groups.first.name|upper }}
+    </div>
 
-    <a href="{% url 'logout' %}" class="btn-exit">sair</a>
+    <a href="{% url 'logout' %}" class="x-btn-exit">
+      sair
+    </a>
 
   </div>
   {% endif %}
 
 </header>
+
 
 <main class="xodo-page">
 {% block content %}{% endblock %}

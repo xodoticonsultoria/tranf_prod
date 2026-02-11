@@ -388,3 +388,68 @@ body{
   cursor:pointer;
   box-shadow:0 4px 10px rgba(0,0,0,.25);
 }
+
+/* ===== XODÓ HEADER ===== */
+
+.x-topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 24px;
+  background:linear-gradient(90deg,#b91c1c,#f97316);
+}
+
+.x-logo img{
+  height:56px;   /* 👈 tamanho maior */
+}
+
+.x-user-right{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.x-chip{
+  background:#facc15;
+  padding:8px 14px;
+  border-radius:10px;
+  font-weight:700;
+  font-size:14px;
+  box-shadow:0 2px 4px rgba(0,0,0,.2);
+}
+
+.x-btn-exit{
+  background:#e5e7eb;
+  padding:8px 14px;
+  border-radius:10px;
+  font-weight:600;
+  text-decoration:none;
+  color:#111;
+}
+
+/* ===== MENU LATERAL XODÓ ===== */
+
+.x-side-menu{
+  position:fixed;
+  right:30px;
+  top:180px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.x-side-btn{
+  background:#991b1b;
+  color:white;
+  padding:10px 14px;
+  border-radius:8px;
+  font-size:13px;
+  font-weight:800;
+  text-decoration:none;
+  text-align:center;
+  box-shadow:0 4px 10px rgba(0,0,0,.25);
+}
+
+.x-side-btn:hover{
+  opacity:.9;
+}
