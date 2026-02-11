@@ -1,39 +1,27 @@
 {% extends "base.html" %}
+{% block title %}Carrinho{% endblock %}
 {% block content %}
 
 <div class="card">
-<h2>Carrinho</h2>
-
-<div class="row-gap">
-<a href="{% url 'q_products' %}" class="btn btn-secondary">← Produtos</a>
-<a href="{% url 'q_orders' %}" class="btn btn-secondary">Pedidos</a>
-</div>
-</div>
-
-<form method="post">
-{% csrf_token %}
-
-<div class="card">
+<h2>Seu Carrinho</h2>
 
 {% for item in items %}
 <div class="cart-row">
-  {% if item.product.image %}
-    <img src="{{ item.product.image.url }}" class="prod-img">
-  {% endif %}
-
-  <div class="cart-info">
-    <strong>{{ item.product.name }}</strong>
-    <input type="number" name="qty_{{ item.id }}" value="{{ item.qty_requested }}">
-  </div>
+  <div>{{ item.product.name }}</div>
+  <div>{{ item.qty_requested }}</div>
 </div>
+{% empty %}
+<p>Vazio</p>
 {% endfor %}
 
-<div class="row-gap">
-<button class="btn">Salvar alterações</button>
-<a href="{% url 'q_submit_order' %}" class="btn btn-success">Enviar pedido</a>
+<div class="cart-actions">
+  <a href="{% url 'q_products' %}" class="btn btn-secondary">Voltar</a>
+  <form method="post" action="{% url 'q_submit_order' %}">
+    {% csrf_token %}
+    <button class="btn btn-primary">Enviar Pedido</button>
+  </form>
 </div>
 
 </div>
-</form>
 
 {% endblock %}

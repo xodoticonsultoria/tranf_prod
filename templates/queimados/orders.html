@@ -1,29 +1,31 @@
 {% extends "base.html" %}
+{% block title %}Pedidos{% endblock %}
 {% block content %}
 
-<h2>MEUS PEDIDOS</h2>
-
+<div class="card">
 <table class="table-xodo">
 <thead>
 <tr>
 <th>ID</th>
-<th>Criado em</th>
 <th>Status</th>
-<th>Ação</th>
+<th>Data</th>
+<th></th>
 </tr>
 </thead>
-<tbody>
 
+<tbody>
 {% for o in orders %}
 <tr>
-<td>#{{o.id}}</td>
-<td>{{o.created_at}}</td>
-<td>{{o.status}}</td>
-<td><a href="{% url 'q_order_detail' o.id %}" class="btn-open">ABRIR</a></td>
+<td>#{{ o.id }}</td>
+<td><span class="status">{{ o.status }}</span></td>
+<td>{{ o.created_at|date:"d/m H:i" }}</td>
+<td class="td-action">
+<a href="{% url 'q_order_detail' o.id %}" class="btn btn-sm">Abrir</a>
+</td>
 </tr>
 {% endfor %}
-
 </tbody>
 </table>
+</div>
 
 {% endblock %}
