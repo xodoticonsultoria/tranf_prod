@@ -1,45 +1,29 @@
 {% extends "base.html" %}
-{% block title %}Queimados - Meus Pedidos{% endblock %}
-
 {% block content %}
-<div class="card">
-  <h2>Queimados • Meus pedidos</h2>
 
-  <div class="row" style="margin-bottom:12px;">
-    <a class="btn btn-secondary" href="/queimados/produtos/">Produtos</a>
-    <a class="btn btn-secondary" href="/queimados/carrinho/">Carrinho</a>
-  </div>
+<h2>MEUS PEDIDOS</h2>
 
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Criado em</th>
-        <th>Status</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for o in orders %}
-      <tr>
-        <td><strong>#{{ o.id }}</strong></td>
-        <td class="muted">{{ o.created_at }}</td>
-        <td>
-          {% if o.status == "SUBMITTED" %}<span class="pill pill-blue">ENVIADO</span>{% endif %}
-          {% if o.status == "PICKING" %}<span class="pill pill-yellow">EM SEPARAÇÃO</span>{% endif %}
-          {% if o.status == "DISPATCHED" %}<span class="pill pill-green">DESPACHADO</span>{% endif %}
-          {% if o.status == "RECEIVED" %}<span class="pill pill-green">RECEBIDO</span>{% endif %}
-          {% if o.status == "CANCELLED" %}<span class="pill pill-red">CANCELADO</span>{% endif %}
-          {% if o.status not in "SUBMITTED PICKING DISPATCHED RECEIVED CANCELLED" %}
-            <span class="pill pill-gray">{{ o.status }}</span>
-          {% endif %}
-        </td>
-        <td class="right"><a class="btn btn-secondary" href="/queimados/pedidos/{{ o.id }}/">Abrir</a></td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="4">Nenhum pedido enviado ainda.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+<table class="table-xodo">
+<thead>
+<tr>
+<th>ID</th>
+<th>Criado em</th>
+<th>Status</th>
+<th>Ação</th>
+</tr>
+</thead>
+<tbody>
+
+{% for o in orders %}
+<tr>
+<td>#{{o.id}}</td>
+<td>{{o.created_at}}</td>
+<td>{{o.status}}</td>
+<td><a href="{% url 'q_order_detail' o.id %}" class="btn-open">ABRIR</a></td>
+</tr>
+{% endfor %}
+
+</tbody>
+</table>
+
 {% endblock %}

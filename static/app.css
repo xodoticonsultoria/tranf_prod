@@ -1,136 +1,200 @@
-/* ========= BASE ========= */
-
 body{
   margin:0;
-  font-family: Inter, system-ui, Arial;
-  background:#fff8ef;
-  color:#222;
+  font-family: Arial, sans-serif;
+  background:#efefef;
 }
 
-.page{
-  max-width:1100px;
-  margin:auto;
-  padding:22px;
-}
+/* ===== TOPO ===== */
 
-/* ========= NAV ========= */
-
-.topbar{
+.x-top{
+  background:#c53112;
+  color:white;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:14px 22px;
-  background:linear-gradient(90deg,#991b1b,#ea580c);
-  color:white;
+  padding:16px 24px;
 }
 
-.brand{
-  font-weight:700;
-  font-size:18px;
+.x-logo{
+  font-size:28px;
+  font-weight:900;
+  letter-spacing:2px;
 }
 
-.topbar-right{
+.x-user{
   display:flex;
+  gap:12px;
   align-items:center;
+}
+
+.badge-yellow{
+  background:#facc15;
+  padding:8px 14px;
+  border-radius:6px;
+  font-weight:700;
+  box-shadow:0 2px 4px rgba(0,0,0,.2);
+}
+
+.btn-white{
+  background:#eee;
+  padding:8px 14px;
+  border-radius:6px;
+  text-decoration:none;
+  color:#111;
+  font-weight:700;
+}
+
+/* ===== LAYOUT ===== */
+
+.layout{
+  display:flex;
+  gap:24px;
+  max-width:1200px;
+  margin:auto;
+  padding:24px;
+}
+
+.content{
+  flex:1;
+}
+
+/* ===== SIDEBAR ===== */
+
+.sidebar{
+  width:180px;
+  display:flex;
+  flex-direction:column;
   gap:14px;
 }
 
-.userbox{
-  text-align:right;
+.side-btn{
+  background:#991b1b;
+  color:white;
+  text-align:center;
+  padding:12px;
+  border-radius:8px;
+  text-decoration:none;
+  font-weight:700;
+  box-shadow:0 3px 6px rgba(0,0,0,.25);
 }
 
-.user{font-size:14px;font-weight:600;}
-.branch{font-size:12px;opacity:.9;}
+/* ===== CATEGORIA ===== */
 
-
-/* ========= CARD ========= */
-
-.card{
-  background:white;
-  border-radius:14px;
-  padding:18px;
-  margin-bottom:18px;
-  box-shadow:0 2px 8px rgba(0,0,0,.05);
+.cat-box{
+  background:#7a7a7a;
+  color:white;
+  padding:16px;
+  border:2px solid #333;
+  margin-bottom:16px;
 }
-
-
-/* ========= CATEGORIA ========= */
 
 .cat-head{
   display:flex;
+  gap:14px;
   align-items:center;
-  gap:12px;
   cursor:pointer;
 }
 
 .cat-head img{
-  width:42px;
-  height:42px;
-  border-radius:10px;
-  object-fit:cover;
+  width:52px;
 }
 
 .cat-body{
-  display:none;
-  margin-top:12px;
+  margin-top:14px;
 }
 
-
-/* ========= GRID PROD ========= */
+/* ===== GRID PROD ===== */
 
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
-  gap:14px;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
 }
 
-
-/* ========= PRODUTO ========= */
+/* ===== PROD CARD ===== */
 
 .prod-card{
+  background:white;
+  border:2px solid #c53112;
+  padding:10px;
   display:flex;
   align-items:center;
-  gap:12px;
-  padding:10px;
-  border:1px solid #eee;
-  border-radius:12px;
-  background:white;
+  gap:10px;
+  box-shadow:0 3px 6px rgba(0,0,0,.2);
 }
 
 .prod-img{
   width:40px;
-  height:40px;
-  border-radius:8px;
-  object-fit:cover;
 }
 
-.prod-title{
-  font-size:14px;
-  font-weight:700;
-}
-
-.prod-sku{
-  font-size:12px;
-  color:#666;
-}
-
-
-/* ========= QTD ========= */
-
-.qty-box{
+.qty{
   display:flex;
   align-items:center;
   gap:6px;
-  margin-top:6px;
 }
 
-.qty-box input{
-  width:42px;
+.qty input{
+  width:44px;
   height:28px;
   text-align:center;
-  border:1px solid #ddd;
-  border-radius:6px;
-  font-size:13px;
+  font-weight:700;
 }
 
-input::-webkit-inner-spin-b
+.qty button{
+  background:#facc15;
+  border:1px solid #333;
+  width:28px;
+  height:28px;
+  font-weight:900;
+}
+
+.btn-add{
+  background:#facc15;
+  border:1px solid #333;
+  padding:6px 12px;
+  font-weight:800;
+}
+
+/* ===== TABELA ===== */
+
+.table-xodo{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.table-xodo th{
+  background:#facc15;
+  padding:10px;
+  border:1px solid #333;
+}
+
+.table-xodo td{
+  padding:10px;
+  border:1px solid #333;
+  background:#f3f3f3;
+}
+
+.btn-open{
+  background:#991b1b;
+  color:white;
+  padding:6px 12px;
+  text-decoration:none;
+  border-radius:6px;
+}
+
+/* ===== MOBILE ===== */
+
+@media(max-width:900px){
+  .layout{
+    flex-direction:column;
+  }
+
+  .sidebar{
+    flex-direction:row;
+    width:auto;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+}

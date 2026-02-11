@@ -1,44 +1,45 @@
-<!DOCTYPE html>
 {% load static %}
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>{% block title %}Sistema{% endblock %}</title>
+<title>{% block title %}Xodó{% endblock %}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link rel="stylesheet" href="{% static 'app.css' %}">
-<link rel="icon" href="{% static 'favicon.ico' %}">
 </head>
 
 <body>
 
-<header class="topbar">
-  <div class="brand">Sistema de Pedidos Xodó</div>
+<header class="x-top">
+  <div class="x-logo">XODÓ</div>
 
   {% if request.user.is_authenticated %}
-  <div class="topbar-right">
-
-    <div class="userbox">
-      <div class="user">{{ request.user.username }}</div>
-      {% if request.user.groups.first %}
-        <div class="branch">{{ request.user.groups.first.name }}</div>
-      {% endif %}
-    </div>
-
-    <a href="{% url 'logout' %}" class="btn btn-danger">Sair</a>
-
+  <div class="x-user">
+    <span class="badge-yellow">Nome: {{ request.user.username }}</span>
+    {% if request.user.groups.first %}
+      <span class="badge-yellow">Filial: {{ request.user.groups.first.name }}</span>
+    {% endif %}
+    <a href="{% url 'logout' %}" class="btn-white">sair</a>
   </div>
   {% endif %}
 </header>
 
-<main class="page">
+<div class="layout">
 
-{% for m in messages %}
-<div class="toast">{{ m }}</div>
-{% endfor %}
+  <main class="content">
+    {% block content %}{% endblock %}
+  </main>
 
-{% block content %}{% endblock %}
-</main>
+  {% if request.user.is_authenticated %}
+  <aside class="sidebar">
+    <a href="{% url 'q_cart' %}" class="side-btn">Abrir Carrinho</a>
+    <a href="{% url 'q_products' %}" class="side-btn">Produtos</a>
+    <a href="{% url 'q_orders' %}" class="side-btn">Meus pedidos</a>
+  </aside>
+  {% endif %}
+
+</div>
 
 <script src="{% static 'app.js' %}"></script>
 </body>
