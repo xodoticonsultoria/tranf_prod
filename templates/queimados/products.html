@@ -2,50 +2,52 @@
 {% block title %}Produtos{% endblock %}
 {% block content %}
 
-<div class="section-title">
-  Produtos por categoria
-</div>
+<h2 class="area-title">ÁREA DE PEDIDOS</h2>
 
 {% for cat in categories %}
-<div class="cat-card">
+<div class="x-cat">
 
-  <div class="cat-header" onclick="toggleCat({{ cat.id }})">
+  <!-- header categoria -->
+  <div class="x-cat-head" onclick="toggleCat({{ cat.id }})">
     {% if cat.image %}
-      <img src="{{ cat.image.url }}">
+      <img src="{{ cat.image.url }}" class="x-cat-icon">
     {% endif %}
     <div>
-      <div class="cat-name">{{ cat.name }}</div>
-      <div class="cat-count">{{ cat.products.count }} itens</div>
+      <div class="x-cat-name">{{ cat.name|upper }}</div>
+      <div class="x-cat-count">{{ cat.products.count }} PRODUTOS</div>
     </div>
   </div>
 
-  <div id="cat-body-{{ cat.id }}" class="cat-body">
+  <!-- corpo -->
+  <div id="cat-body-{{ cat.id }}" class="x-cat-body">
+
+    <div class="x-grid">
 
     {% for p in cat.products.all %}
     {% if p.active %}
-    <form method="post" action="{% url 'q_products' %}" class="prod-row">
+    <form method="post" action="{% url 'q_products' %}" class="x-prod">
       {% csrf_token %}
       <input type="hidden" name="product_id" value="{{ p.id }}">
 
       {% if p.image %}
-        <img src="{{ p.image.url }}" class="prod-img">
+        <img src="{{ p.image.url }}" class="x-prod-img">
       {% endif %}
 
-      <div class="prod-mid">
-        <div class="prod-name">{{ p.name }}</div>
-        <div class="prod-sku">SKU {{ p.sku }}</div>
+      <div class="x-prod-name">{{ p.name }}</div>
+
+      <div class="x-qty">
+        <button type="button" onclick="dec(this)">−</button>
+        <input name="qty" value="1">
+        <button type="button" onclick="inc(this)">+</button>
       </div>
 
-      <div class="prod-right">
-        <button type="button" onclick="dec(this)" class="qty-btn">−</button>
-        <input name="qty" value="1">
-        <button type="button" onclick="inc(this)" class="qty-btn">+</button>
-        <button class="btn btn-add">Adicionar</button>
-      </div>
+      <button class="x-add">ADICIONAR</button>
 
     </form>
     {% endif %}
     {% endfor %}
+
+    </div>
 
   </div>
 
