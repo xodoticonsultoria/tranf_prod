@@ -1,204 +1,111 @@
+/* =========================
+   BASE
+========================= */
+
 body{
- margin:0;
- font-family: Arial, Helvetica, sans-serif;
- background:#e9e9e9;
+  margin:0;
+  font-family: Inter, system-ui, Arial;
+  background:#e9e9e9;
+  color:#111;
 }
 
-/* TOPBAR */
+/* =========================
+   HEADER XODÓ
+========================= */
 
-.xodo-topbar{
- display:flex;
- justify-content:space-between;
- align-items:center;
- padding:14px 28px;
- background:linear-gradient(90deg,#b91c1c,#f97316);
- color:white;
+.x-header{
+  background: linear-gradient(90deg,#9f1d1d,#f25c05);
+  padding: 12px 26px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
 }
 
-.xodo-left{
- display:flex;
- flex-direction:column;
+.x-logo{
+  height:56px;
 }
 
-.xodo-logo{
- height:46px;
-}
-
-.xodo-sub{
- font-size:13px;
- margin-top:4px;
- opacity:.9;
-}
-
-.xodo-userbar{
- display:flex;
- gap:12px;
- align-items:center;
+.x-user-bar{
+  display:flex;
+  gap:12px;
+  align-items:center;
 }
 
 .pill{
- background:#facc15;
- color:#111;
- padding:8px 14px;
- border-radius:8px;
- font-weight:700;
- box-shadow:0 2px 0 rgba(0,0,0,.25);
+  background:#f2c316;
+  padding:8px 14px;
+  border-radius:10px;
+  font-weight:800;
+  box-shadow:0 3px 0 rgba(0,0,0,.25);
 }
 
-.btn-exit{
- background:#e5e7eb;
- padding:8px 14px;
- border-radius:8px;
- text-decoration:none;
- color:#111;
- font-weight:600;
- box-shadow:0 2px 0 rgba(0,0,0,.25);
+.pill-light{
+  background:#e5e7eb;
+  color:#111;
+  text-decoration:none;
 }
 
-/* PAGE */
+/* =========================
+   LAYOUT GLOBAL
+========================= */
 
-.xodo-page{
- max-width:1100px;
- margin:auto;
- padding:24px;
+.x-layout{
+  display:flex;
 }
 
-/* TITULOS */
-
-.title-main{
- text-align:center;
- color:#991b1b;
- font-weight:800;
- letter-spacing:1px;
- margin:18px 0 26px;
+.x-main{
+  flex:1;
+  padding: 22px 40px;
 }
 
-/* CATEGORIA */
+/* =========================
+   MENU LATERAL
+========================= */
 
-.cat-box{
- background:#7a7a7a;
- border:2px solid #333;
- padding:16px;
- margin-bottom:16px;
- box-shadow:0 3px 0 rgba(0,0,0,.4);
+.x-side{
+  width:210px;
+  padding:20px 14px;
 }
 
-.cat-head{
- display:flex;
- align-items:center;
- gap:14px;
- color:white;
- font-weight:800;
- cursor:pointer;
+.x-cart-icon{
+  font-size:28px;
+  text-align:right;
+  margin-bottom:12px;
+  opacity:.6;
 }
 
-.cat-head img{
- width:54px;
+.x-side-btn{
+  display:block;
+  background:#991b1b;
+  color:white;
+  text-decoration:none;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:12px;
+  text-align:center;
+  font-weight:800;
+  box-shadow:0 4px 10px rgba(0,0,0,.20);
 }
 
-/* PRODUTOS */
-
-.prod-grid{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:14px;
- margin-top:14px;
+.x-side-btn:hover{
+  filter:brightness(1.05);
 }
 
-.prod-card{
- background:white;
- border:2px solid #dc2626;
- padding:10px;
- display:flex;
- align-items:center;
- justify-content:space-between;
-}
-
-.qty{
- display:flex;
- align-items:center;
- gap:6px;
-}
-
-.qty input{
- width:44px;
- height:28px;
- text-align:center;
- font-weight:700;
-}
-
-.qty button{
- background:#facc15;
- border:1px solid #000;
- width:26px;
- height:26px;
- font-weight:900;
- cursor:pointer;
-}
-
-.btn-add{
- background:#facc15;
- border:1px solid #000;
- padding:6px 12px;
- font-weight:800;
- cursor:pointer;
-}
-
-/* CARRINHO BOX */
-
-.cart-box{
- background:#facc15;
- border:2px solid #000;
- padding:18px;
-}
-
-/* TABELA PEDIDOS */
-
-.table-xodo{
- width:100%;
- border-collapse:collapse;
-}
-
-.table-xodo th{
- background:#facc15;
- border:1px solid #000;
- padding:10px;
-}
-
-.table-xodo td{
- border:1px solid #000;
- padding:10px;
-}
-
-.btn-open{
- background:#b91c1c;
- color:white;
- border:none;
- padding:6px 10px;
- font-weight:700;
- cursor:pointer;
-}
-
-/* MOBILE */
-
-@media(max-width:720px){
- .prod-grid{
-  grid-template-columns:1fr;
- }
-}
-
-
-/* ===== XODÓ PRODUTOS ===== */
+/* =========================
+   TÍTULO ÁREA
+========================= */
 
 .area-title{
   text-align:center;
-  color:#9b1c1c;
-  font-weight:800;
+  color:#a01414;
+  font-weight:900;
   letter-spacing:1px;
-  margin:20px 0;
+  margin:20px 0 16px;
 }
 
-/* categoria box */
+/* =========================
+   CATEGORIAS
+========================= */
 
 .x-cat{
   background:#777;
@@ -218,11 +125,11 @@ body{
 }
 
 .x-cat-icon{
-  width:46px;
+  width:48px;
 }
 
 .x-cat-name{
-  font-weight:800;
+  font-weight:900;
 }
 
 .x-cat-count{
@@ -230,22 +137,20 @@ body{
   opacity:.9;
 }
 
-/* body */
-
 .x-cat-body{
   display:none;
   margin-top:14px;
 }
 
-/* grid produtos */
+/* =========================
+   PRODUTOS GRID
+========================= */
 
 .x-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px;
 }
-
-/* card produto */
 
 .x-prod{
   background:white;
@@ -266,11 +171,11 @@ body{
 }
 
 .x-prod-name{
-  font-weight:700;
+  font-weight:800;
   font-size:13px;
 }
 
-/* quantidade */
+/* QTD */
 
 .x-qty{
   display:flex;
@@ -291,31 +196,24 @@ body{
   width:38px;
   height:26px;
   text-align:center;
-  font-weight:700;
+  font-weight:900;
   border:1px solid #aaa;
 }
 
-/* botão adicionar */
+/* adicionar */
 
 .x-add{
   background:#facc15;
   border:1px solid #333;
   padding:6px 10px;
   font-size:12px;
-  font-weight:800;
+  font-weight:900;
   cursor:pointer;
 }
 
-/* mobile */
-
-@media(max-width:640px){
-  .x-grid{
-    grid-template-columns:1fr;
-  }
-}
-
-
-/* ===== XODÓ CARRINHO ===== */
+/* =========================
+   CARRINHO
+========================= */
 
 .x-cart-wrap{
   display:flex;
@@ -333,8 +231,6 @@ body{
   box-shadow:0 6px 14px rgba(0,0,0,.15);
 }
 
-/* item */
-
 .x-cart-item{
   background:white;
   border:2px solid #b91c1c;
@@ -344,6 +240,7 @@ body{
   grid-template-columns:48px 1fr auto auto;
   gap:10px;
   align-items:center;
+  margin-bottom:10px;
 }
 
 .x-cart-img{
@@ -355,10 +252,8 @@ body{
 
 .x-cart-name{
   font-size:13px;
-  font-weight:700;
+  font-weight:800;
 }
-
-/* salvar */
 
 .x-save{
   background:#991b1b;
@@ -366,11 +261,9 @@ body{
   border:none;
   padding:6px 10px;
   font-size:12px;
-  font-weight:800;
+  font-weight:900;
   cursor:pointer;
 }
-
-/* botão enviar */
 
 .x-submit-form{
   text-align:center;
@@ -389,67 +282,83 @@ body{
   box-shadow:0 4px 10px rgba(0,0,0,.25);
 }
 
-/* ===== XODÓ HEADER ===== */
+/* =========================
+   MEUS PEDIDOS — TABELA PRINT
+========================= */
 
-.x-topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:10px 24px;
-  background:linear-gradient(90deg,#b91c1c,#f97316);
+.xodo-wrap{
+  max-width:980px;
+  margin:auto;
 }
 
-.x-logo img{
-  height:56px;   /* 👈 tamanho maior */
-}
-
-.x-user-right{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.x-chip{
-  background:#facc15;
-  padding:8px 14px;
-  border-radius:10px;
-  font-weight:700;
-  font-size:14px;
-  box-shadow:0 2px 4px rgba(0,0,0,.2);
-}
-
-.x-btn-exit{
-  background:#e5e7eb;
-  padding:8px 14px;
-  border-radius:10px;
-  font-weight:600;
-  text-decoration:none;
-  color:#111;
-}
-
-/* ===== MENU LATERAL XODÓ ===== */
-
-.x-side-menu{
-  position:fixed;
-  right:30px;
-  top:180px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-
-.x-side-btn{
-  background:#991b1b;
-  color:white;
-  padding:10px 14px;
-  border-radius:8px;
-  font-size:13px;
-  font-weight:800;
-  text-decoration:none;
+.xodo-title{
   text-align:center;
+  color:#a01414;
+  font-weight:900;
+  margin:18px 0 14px;
+}
+
+.xodo-table-wrap{
+  display:flex;
+  justify-content:center;
+}
+
+.xodo-table{
+  width:760px;
+  border-collapse:collapse;
+  background:#e9e9e9;
+  border:2px solid #111;
   box-shadow:0 4px 10px rgba(0,0,0,.25);
 }
 
-.x-side-btn:hover{
-  opacity:.9;
+.xodo-table th{
+  background:#f2c316;
+  border:1px solid #111;
+  padding:10px;
+  font-weight:900;
+  text-transform:uppercase;
+}
+
+.xodo-table td{
+  border:1px solid #111;
+  padding:10px;
+}
+
+.xodo-table tr:nth-child(odd){ background:#efefef; }
+.xodo-table tr:nth-child(even){ background:#e2e2e2; }
+
+.td-id{
+  font-weight:900;
+  text-align:center;
+}
+
+.xodo-btn-open{
+  background:#8f1212;
+  color:white;
+  padding:6px 12px;
+  font-weight:900;
+  text-decoration:none;
+  border-radius:4px;
+  box-shadow:0 3px 0 rgba(0,0,0,.35);
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:720px){
+
+  .x-layout{
+    flex-direction:column;
+  }
+
+  .x-side{
+    width:auto;
+    display:flex;
+    gap:10px;
+  }
+
+  .x-grid{
+    grid-template-columns:1fr;
+  }
 }

@@ -1,31 +1,50 @@
 {% extends "base.html" %}
-{% block title %}Pedidos{% endblock %}
+{% block title %}Meus pedidos{% endblock %}
+
 {% block content %}
 
-<div class="card">
-<table class="table-xodo">
-<thead>
-<tr>
-<th>ID</th>
-<th>Status</th>
-<th>Data</th>
-<th></th>
-</tr>
-</thead>
+<div class="xodo-wrap">
 
-<tbody>
-{% for o in orders %}
-<tr>
-<td>#{{ o.id }}</td>
-<td><span class="status">{{ o.status }}</span></td>
-<td>{{ o.created_at|date:"d/m H:i" }}</td>
-<td class="td-action">
-<a href="{% url 'q_order_detail' o.id %}" class="btn btn-sm">Abrir</a>
-</td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
+  <h1 class="xodo-title">MEUS PEDIDOS</h1>
+
+  <div class="xodo-table-wrap">
+    <table class="xodo-table">
+      <thead>
+        <tr>
+          <th class="col-id">ID</th>
+          <th class="col-date">CRIADO EM</th>
+          <th class="col-status">STATUS</th>
+          <th class="col-action">AÇÃO</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for o in orders %}
+        <tr>
+          <td class="td-id">#{{ o.id }}</td>
+
+          <td class="td-date">
+            {{ o.created_at|date:"d \\d\\e F \\d\\e Y \\à\\s H:i" }}
+          </td>
+
+          <td class="td-status">
+            {{ o.status }}
+          </td>
+
+          <td class="td-action">
+            <a class="xodo-btn-open" href="{% url 'q_order_detail' o.id %}">ABRIR</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" class="td-empty">Nenhum pedido ainda.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+
+    </table>
+  </div>
+
 </div>
 
 {% endblock %}
