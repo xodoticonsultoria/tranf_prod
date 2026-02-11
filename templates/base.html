@@ -32,13 +32,22 @@
 <div class="x-layout">
 
   <!-- MENU LATERAL GLOBAL -->
-  <aside class="x-side">
-    <div class="x-cart-icon">🛒</div>
+<aside class="x-side">
 
-    <a href="{% url 'q_cart' %}" class="x-side-btn">Abrir Carrinho</a>
-    <a href="{% url 'q_products' %}" class="x-side-btn">Produtos</a>
-    <a href="{% url 'q_orders' %}" class="x-side-btn">Meus Pedidos</a>
-  </aside>
+    <div class="x-cart-icon">
+      🛒
+      {% if cart_count %}
+        <span class="x-cart-badge">{{ cart_count }}</span>
+      {% endif %}
+    </div>
+
+
+  <a href="{% url 'q_cart' %}" class="x-side-btn">Abrir Carrinho</a>
+  <a href="{% url 'q_products' %}" class="x-side-btn">Produtos</a>
+  <a href="{% url 'q_orders' %}" class="x-side-btn">Meus Pedidos</a>
+
+</aside>
+
 
   <!-- CONTEÚDO -->
   <main class="x-main">
