@@ -405,3 +405,88 @@ body{
   border-radius:999px;
   box-shadow:0 2px 6px rgba(0,0,0,.3);
 }
+
+/* =========================
+   LOGIN MODERNO
+========================= */
+
+.login-page{
+  min-height: calc(100vh - 120px);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:24px;
+}
+
+.login-panel{
+  width:100%;
+  max-width:900px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  background:white;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 10px 40px rgba(0,0,0,.25);
+}
+
+.login-brand{
+  background: linear-gradient(135deg,#9f1d1d,#f25c05);
+  color:white;
+  padding:40px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.login-logo{
+  width:110px;
+  margin-bottom:18px;
+}
+
+.login-form-box{
+  padding:40px;
+}
+
+.field{
+  margin-bottom:16px;
+}
+
+.field label{
+  font-weight:700;
+  font-size:14px;
+}
+
+.field input{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:15px;
+}
+
+.login-btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  background:#9f1d1d;
+  color:white;
+  font-weight:bold;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.login-error{
+  background:#ffe3e3;
+  color:#900;
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:14px;
+  text-align:center;
+}
+
+@media(max-width:820px){
+  .login-panel{
+    grid-template-columns:1fr;
+  }
+}

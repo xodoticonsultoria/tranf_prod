@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% block title %}Login{% endblock %}
 
 {% block content %}
 
@@ -8,9 +9,9 @@
   <div class="login-panel">
 
     <div class="login-brand">
-      <img src="{% static 'logo_xodo.png' %}" class="login-logo">
-      <h2>Sistema Xodó</h2>
-      <p>Acesso ao painel de pedidos</p>
+      <img src="{% static 'img/logo_xodo.png' %}" class="login-logo">
+
+      <p>Faça login e acesso ao painel de pedidos ❤</p>
     </div>
 
     <div class="login-form-box">
@@ -36,10 +37,9 @@
           {{ form.password }}
         </div>
 
-        <button type="submit" class="login-btn">
+        <button class="login-btn">
           Entrar no sistema
         </button>
-
       </form>
 
     </div>
