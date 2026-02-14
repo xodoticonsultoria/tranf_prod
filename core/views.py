@@ -159,8 +159,9 @@ def q_submit_order(request):
     cart.status = OrderStatus.SUBMITTED
     cart.save()
 
-    messages.success(request, f"Pedido #{cart.id} enviado.")
-    return redirect("q_orders")
+    messages.success(request, f"Pedido #{cart.id} enviado com sucesso!")
+
+    return redirect("q_cart")
 
 
 @require_queimados

@@ -9,16 +9,20 @@
 
     <div class="x-grid">
       {% for item in items %}
-      <form method="post" action="{% url 'q_cart' %}" class="x-cart-item">
+      <form method="post"
+            action="{% url 'q_cart' %}"
+            class="x-cart-item {% if item.product.image %}has-img{% endif %}">
         {% csrf_token %}
 
         {% if item.product.image %}
-          <img src="{{ item.product.image.url }}" class="x-cart-img" alt="">
-        {% else %}
-          <div class="x-cart-img placeholder"></div>
+          <img src="{{ item.product.image.url }}"
+               class="x-cart-img"
+               alt="">
         {% endif %}
 
-        <div class="x-cart-name">{{ item.product.name|upper }}</div>
+        <div class="x-cart-name">
+          {{ item.product.name|upper }}
+        </div>
 
         <div class="x-qty">
           <button type="button" onclick="dec(this)">−</button>
@@ -28,6 +32,7 @@
 
         <button class="x-save">SALVAR</button>
       </form>
+
       {% empty %}
         <div style="padding:10px;font-weight:800;">Carrinho vazio</div>
       {% endfor %}
@@ -36,9 +41,13 @@
   </div>
 </div>
 
-<form method="post" action="{% url 'q_submit_order' %}" class="x-submit-form">
+<form method="post"
+      action="{% url 'q_submit_order' %}"
+      class="x-submit-form">
   {% csrf_token %}
-  <button class="x-submit">ENVIAR<br>PEDIDO</button>
+  <button class="x-submit">
+    ENVIAR<br>PEDIDO
+  </button>
 </form>
 
 {% endblock %}

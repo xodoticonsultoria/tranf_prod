@@ -246,7 +246,7 @@ body{
 }
 
 .x-cart-box{
-  background:#facc15;
+  background:#D6DCE5;
   border:2px solid #333;
   padding:18px;
   border-radius:4px;
@@ -305,6 +305,17 @@ body{
   cursor:pointer;
   box-shadow:0 4px 10px rgba(0,0,0,.25);
 }
+
+/* se NÃO tiver imagem remove a coluna */
+.x-cart-item{
+  display:grid;
+  grid-template-columns:48px 1fr auto auto;
+}
+
+.x-cart-item:not(.has-img){
+  grid-template-columns:1fr auto auto;
+}
+
 
 /* =========================
    MEUS PEDIDOS — TABELA PRINT
@@ -520,4 +531,31 @@ body{
 
 .x-qty input[type=number]{
   -moz-appearance:textfield;
+}
+
+/* =========================
+   CART IGUAL PRODUTO
+========================= */
+
+.x-cart-item{
+  background:white;
+  border:2px solid #c81e1e; /* mesma cor do produto */
+  border-radius:4px;
+  padding:8px 10px;        /* mesma espessura */
+  display:grid;
+  grid-template-columns:48px 1fr auto auto;
+  align-items:center;
+  gap:8px;
+}
+
+/* quando não tiver imagem */
+.x-cart-item:not(.has-img){
+  grid-template-columns:1fr auto auto;
+}
+
+.x-cart-img{
+  width:42px;
+  height:42px;
+  object-fit:cover;
+  border-radius:50%;
 }
