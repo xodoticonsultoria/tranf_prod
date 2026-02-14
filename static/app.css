@@ -490,3 +490,34 @@ body{
     grid-template-columns:1fr;
   }
 }
+
+/* =========================
+   ADD — PRODUTO COM / SEM IMAGEM (NÃO RESERVA ESPAÇO)
+   (somente adiciona, não quebra o resto)
+========================= */
+
+/* quando NÃO tem imagem */
+.x-prod.no-img{
+  grid-template-columns: 1fr auto auto !important;
+}
+
+/* quando TEM imagem */
+.x-prod.has-img{
+  grid-template-columns: 42px 1fr auto auto !important;
+}
+
+/* garante que imagem some totalmente se não existir */
+.x-prod.no-img .x-prod-img{
+  display:none !important;
+}
+
+/* remove setas do input number (evita desalinhamento visual) */
+.x-qty input::-webkit-outer-spin-button,
+.x-qty input::-webkit-inner-spin-button{
+  -webkit-appearance:none;
+  margin:0;
+}
+
+.x-qty input[type=number]{
+  -moz-appearance:textfield;
+}
