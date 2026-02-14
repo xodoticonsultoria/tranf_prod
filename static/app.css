@@ -613,7 +613,4 @@ body{
     padding:8px 0;
   }
 
-  .td-id::before{content:"ID: "; font-weight:800;}
-  .td-date::before{content:"Criado: "; font-weight:800;}
-  .td-status::before{content:"Status: "; font-weight:800;}
-}
+
