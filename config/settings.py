@@ -124,9 +124,6 @@ TIME_ZONE = "America/Sao_Paulo"
 USE_I18N = True
 USE_TZ = True
 
-# --------------------
-# Static (WhiteNoise)
-# --------------------
 # ======================
 # STATIC FILES
 # ======================
@@ -172,6 +169,9 @@ cloudinary.config(
     api_key=os.getenv("CLOUDINARY_API_KEY"),
     api_secret=os.getenv("CLOUDINARY_API_SECRET"),
 )
+
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+
 
 # --------------------
 # Auth redirects
