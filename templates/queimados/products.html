@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Produtos{% endblock %}
 {% block content %}
 
@@ -8,8 +9,11 @@
 <div class="x-cat">
 
   <div class="x-cat-head" onclick="toggleCat({{ cat.id }})">
-    {% if cat.image %}
+
+    {% if cat.image and cat.image.url %}
       <img src="{{ cat.image.url }}" class="x-cat-icon">
+    {% else %}
+      <img src="{% static 'img/cat-default.png' %}" class="x-cat-icon">
     {% endif %}
 
     <div>
@@ -28,8 +32,10 @@
         {% csrf_token %}
         <input type="hidden" name="product_id" value="{{ p.id }}">
 
-        {% if p.image %}
+        {% if p.image and p.image.url %}
           <img src="{{ p.image.url }}" class="x-prod-img">
+        {% else %}
+          <img src="{% static 'img/prod-default.png' %}" class="x-prod-img">
         {% endif %}
 
         <div class="x-prod-name">
@@ -38,7 +44,7 @@
 
         <div class="x-qty">
           <button type="button" onclick="dec(this)">−</button>
-          <input name="qty" value="1">
+          <input name="qty" value="1" type="number" min="1">
           <button type="button" onclick="inc(this)">+</button>
         </div>
 
