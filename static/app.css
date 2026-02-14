@@ -494,3 +494,126 @@ body{
   }
 }
 
+/* =========================
+   XODO — ORDERS TABLE
+========================= */
+
+.xodo-wrap{
+  max-width: 980px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.xodo-title{
+  text-align:center;
+  font-size:28px;
+  font-weight:900;
+  letter-spacing:2px;
+  color:#a51a1a;
+  margin-bottom:28px;
+}
+
+.xodo-table-wrap{
+  background:#ffffff;
+  border-radius:14px;
+  box-shadow:0 6px 18px rgba(0,0,0,.15);
+  overflow:hidden;
+}
+
+.xodo-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:15px;
+}
+
+.xodo-table thead{
+  background:linear-gradient(90deg,#b61f1f,#f25c05);
+  color:#fff;
+}
+
+.xodo-table th{
+  padding:14px 16px;
+  text-align:left;
+  font-weight:800;
+}
+
+.xodo-table td{
+  padding:14px 16px;
+  border-bottom:1px solid #eee;
+}
+
+.xodo-table tbody tr:hover{
+  background:#fafafa;
+}
+
+/* colunas */
+
+.col-id,
+.td-id{
+  width:90px;
+  font-weight:800;
+}
+
+.col-status,
+.td-status{
+  font-weight:700;
+}
+
+/* botão abrir */
+
+.xodo-btn-open{
+  display:inline-block;
+  padding:8px 16px;
+  border-radius:8px;
+  background:#b31818;
+  color:#fff;
+  font-weight:800;
+  text-decoration:none;
+  transition:.15s;
+}
+
+.xodo-btn-open:hover{
+  background:#8f1010;
+  transform:translateY(-1px);
+}
+
+/* vazio */
+
+.td-empty{
+  text-align:center;
+  padding:30px;
+  font-weight:600;
+  color:#666;
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+
+@media (max-width:700px){
+
+  .xodo-table thead{
+    display:none;
+  }
+
+  .xodo-table,
+  .xodo-table tbody,
+  .xodo-table tr,
+  .xodo-table td{
+    display:block;
+    width:100%;
+  }
+
+  .xodo-table tr{
+    padding:12px;
+    border-bottom:1px solid #eee;
+  }
+
+  .xodo-table td{
+    padding:8px 0;
+  }
+
+  .td-id::before{content:"ID: "; font-weight:800;}
+  .td-date::before{content:"Criado: "; font-weight:800;}
+  .td-status::before{content:"Status: "; font-weight:800;}
+}
