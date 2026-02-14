@@ -8,16 +8,21 @@
 {% for cat in categories %}
 <div class="x-cat">
 
-  <div class="x-cat-head" onclick="toggleCat({{ cat.id }})">
+    <div class="x-cat-head" onclick="toggleCat({{ cat.id }})">
 
-    <img src="{% static 'img/logo_xodo.png' %}" class="x-cat-icon">
+      <img
+        src="{% if cat.image %}{{ cat.image.url }}{% else %}{% static 'img/logo_xodo.png' %}{% endif %}"
+        class="x-cat-icon"
+        onerror="this.src='{% static 'img/logo_xodo.png' %}'"
+      >
 
-    <div>
-      <div class="x-cat-name">{{ cat.name|upper }}</div>
-      <div class="x-cat-count">{{ cat.products.count }} PRODUTOS</div>
+      <div>
+        <div class="x-cat-name">{{ cat.name|upper }}</div>
+        <div class="x-cat-count">{{ cat.products.count }} PRODUTOS</div>
+      </div>
+
     </div>
 
-  </div>
 
   <div id="cat-body-{{ cat.id }}" class="x-cat-body">
 
