@@ -1,24 +1,51 @@
 {% extends "base.html" %}
-{% block title %}Login{% endblock %}
+{% load static %}
 
 {% block content %}
-<div class="card" style="max-width: 520px; margin: 0 auto;">
-  <h2>Entrar</h2>
-  <p class="muted">Use seu usuário e senha.</p>
 
-  <form method="post">
-    {% csrf_token %}
-    <div style="margin-bottom: 10px;">
-      <label class="muted"><strong>Usuário</strong></label>
-      <input name="username" />
+<div class="login-page">
+
+  <div class="login-panel">
+
+    <div class="login-brand">
+      <img src="{% static 'logo_xodo.png' %}" class="login-logo">
+      <h2>Sistema Xodó</h2>
+      <p>Acesso ao painel de pedidos</p>
     </div>
 
-    <div style="margin-bottom: 14px;">
-      <label class="muted"><strong>Senha</strong></label>
-      <input type="password" name="password" />
+    <div class="login-form-box">
+
+      <h3>Entrar</h3>
+
+      {% if form.errors %}
+        <div class="login-error">
+          Usuário ou senha inválidos
+        </div>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="field">
+          <label>Usuário</label>
+          {{ form.username }}
+        </div>
+
+        <div class="field">
+          <label>Senha</label>
+          {{ form.password }}
+        </div>
+
+        <button type="submit" class="login-btn">
+          Entrar no sistema
+        </button>
+
+      </form>
+
     </div>
 
-    <button class="btn btn-primary" type="submit" style="width:100%;">Entrar</button>
-  </form>
+  </div>
+
 </div>
+
 {% endblock %}

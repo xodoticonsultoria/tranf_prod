@@ -14,19 +14,18 @@ DEBUG = os.getenv("DEBUG", "0") == "1"
 # --------------------
 # Hosts / CSRF
 # --------------------
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "tranf-prod.onrender.com",
-]
 
-extra_hosts = os.getenv("ALLOWED_HOSTS", "").strip()
-if extra_hosts:
-    ALLOWED_HOSTS += [h.strip() for h in extra_hosts.split(",") if h.strip()]
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://tranf-prod.onrender.com",
-]
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# DEBUG controlado por env (local fica True, Render fica False)
+DEBUG = os.environ.get("DEBUG", "1") == "1"
+
+# Hosts permitidos
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+
+# Render costuma usar isso quando está atrás de proxy
+CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if os.environ.get("CSRF_TRUSTED_ORIGINS") else []
 
 # --------------------
 # Apps
@@ -62,24 +61,26 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls"
 
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 TEMPLATES = [
     {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-                "core.context.cart_context",
-                'core.context_processors.cart_badge',
-
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / "templates"],  # 👈 ESSENCIAL
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
             ],
         },
     },
 ]
+
 
 
 WSGI_APPLICATION = "config.wsgi.application"
@@ -126,17 +127,24 @@ USE_TZ = True
 # --------------------
 # Static (WhiteNoise)
 # --------------------
+# ======================
+# STATIC FILES
+# ======================
+
 STATIC_URL = "/static/"
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-STORAGES = {
-    "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
+# em desenvolvimento local NÃO use manifest
+# isso evita erro 500 quando falta arquivo no manifest
+if DEBUG:
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+else:
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
 # --------------------
 # Cloudinary (media files)

@@ -35,6 +35,7 @@
     {% block content %}{% endblock %}
   </main>
 
+  {% if request.user.is_authenticated %}
   <aside class="x-side">
     <div class="x-cart-icon">
       🛒
@@ -47,9 +48,9 @@
     <a href="{% url 'q_products' %}" class="x-side-btn">Produtos</a>
     <a href="{% url 'q_orders' %}" class="x-side-btn">Meus Pedidos</a>
   </aside>
+  {% endif %}
 
 </div>
-
 
 <script src="{% static 'app.js' %}"></script>
 </body>

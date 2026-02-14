@@ -19,6 +19,8 @@ body{
   display:flex;
   align-items:center;
   justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
 }
 
 .x-logo{
@@ -29,6 +31,7 @@ body{
   display:flex;
   gap:12px;
   align-items:center;
+  flex-wrap:wrap;
 }
 
 .pill{
@@ -61,13 +64,12 @@ body{
   align-items:center;
 }
 
-
 /* =========================
    MENU LATERAL
 ========================= */
 
 .x-side{
-  width:160px;      /* menor */
+  width:160px;
   padding:20px 10px;
 }
 
@@ -75,21 +77,22 @@ body{
   position:relative;
   font-size:28px;
   text-align:center;
-  margin-bottom:12px;
+  margin-bottom:10px;
 }
 
 /* badge contador */
+
 .x-cart-badge{
   position:absolute;
   top:-6px;
-  right:26px;
-  background:#facc15;
-  color:#111;
-  font-weight:900;
+  right:-8px;
+  background:#b91c1c;
+  color:white;
   font-size:12px;
+  font-weight:900;
+  padding:3px 7px;
   border-radius:999px;
-  padding:2px 6px;
-  box-shadow:0 2px 4px rgba(0,0,0,.3);
+  box-shadow:0 2px 6px rgba(0,0,0,.3);
 }
 
 .x-side-btn{
@@ -97,12 +100,12 @@ body{
   background:#a51515;
   color:white;
   text-decoration:none;
-  padding:10px 10px;    /* menor */
+  padding:10px 10px;
   border-radius:8px;
   margin-bottom:10px;
   text-align:center;
   font-weight:800;
-  font-size:13px;       /* menor */
+  font-size:13px;
   box-shadow:0 3px 8px rgba(0,0,0,.15);
 }
 
@@ -123,7 +126,6 @@ body{
   font-size:22px;
 }
 
-
 /* =========================
    CATEGORIAS
 ========================= */
@@ -133,13 +135,11 @@ body{
   border:2px solid #333;
   border-radius:6px;
   padding:14px;
-  margin: 0 auto 18px auto;   /* centraliza */
-  width: 820px;               /* largura menor */
+  margin: 0 auto 18px auto;
+  width: 820px;
   max-width: 92%;
   box-shadow:0 4px 10px rgba(0,0,0,.15);
 }
-
-
 
 .x-cat-head{
   display:flex;
@@ -178,7 +178,6 @@ body{
   margin-top:12px;
 }
 
-
 .x-prod{
   background:white;
   border:2px solid #c81e1e;
@@ -189,7 +188,6 @@ body{
   align-items:center;
   gap:8px;
 }
-
 
 .x-prod-img{
   width:42px;
@@ -221,11 +219,13 @@ body{
 }
 
 .x-qty input{
-  width:38px;
-  height:26px;
+  width:42px;
+  height:28px;
   text-align:center;
   font-weight:900;
   border:1px solid #aaa;
+  border-radius:6px;
+  background:white;
 }
 
 /* adicionar */
@@ -311,101 +311,186 @@ body{
 }
 
 /* =========================
-   MEUS PEDIDOS — TABELA PRINT
+   LOGIN MODERNO (NOVO)
 ========================= */
 
-.xodo-wrap{
-  max-width:980px;
-  margin:auto;
-}
-
-.xodo-title{
-  text-align:center;
-  color:#a01414;
-  font-weight:900;
-  margin:18px 0 14px;
-}
-
-.xodo-table-wrap{
+.login-page{
+  min-height: calc(100vh - 120px);
   display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:24px;
+}
+
+.login-panel{
+  width:100%;
+  max-width:900px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  background:white;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 10px 40px rgba(0,0,0,.15);
+}
+
+.login-brand{
+  background: linear-gradient(135deg,#9f1d1d,#f25c05);
+  color:white;
+  padding:40px;
+  display:flex;
+  flex-direction:column;
   justify-content:center;
 }
 
-.xodo-table{
-  width:760px;
-  border-collapse:collapse;
-  background:#e9e9e9;
-  border:2px solid #111;
-  box-shadow:0 4px 10px rgba(0,0,0,.25);
+.login-logo{
+  width:90px;
+  margin-bottom:18px;
 }
 
-.xodo-table th{
-  background:#f2c316;
-  border:1px solid #111;
-  padding:10px;
-  font-weight:900;
-  text-transform:uppercase;
+.login-form-box{
+  padding:40px;
 }
 
-.xodo-table td{
-  border:1px solid #111;
-  padding:10px;
+.field{
+  margin-bottom:16px;
 }
 
-.xodo-table tr:nth-child(odd){ background:#efefef; }
-.xodo-table tr:nth-child(even){ background:#e2e2e2; }
-
-.td-id{
-  font-weight:900;
-  text-align:center;
+.field input{
+  width:100%;
+  padding:11px;
+  border-radius:10px;
+  border:1px solid #ccc;
 }
 
-.xodo-btn-open{
-  background:#8f1212;
+.login-btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  background:#9f1d1d;
   color:white;
-  padding:6px 12px;
-  font-weight:900;
-  text-decoration:none;
-  border-radius:4px;
-  box-shadow:0 3px 0 rgba(0,0,0,.35);
+  font-weight:bold;
+  cursor:pointer;
 }
 
 /* =========================
    MOBILE
 ========================= */
 
-@media(max-width:720px){
+@media(max-width:820px){
+
+  .login-panel{
+    grid-template-columns:1fr;
+  }
 
   .x-layout{
     flex-direction:column;
   }
 
-.x-side{
-  width:150px;
-  padding:10px 8px;
-}
-
+  .x-side{
+    width:100%;
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    padding:10px;
+  }
 
   .x-grid{
     grid-template-columns:1fr;
   }
-}
-.x-cart-icon{
-  position:relative;
-  font-size:28px;
-  text-align:center;
-  margin-bottom:10px;
+
 }
 
-.x-cart-badge{
-  position:absolute;
-  top:-6px;
-  right:-8px;
-  background:#b91c1c;
-  color:white;
-  font-size:12px;
-  font-weight:900;
-  padding:3px 7px;
-  border-radius:999px;
-  box-shadow:0 2px 6px rgba(0,0,0,.3);
+
+/* =========================
+   LOGIN MODERNO — PAINEL
+========================= */
+
+.login-page{
+  min-height: calc(100vh - 120px);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:24px;
 }
+
+.login-panel{
+  width:100%;
+  max-width:900px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  background:white;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 10px 40px rgba(0,0,0,.25);
+}
+
+.login-brand{
+  background: linear-gradient(135deg,#9f1d1d,#f25c05);
+  color:white;
+  padding:40px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.login-logo{
+  width:110px;
+  margin-bottom:18px;
+}
+
+.login-form-box{
+  padding:40px;
+  background:white;
+}
+
+.login-form-box h3{
+  margin-bottom:20px;
+}
+
+.field{
+  margin-bottom:16px;
+}
+
+.field label{
+  font-weight:700;
+  font-size:14px;
+}
+
+.field input{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:15px;
+}
+
+.login-btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  background:#9f1d1d;
+  color:white;
+  font-weight:bold;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.login-error{
+  background:#ffe3e3;
+  color:#900;
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:14px;
+  text-align:center;
+}
+
+/* mobile */
+
+@media(max-width:820px){
+  .login-panel{
+    grid-template-columns:1fr;
+  }
+}
+
