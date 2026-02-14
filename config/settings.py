@@ -1,35 +1,32 @@
 import os
 from pathlib import Path
+
 import dj_database_url
-import cloudinary
 
+from dotenv import load_dotenv
+load_dotenv()
+
+
+# ======================
+# BASE
+# ======================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# --------------------
-# Básico
-# --------------------
-SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret")
-DEBUG = os.getenv("DEBUG", "0") == "1"
-
-# --------------------
-# Hosts / CSRF
-# --------------------
-
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-# DEBUG controlado por env (local fica True, Render fica False)
+SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret")
 DEBUG = os.environ.get("DEBUG", "1") == "1"
 
-# Hosts permitidos
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
-# Render costuma usar isso quando está atrás de proxy
-CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if os.environ.get("CSRF_TRUSTED_ORIGINS") else []
+# Render / CSRF
+CSRF_TRUSTED_ORIGINS = (
+    os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if os.environ.get("CSRF_TRUSTED_ORIGINS")
+    else []
+)
 
-# --------------------
-# Apps
-# --------------------
+# ======================
+# APPS
+# ======================
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -38,6 +35,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
+    # app
     "core",
 
     # cloudinary
@@ -45,9 +43,9 @@ INSTALLED_APPS = [
     "cloudinary_storage",
 ]
 
-# --------------------
-# Middleware
-# --------------------
+# ======================
+# MIDDLEWARE
+# ======================
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -61,34 +59,31 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls"
 
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
+# ======================
+# TEMPLATES
+# ======================
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],  # 👈 ESSENCIAL
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
-    },
+    }
 ]
-
-
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-# --------------------
-# Database
-# --------------------
-db_url = os.getenv("DATABASE_URL", "").strip()
+# ======================
+# DATABASE
+# ======================
+db_url = os.environ.get("DATABASE_URL", "").strip()
 
 if db_url:
     DATABASES = {
@@ -106,9 +101,9 @@ else:
         }
     }
 
-# --------------------
-# Password validation
-# --------------------
+# ======================
+# PASSWORD VALIDATION
+# ======================
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -116,54 +111,62 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# --------------------
-# Locale
-# --------------------
+# ======================
+# LOCALE
+# ======================
 LANGUAGE_CODE = "pt-br"
 TIME_ZONE = "America/Sao_Paulo"
 USE_I18N = True
 USE_TZ = True
 
 # ======================
-# STATIC FILES
+# STATIC + MEDIA
 # ======================
-
 STATIC_URL = "/static/"
-
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
-
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
-# em desenvolvimento local NÃO use manifest
-# isso evita erro 500 quando falta arquivo no manifest
-if DEBUG:
-    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
-else:
-    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
-
-# --------------------
-# Cloudinary (media)
-# --------------------
-DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
-
-CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
-    "API_KEY": os.getenv("CLOUDINARY_API_KEY"),
-    "API_SECRET": os.getenv("CLOUDINARY_API_SECRET"),
-}
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# ======================
+# CLOUDINARY STORAGE (Django 6)
+# ======================
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": os.environ.get("CLOUDINARY_API_KEY"),
+    "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET"),
+}
 
+STORAGES = {
+    # uploads (ImageField/FileField)
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    # collectstatic / whitenoise
+    "staticfiles": {
+        "BACKEND": (
+            "django.contrib.staticfiles.storage.StaticFilesStorage"
+            if DEBUG
+            else "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+        ),
+    },
+}
 
-# --------------------
-# Auth redirects
-# --------------------
+# ======================
+# AUTH REDIRECTS
+# ======================
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/login/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# ======================
+# SECURITY (opcional, mas bom pro Render)
+# ======================
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = False  # Render já faz https; deixe False pra evitar loop
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
