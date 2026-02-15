@@ -1,11 +1,9 @@
 import os
 from pathlib import Path
-
 import dj_database_url
-
 from dotenv import load_dotenv
-load_dotenv()
 
+load_dotenv()
 
 # ======================
 # BASE
@@ -13,20 +11,27 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret")
-DEBUG = os.environ.get("DEBUG", "1") == "1"
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+DEBUG = os.environ.get("DEBUG", "0") == "1"
 
-# Render / CSRF
-CSRF_TRUSTED_ORIGINS = (
-    os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
-    if os.environ.get("CSRF_TRUSTED_ORIGINS")
-    else []
-)
+# ======================
+# HOSTS (FIXO PRA RENDER)
+# ======================
+
+ALLOWED_HOSTS = [
+    "tranf-prod.onrender.com",
+    "127.0.0.1",
+    "localhost",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://tranf-prod.onrender.com",
+]
 
 # ======================
 # APPS
 # ======================
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -46,6 +51,7 @@ INSTALLED_APPS = [
 # ======================
 # MIDDLEWARE
 # ======================
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -62,6 +68,7 @@ ROOT_URLCONF = "config.urls"
 # ======================
 # TEMPLATES
 # ======================
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -73,8 +80,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                'core.context_processors.cart_badge',
-
+                "core.context_processors.cart_badge",
             ],
         },
     }
@@ -85,6 +91,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 # ======================
 # DATABASE
 # ======================
+
 db_url = os.environ.get("DATABASE_URL", "").strip()
 
 if db_url:
@@ -92,7 +99,7 @@ if db_url:
         "default": dj_database_url.parse(
             db_url,
             conn_max_age=600,
-            ssl_require=not DEBUG,
+            ssl_require=True,
         )
     }
 else:
@@ -106,6 +113,7 @@ else:
 # ======================
 # PASSWORD VALIDATION
 # ======================
+
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -116,6 +124,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # ======================
 # LOCALE
 # ======================
+
 LANGUAGE_CODE = "pt-br"
 TIME_ZONE = "America/Sao_Paulo"
 USE_I18N = True
@@ -124,6 +133,7 @@ USE_TZ = True
 # ======================
 # STATIC + MEDIA
 # ======================
+
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
@@ -132,8 +142,9 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # ======================
-# CLOUDINARY STORAGE (Django 6)
+# CLOUDINARY STORAGE
 # ======================
+
 CLOUDINARY_STORAGE = {
     "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME"),
     "API_KEY": os.environ.get("CLOUDINARY_API_KEY"),
@@ -141,11 +152,9 @@ CLOUDINARY_STORAGE = {
 }
 
 STORAGES = {
-    # uploads (ImageField/FileField)
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
-    # collectstatic / whitenoise
     "staticfiles": {
         "BACKEND": (
             "django.contrib.staticfiles.storage.StaticFilesStorage"
@@ -156,8 +165,9 @@ STORAGES = {
 }
 
 # ======================
-# AUTH REDIRECTS
+# AUTH
 # ======================
+
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/login/"
@@ -165,10 +175,11 @@ LOGOUT_REDIRECT_URL = "/login/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # ======================
-# SECURITY (opcional, mas bom pro Render)
+# SECURITY (RENDER)
 # ======================
+
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-    SECURE_SSL_REDIRECT = False  # Render já faz https; deixe False pra evitar loop
+    SECURE_SSL_REDIRECT = False  # Render já usa HTTPS
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
