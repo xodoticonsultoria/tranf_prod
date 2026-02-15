@@ -1,11 +1,10 @@
-from msilib import Table
-import io
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
+
 from .models import Category, Product, TransferOrder, TransferOrderItem, OrderStatus, Branch
 from .permissions import require_austin, require_queimados
 
@@ -13,12 +12,12 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_GET
 
 import io
-from django.http import HttpResponse
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 from reportlab.lib.units import inch
+
 
 
 
