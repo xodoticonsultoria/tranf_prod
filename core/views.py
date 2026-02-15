@@ -1,15 +1,25 @@
+from msilib import Table
+import io
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-
 from .models import Category, Product, TransferOrder, TransferOrderItem, OrderStatus, Branch
 from .permissions import require_austin, require_queimados
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_GET
+
+import io
+from django.http import HttpResponse
+
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+
 
 
 
@@ -306,17 +316,118 @@ def austin_badge(request):
     return JsonResponse({"count": count})
 
 
+
+@require_queimados
+def q_report(request):
+    orders = TransferOrder.objects.exclude(status=OrderStatus.DRAFT)
+
+    start = request.GET.get("start")
+    end = request.GET.get("end")
+    user = request.GET.get("user")
+
+    if start:
+        orders = orders.filter(created_at__date__gte=start)
+
+    if end:
+        orders = orders.filter(created_at__date__lte=end)
+
+    if user:
+        orders = orders.filter(created_by__username__icontains=user)
+
+    orders = orders.order_by("-created_at")
+
+    return render(
+        request,
+        "queimados/report.html",
+        {
+            "orders": orders,
+            "start": start,
+            "end": end,
+            "user": user,
+        },
+    )
+
+
 @require_austin
 @require_GET
 def austin_poll(request):
-    """
-    Retorna:
-      - count: total de SUBMITTED
-      - newest_id: maior id entre SUBMITTED (pra detectar novidade)
-    O front guarda o last_id e toca som/mostra toast quando aumenta.
-    """
     qs = TransferOrder.objects.filter(status=OrderStatus.SUBMITTED)
     count = qs.count()
     newest = qs.order_by("-id").first()
     newest_id = newest.id if newest else 0
     return JsonResponse({"count": count, "newest_id": newest_id})
+
+
+
+@login_required
+def report_view(request):
+
+    orders = TransferOrder.objects.exclude(status=OrderStatus.DRAFT)
+
+    start = request.GET.get("start")
+    end = request.GET.get("end")
+    responsavel = request.GET.get("responsavel")
+    export = request.GET.get("export")
+
+    if start:
+        orders = orders.filter(created_at__date__gte=start)
+
+    if end:
+        orders = orders.filter(created_at__date__lte=end)
+
+    if responsavel:
+        orders = orders.filter(created_by__username__icontains=responsavel)
+
+    # 🔥 SE FOR EXPORT PDF
+    if export == "pdf":
+
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer)
+        elements = []
+
+        styles = getSampleStyleSheet()
+
+        elements.append(Paragraph("Relatório de Pedidos", styles["Heading1"]))
+        elements.append(Spacer(1, 0.3 * inch))
+
+        data = [["ID", "Responsável", "Status", "Data"]]
+
+        for order in orders:
+            data.append([
+                f"#{order.id}",
+                order.created_by.username,
+                order.status,
+                order.created_at.strftime("%d/%m/%Y %H:%M")
+            ])
+
+        table = Table(data)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.yellow),
+            ('GRID', (0,0), (-1,-1), 1, colors.black),
+            ('ALIGN', (0,0), (-1,-1), 'CENTER')
+        ]))
+
+        elements.append(table)
+
+        doc.build(elements)
+
+        buffer.seek(0)
+
+        response = HttpResponse(buffer, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="relatorio.pdf"'
+        return response
+
+    # 🔥 RESUMO NORMAL NA TELA
+    summary = None
+
+    if start or end or responsavel:
+        summary = {
+            "total": orders.count(),
+            "submitted": orders.filter(status=OrderStatus.SUBMITTED).count(),
+            "dispatched": orders.filter(status=OrderStatus.DISPATCHED).count(),
+            "received": orders.filter(status=OrderStatus.RECEIVED).count(),
+        }
+
+    return render(request, "queimados/report.html", {"summary": summary})
+
+

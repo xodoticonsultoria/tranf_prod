@@ -1,59 +1,65 @@
 {% extends "base.html" %}
-{% block title %}Queimados - Pedido #{{ order.id }}{% endblock %}
-
+{% block title %}Pedido {{ order.id }}{% endblock %}
 {% block content %}
-<div class="card">
-  <div class="row">
-    <div class="grow">
-      <h2>Queimados • Pedido #{{ order.id }}</h2>
-      <p class="muted">Comparativo: pedido x enviado.</p>
-    </div>
-    <div class="right">
-      <p><strong>Status:</strong> <span class="pill pill-gray">{{ order.status }}</span></p>
-      {% if order.status == "DISPATCHED" %}
-        <a class="btn btn-primary" href="/queimados/pedidos/{{ order.id }}/receber/" onclick="return confirm('Confirmar recebimento do pedido?');">Confirmar recebimento</a>
-      {% endif %}
-    </div>
-  </div>
 
-  <table>
+<h2 class="area-title">
+  Queimados • Pedido #{{ order.id }}
+</h2>
+
+<div class="order-status-box">
+  <span class="order-status-label">Status:</span>
+  <span class="order-status-badge">
+    {{ order.get_status_display|upper }}
+  </span>
+</div>
+
+<div class="order-table-wrap">
+  <table class="order-table">
+
     <thead>
       <tr>
         <th>Produto</th>
-        <th class="wrap">Pedido</th>
-        <th class="wrap">Enviado</th>
+        <th>Pedido</th>
+        <th>Recebido</th>
         <th>Resultado</th>
       </tr>
     </thead>
+
     <tbody>
-      {% for it in items %}
+      {% for item in items %}
       <tr>
-        <td><strong>{{ it.product.name }}</strong> <span class="muted">({{ it.product.sku }})</span></td>
-        <td>{{ it.qty_requested }}</td>
-        <td>{{ it.qty_sent }}</td>
+        <td class="prod-name">
+          {{ item.product.name|upper }}
+        </td>
+
         <td>
-          {% if it.is_fulfilled %}
-            ✅ Completo
+          {{ item.qty_requested }}
+        </td>
+
+        <td>
+          {{ item.qty_sent|default:0 }}
+        </td>
+
+        <td>
+          {% if item.qty_sent == item.qty_requested %}
+            <span class="result-ok">✔ OK</span>
           {% else %}
-            ⚠ Faltou {{ it.missing_qty }}
+            <span class="result-missing">
+              ⚠ Faltou {{ item.qty_requested|add:"-item.qty_sent" }}
+            </span>
           {% endif %}
         </td>
       </tr>
-      {% empty %}
-      <tr><td colspan="4">Pedido sem itens.</td></tr>
       {% endfor %}
     </tbody>
+
   </table>
-
-  {% if order.notes_from_austin %}
-    <div class="card" style="margin-top:14px;">
-      <h3>Observação de Austin</h3>
-      <p>{{ order.notes_from_austin }}</p>
-    </div>
-  {% endif %}
-
-  <div class="row" style="margin-top:14px;">
-    <a class="btn btn-secondary" href="/queimados/pedidos/">Voltar</a>
-  </div>
 </div>
+
+<div style="text-align:center; margin-top:25px;">
+  <a href="{% url 'q_orders' %}" class="x-side-btn" style="display:inline-block;">
+    Voltar
+  </a>
+</div>
+
 {% endblock %}

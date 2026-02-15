@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Relatório{% endblock %}
+{% block content %}
+
+<h2 class="area-title">RELATÓRIO</h2>
+
+<div class="report-box">
+  <form method="get" class="report-form">
+
+    <input type="date" name="start" value="{{ request.GET.start }}">
+    <input type="date" name="end" value="{{ request.GET.end }}">
+    <input type="text" name="responsavel" placeholder="Responsável" value="{{ request.GET.responsavel }}">
+
+    <button type="submit" class="btn-search">
+      Buscar
+    </button>
+
+  </form>
+</div>
+
+
+{% if summary %}
+  <div class="report-summary">
+
+    <div class="card">
+      <h3>{{ summary.total }}</h3>
+      <span>Total Pedidos</span>
+    </div>
+
+    <div class="card">
+      <h3>{{ summary.submitted }}</h3>
+      <span>Enviados</span>
+    </div>
+
+    <div class="card">
+      <h3>{{ summary.dispatched }}</h3>
+      <span>Despachados</span>
+    </div>
+
+    <div class="card">
+      <h3>{{ summary.received }}</h3>
+      <span>Recebidos</span>
+    </div>
+
+  </div>
+
+  <div class="report-actions">
+    <a href="?export=pdf&start={{ request.GET.start }}&end={{ request.GET.end }}&responsavel={{ request.GET.responsavel }}"
+       class="btn-export">
+       Exportar PDF
+    </a>
+  </div>
+
+  {% if orders %}
+    <div class="report-results">
+      <p>Total encontrado: {{ orders.count }}</p>
+    </div>
+  {% endif %}
+
+{% endif %}
+
+{% endblock %}
