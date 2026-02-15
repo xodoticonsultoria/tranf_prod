@@ -1,12 +1,19 @@
-from .models import TransferOrderItem, OrderStatus
+from .models import TransferOrder, OrderStatus
 
 def cart_badge(request):
     if not request.user.is_authenticated:
-        return {"cart_count": 0}
+        return {}
 
-    count = TransferOrderItem.objects.filter(
-        order__created_by=request.user,
-        order__status=OrderStatus.DRAFT
-    ).count()
+    cart = TransferOrder.objects.filter(
+        created_by=request.user,
+        status=OrderStatus.DRAFT
+    ).first()
 
-    return {"cart_count": count}
+    count = 0
+    if cart:
+        count = cart.items.count()
+
+    return {
+        "cart_count": count
+    }
+

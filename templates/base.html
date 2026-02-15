@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="{% static 'app.css' %}">
 </head>
 
-<body>
+<body class="{% if animate_cart %}animate-cart{% endif %}">
 
 <header class="x-header">
 
@@ -53,6 +53,27 @@
 </div>
 
 <script src="{% static 'app.js' %}"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+  const badge = document.getElementById("cart-badge")
+
+  if(!badge) return
+
+  const current = parseInt(badge.innerText)
+  const stored = parseInt(localStorage.getItem("cart_count") || 0)
+
+  if(current > stored){
+      badge.classList.add("pulse-badge")
+  }
+
+  localStorage.setItem("cart_count", current)
+
+})
+</script>
+
 
 </body>
 </html>

@@ -81,15 +81,16 @@ def _get_or_create_cart(user):
 def q_products(request):
     cart = _get_or_create_cart(request.user)
 
-    # categorias ativas + produtos ativos
     categories = (
         Category.objects.filter(active=True)
         .prefetch_related("products")
         .order_by("name")
     )
 
-    # produtos sem categoria (opcional)
-    uncategorized = Product.objects.filter(active=True, category__isnull=True).order_by("name")
+    uncategorized = Product.objects.filter(
+        active=True,
+        category__isnull=True
+    ).order_by("name")
 
     if request.method == "POST":
         product_id = int(request.POST["product_id"])
@@ -111,8 +112,12 @@ def q_products(request):
             item.qty_requested += qty
             item.save()
 
-        messages.success(request, f"Adicionado: {product.name} (+{qty})")
+        if created:
+            request.session["animate_cart"] = True
+
         return redirect("q_products")
+
+    animate = request.session.pop("animate_cart", False)
 
     return render(
         request,
@@ -121,6 +126,7 @@ def q_products(request):
             "cart": cart,
             "categories": categories,
             "uncategorized": uncategorized,
+            "animate_cart": animate,
         },
     )
 
