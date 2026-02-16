@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="{% static 'app.css' %}">
 </head>
 
-<body class="{% if animate_cart %}animate-cart{% endif %}">
+<body>
 
 <header class="x-header">
 
@@ -20,14 +20,19 @@
   {% if request.user.is_authenticated %}
   <div class="x-user-bar">
     <span class="pill">Nome: {{ request.user.username }}</span>
+
     {% if request.user.groups.first %}
-      <span class="pill">Filial: {{ request.user.groups.first.name }}</span>
+      <span class="pill">
+        Filial: {{ request.user.groups.first.name }}
+      </span>
     {% endif %}
-    <a href="{% url 'logout' %}" class="pill pill-light">sair</a>
+
+    <a href="{% url 'logout' %}" class="pill pill-light">Sair</a>
   </div>
   {% endif %}
 
 </header>
+
 
 <div class="x-layout">
 
@@ -37,17 +42,24 @@
 
   {% if request.user.is_authenticated %}
   <aside class="x-side">
-    <div class="x-cart-icon">
-      🛒
-      {% if cart_count %}
-        <span class="x-cart-badge">{{ cart_count }}</span>
-      {% endif %}
-    </div>
 
-    <a href="{% url 'q_cart' %}" class="x-side-btn">Abrir Carrinho</a>
-    <a href="{% url 'q_products' %}" class="x-side-btn">Produtos</a>
-    <a href="{% url 'q_orders' %}" class="x-side-btn">Meus Pedidos</a>
-    <a href="{% url 'q_report' %}" class="x-side-btn">Relatório</a>
+    <!-- ========================= -->
+    <!-- MENU QUEIMADOS -->
+    <!-- ========================= -->
+    {% if request.user.groups.first.name == "QUEIMADOS" %}
+      <a href="{% url 'q_cart' %}" class="x-side-btn">Abrir Carrinho</a>
+      <a href="{% url 'q_products' %}" class="x-side-btn">Produtos</a>
+      <a href="{% url 'q_orders' %}" class="x-side-btn">Meus Pedidos</a>
+      <a href="{% url 'q_report' %}" class="x-side-btn">Relatório</a>
+    {% endif %}
+
+    <!-- ========================= -->
+    <!-- MENU AUSTIN -->
+    <!-- ========================= -->
+    {% if request.user.groups.first.name == "AUSTIN" %}
+      <a href="{% url 'a_orders' %}" class="x-side-btn">Pedidos Recebidos</a>
+      <a href="{% url 'a_report' %}" class="x-side-btn">Relatório</a>
+    {% endif %}
 
   </aside>
   {% endif %}
@@ -57,25 +69,57 @@
 <script src="{% static 'app.js' %}"></script>
 
 
+<!-- ========================================= -->
+<!-- 🔄 POLLING PROFISSIONAL AUSTIN -->
+<!-- ========================================= -->
+{% if request.user.is_authenticated and request.user.groups.first.name == "AUSTIN" %}
+
 <script>
-document.addEventListener("DOMContentLoaded", function(){
 
-  const badge = document.getElementById("cart-badge")
+let lastOrderId = parseInt(localStorage.getItem("last_austin_order_id") || 0)
+let alreadyInsideOrders = window.location.pathname.includes("/austin/pedidos/")
+let btn = document.getElementById("austin-orders-btn")
 
-  if(!badge) return
+// Se entrou na tela de pedidos → para alerta
+if(alreadyInsideOrders){
+    localStorage.setItem("last_austin_order_id", lastOrderId)
+    if(btn) btn.classList.remove("blinking")
+}
 
-  const current = parseInt(badge.innerText)
-  const stored = parseInt(localStorage.getItem("cart_count") || 0)
+setInterval(function(){
 
-  if(current > stored){
-      badge.classList.add("pulse-badge")
-  }
+    fetch("/austin/api/badge/")
+    .then(r => r.json())
+    .then(data => {
 
-  localStorage.setItem("cart_count", current)
+        if(data.newest_id && data.newest_id > lastOrderId){
 
-})
+            // Atualiza último ID salvo
+            lastOrderId = data.newest_id
+            localStorage.setItem("last_austin_order_id", lastOrderId)
+
+            // Só alerta se NÃO estiver na tela de pedidos
+            if(!alreadyInsideOrders){
+
+                if(btn){
+                    btn.classList.add("blinking")
+                }
+
+                // 🔔 Som só quando realmente chega novo
+                const audio = new Audio("{% static 'ding.mp3' %}")
+                audio.play()
+
+            }
+
+        }
+
+    })
+
+}, 4000)
+
 </script>
 
+{% endif %}
 
 </body>
 </html>

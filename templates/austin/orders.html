@@ -1,28 +1,106 @@
 {% extends "base.html" %}
+{% block title %}Austin • Pedidos{% endblock %}
+
 {% block content %}
 
-<div class="card">
-<h2>Austin • Pedidos</h2>
+<h2 class="area-title">
+  Austin • Pedidos Recebidos
+</h2>
+
+<div class="table-wrap">
+
+  <table class="order-table-modern" id="orders-table">
+
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Status</th>
+        <th>Data</th>
+        <th>Origem</th>
+        <th>Ação</th>
+      </tr>
+    </thead>
+
+    <tbody id="orders-body">
+      {% for o in orders %}
+        {% if o.status == "SUBMITTED" or o.status == "PICKING" %}
+        <tr id="order-row-{{ o.id }}">
+
+          <td class="center">
+            <strong>#{{ o.id }}</strong>
+          </td>
+
+          <td class="center">
+            <span class="status-badge {{ o.status }}">
+              {{ o.get_status_display|upper }}
+            </span>
+          </td>
+
+          <td class="center">
+            {{ o.created_at|date:"d/m/Y H:i" }}
+          </td>
+
+          <td class="center">
+            {{ o.from_branch }}
+          </td>
+
+          <td class="center">
+            <a href="{% url 'a_order_detail' o.id %}"
+               class="btn-mini btn-mini-sm">
+               Abrir
+            </a>
+          </td>
+
+        </tr>
+        {% endif %}
+      {% empty %}
+        <tr>
+          <td colspan="5" class="center muted">
+            Nenhum pedido ativo no momento.
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+
+  </table>
+
 </div>
 
-<div class="grid">
 
-{% for o in orders %}
-<div class="card order-card">
+<!-- ========================= -->
+<!-- 🔥 TEMPO REAL PROFISSIONAL -->
+<!-- ========================= -->
 
-<div class="order-top">
-<strong>#{{ o.id }}</strong>
-<span class="pill">{{ o.status }}</span>
-</div>
+<script>
+let lastNewestId = 0
 
-<div class="muted">{{ o.created_at }}</div>
-<div class="muted">{{ o.from_branch }}</div>
+setInterval(function(){
 
-<a href="{% url 'a_order_detail' o.id %}" class="btn">Abrir</a>
+  fetch("/austin/api/poll/")
+    .then(r => r.json())
+    .then(data => {
 
-</div>
-{% endfor %}
+      // 🔔 Tocar som somente quando realmente chega novo pedido
+      if(data.newest_id > lastNewestId){
+          lastNewestId = data.newest_id
 
-</div>
+          const audio = new Audio("/static/ding.mp3")
+          audio.play()
+
+          // Fazer linha piscar se existir
+          const row = document.getElementById("order-row-" + data.newest_id)
+          if(row){
+              row.classList.add("pulse-row")
+
+              setTimeout(() => {
+                row.classList.remove("pulse-row")
+              }, 3000)
+          }
+      }
+
+    })
+
+}, 5000)
+</script>
 
 {% endblock %}

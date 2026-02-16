@@ -2,75 +2,121 @@
 {% block title %}Austin - Pedido #{{ order.id }}{% endblock %}
 
 {% block content %}
-<div class="card">
-  <div class="row">
-    <div class="grow">
-      <h2>Austin • Pedido #{{ order.id }}</h2>
-      <p class="muted">Defina o que será enviado. “OK” copia a quantidade pedida.</p>
-      <p><strong>Status:</strong> <span class="pill pill-gray">{{ order.status }}</span></p>
-    </div>
 
-    <div class="right">
-      {% if order.status == "SUBMITTED" %}
-        <a class="btn btn-primary" href="/austin/pedidos/{{ order.id }}/iniciar-separacao/" onclick="return confirm('Iniciar separação?');">Iniciar separação</a>
-      {% endif %}
-      {% if order.status == "PICKING" %}
-        <a class="btn btn-ok" href="/austin/pedidos/{{ order.id }}/despachar/" onclick="return confirm('Despachar pedido?');">Despachar</a>
-      {% endif %}
-    </div>
-  </div>
+<h2 class="area-title">
+  Austin Pedido #{{ order.id }}
+</h2>
 
-  <form method="post">
-    {% csrf_token %}
-    <table>
-      <thead>
-        <tr>
-          <th>Produto</th>
-          <th class="wrap">Pedido</th>
-          <th class="wrap">Enviado</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for it in items %}
-        <tr>
-          <td><strong>{{ it.product.name }}</strong> <span class="muted">({{ it.product.sku }})</span></td>
-          <td>{{ it.qty_requested }}</td>
-          <td class="num">
-            {% if order.status == "PICKING" %}
-              <input type="number" name="sent_{{ it.id }}" min="0" value="{{ it.qty_sent }}">
-            {% else %}
-              {{ it.qty_sent }}
-            {% endif %}
-          </td>
-          <td class="right">
-            {% if order.status == "PICKING" %}
-              <a class="btn btn-secondary" href="/austin/pedidos/{{ order.id }}/item/{{ it.id }}/ok/">OK</a>
-            {% endif %}
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="4">Pedido sem itens.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
-    <div style="margin-top:14px;">
-      <label class="muted"><strong>Observação (Austin)</strong></label>
-      {% if order.status == "PICKING" %}
-        <textarea name="notes_from_austin" placeholder="Ex: faltou rosquinha, enviando 3...">{{ order.notes_from_austin }}</textarea>
-      {% else %}
-        <div class="card" style="margin-top:8px;">{{ order.notes_from_austin|default:"(sem observações)" }}</div>
-      {% endif %}
-    </div>
-
-    <div class="row" style="margin-top:14px;">
-      <a class="btn btn-secondary" href="/austin/pedidos/">Voltar</a>
-      <span class="grow"></span>
-      {% if order.status == "PICKING" %}
-        <button class="btn btn-primary" type="submit">Salvar quantidades</button>
-      {% endif %}
-    </div>
-  </form>
+<div class="order-status-box">
+  <span class="order-status-label">Status:</span>
+  <span class="order-status-badge {{ order.status }}">
+    {{ order.get_status_display|upper }}
+  </span>
 </div>
+
+<div class="order-table-wrap">
+
+  <table class="order-table">
+
+    <thead>
+      <tr>
+        <th>Produto</th>
+        <th>Pedido</th>
+        <th>Enviado</th>
+        <th>Ação</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      {% for it in items %}
+      <tr>
+
+        <td class="prod-name">
+          {{ it.product.name|upper }}
+          <span class="muted">({{ it.product.sku }})</span>
+        </td>
+
+        <td>{{ it.qty_requested }}</td>
+
+        <td>
+          {% if order.status == "PICKING" %}
+            <input type="number"
+                   name="sent_{{ it.id }}"
+                   min="0"
+                   value="{{ it.qty_sent }}"
+                   class="qty-input">
+          {% else %}
+            {{ it.qty_sent }}
+          {% endif %}
+        </td>
+
+        <td>
+          {% if order.status == "PICKING" %}
+            <a href="{% url 'a_item_ok' order.id it.id %}"
+               class="btn-ok">
+              OK
+            </a>
+          {% endif %}
+        </td>
+
+      </tr>
+      {% endfor %}
+
+    </tbody>
+
+  </table>
+
+</div>
+
+<!-- OBSERVAÇÃO -->
+
+<div class="order-notes-box">
+  <h3>Observação (Austin)</h3>
+
+  {% if order.status == "PICKING" %}
+    <form method="post">
+      {% csrf_token %}
+      <textarea name="notes_from_austin"
+                placeholder="Ex: faltou rosquinha, enviando 3...">
+        {{ order.notes_from_austin }}
+      </textarea>
+
+      <div style="text-align:right; margin-top:10px;">
+        <button class="x-save">Salvar observação</button>
+      </div>
+    </form>
+  {% else %}
+    <div class="order-note-display">
+      {{ order.notes_from_austin|default:"(sem observações)" }}
+    </div>
+  {% endif %}
+</div>
+
+<!-- BOTÕES -->
+
+<div style="text-align:center; margin-top:30px;">
+
+  {% if order.status == "SUBMITTED" %}
+    <a href="{% url 'a_start_picking' order.id %}"
+       class="x-save"
+       onclick="return confirm('Iniciar separação?');">
+       INICIAR SEPARAÇÃO
+    </a>
+  {% endif %}
+
+  {% if order.status == "PICKING" %}
+    <a href="{% url 'a_dispatch' order.id %}"
+       class="x-save"
+       onclick="return confirm('Despachar pedido?');">
+       DESPACHAR
+    </a>
+  {% endif %}
+
+  <br><br>
+
+    <a href="{% url 'a_orders' %}" class="x-side-btn btn-small">Voltar</a>
+
+</div>
+
 {% endblock %}

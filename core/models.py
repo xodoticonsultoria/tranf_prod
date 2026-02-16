@@ -94,3 +94,26 @@ class TransferOrderItem(models.Model):
 
     def __str__(self):
         return f"{self.order_id} - {self.product.name}"
+
+
+# 🔥 NOVO HISTÓRICO
+class OrderLog(models.Model):
+    order = models.ForeignKey(
+        TransferOrder,
+        on_delete=models.CASCADE,
+        related_name="logs"
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    action = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"#{self.order.id} - {self.action}"

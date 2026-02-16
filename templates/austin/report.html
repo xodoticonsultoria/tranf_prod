@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Austin • Relatório{% endblock %}
+
+{% block content %}
+
+<h2 class="area-title">
+  Austin • Relatório
+</h2>
+
+<div class="report-box">
+  <form method="get" class="report-form">
+
+    <input type="date" name="start" value="{{ start }}">
+    <input type="date" name="end" value="{{ end }}">
+
+    <input type="text" name="branch" placeholder="Filial origem"
+           value="{{ branch }}">
+
+    <button class="btn-search">Buscar</button>
+
+  </form>
+</div>
+
+<div class="table-wrap">
+    <div class="report-actions">
+      <a href="{% url 'a_report_pdf' %}" class="btn-export">
+        Exportar PDF
+      </a>
+    </div>
+
+
+
+</div>
+
+{% endblock %}

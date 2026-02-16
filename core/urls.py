@@ -17,7 +17,10 @@ urlpatterns = [
     path("queimados/pedidos/<int:order_id>/receber/", views.q_receive_order, name="q_receive_order"),
 
     # 🔥 RELATÓRIO (corrigido)
-    path("queimados/relatorio/", views.report_view, name="q_report"),
+    path("queimados/relatorio/", views.q_report, name="q_report"),
+
+
+
 
     # Categorias
     path("queimados/categorias/", views.queimados_categories, name="q_categories"),
@@ -32,6 +35,10 @@ urlpatterns = [
     path("austin/pedidos/<int:order_id>/iniciar-separacao/", views.a_start_picking, name="a_start_picking"),
     path("austin/pedidos/<int:order_id>/despachar/", views.a_dispatch, name="a_dispatch"),
     path("austin/pedidos/<int:order_id>/item/<int:item_id>/ok/", views.a_item_ok, name="a_item_ok"),
+    path("austin/relatorio/", views.a_report, name="a_report"),
+    path("austin/relatorio/pdf/", views.a_report_pdf, name="a_report_pdf"),
+
+
 
     # =====================
     # API
@@ -45,4 +52,9 @@ urlpatterns = [
     # =====================
 
     path("teste/", lambda r: render(r, "test.html")),
+    path("pedido/<int:order_id>/poll/", views.order_status_poll, name="order_status_poll"),
+
 ]
+
+
+

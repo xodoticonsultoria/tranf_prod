@@ -95,11 +95,18 @@ body{
   text-decoration:none;
   padding:9px 10px;
   border-radius:8px;
-  margin-bottom:10px;
+  margin-bottom:11px;
   text-align:center;
   font-weight:800;
   font-size:13px;
   box-shadow:0 3px 8px rgba(0,0,0,.18);
+}
+
+.btn-small{
+  padding:6px 14px;
+  font-size:13px;
+  border-radius:6px;
+
 }
 
 
@@ -965,3 +972,450 @@ body{
 .btn-export:hover{
   background:#166534;
 }
+
+
+/* ============================
+   STATUS PULSE
+============================ */
+
+.pulse-status{
+  animation: pulseStatus 0.6s ease-in-out 3;
+}
+
+@keyframes pulseStatus{
+  0%{ transform:scale(1); background:#f2c316; }
+  50%{ transform:scale(1.1); background:#22c55e; color:#fff; }
+  100%{ transform:scale(1); }
+}
+
+
+/* ========================= */
+/* LISTA MEUS PEDIDOS        */
+/* ========================= */
+
+.orders-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  margin-top:20px;
+}
+
+.order-card-x{
+  background:#ffffff;
+  border-radius:14px;
+  padding:18px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.08);
+  transition:0.2s ease;
+}
+
+.order-card-x:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 18px rgba(0,0,0,0.12);
+}
+
+.order-card-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.order-id{
+  font-size:18px;
+  font-weight:700;
+}
+
+.order-status-badge{
+  background:#f4c400;
+  color:#000;
+  padding:6px 14px;
+  border-radius:20px;
+  font-size:13px;
+  font-weight:600;
+}
+
+.order-date{
+  margin-top:8px;
+  color:#666;
+  font-size:14px;
+}
+
+.order-actions{
+  margin-top:14px;
+}
+
+.order-open-btn{
+  background:#b31212;
+  color:#fff;
+  padding:8px 18px;
+  border-radius:8px;
+  text-decoration:none;
+  font-weight:600;
+  display:inline-block;
+  transition:0.2s;
+}
+
+.order-open-btn:hover{
+  background:#8f0e0e;
+}
+
+
+/* ========================= */
+/* AUSTIN PAINEL */
+/* ========================= */
+
+.status-section{
+  margin-bottom:40px;
+}
+
+.status-section h3{
+  margin-bottom:14px;
+  font-weight:900;
+}
+
+.order-card{
+  background:white;
+  border-radius:10px;
+  padding:18px;
+  margin-bottom:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,.1);
+}
+
+.order-card.priority{
+  border-left:6px solid #dc2626;
+}
+
+.order-card.working{
+  border-left:6px solid #2563eb;
+}
+
+.order-card.done{
+  border-left:6px solid #16a34a;
+}
+
+.order-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:6px;
+}
+
+.card-actions{
+  margin-top:10px;
+  display:flex;
+  gap:10px;
+}
+
+.pill-warning{
+  background:#facc15;
+}
+
+.pill-info{
+  background:#3b82f6;
+  color:white;
+}
+
+.pill-success{
+  background:#16a34a;
+  color:white;
+}
+
+
+.pill.SUBMITTED {
+  background:#facc15;
+}
+
+.pill.PICKING {
+  background:#3b82f6;
+  color:white;
+}
+
+.pill.DISPATCHED {
+  background:#16a34a;
+  color:white;
+}
+
+.pill.RECEIVED {
+  background:#15803d;
+  color:white;
+}
+
+
+/* =========================
+   AUSTIN - DETALHE PEDIDO
+========================= */
+
+.order-status-box{
+  text-align:center;
+  margin:15px 0 25px;
+}
+
+.order-status-label{
+  font-weight:800;
+  margin-right:6px;
+}
+
+.order-status-badge{
+  background:#f2c316;
+  padding:8px 18px;
+  border-radius:999px;
+  font-weight:900;
+  box-shadow:0 3px 0 rgba(0,0,0,.25);
+}
+
+.order-table-wrap{
+  display:flex;
+  justify-content:center;
+}
+
+.order-table{
+  width:900px;
+  max-width:100%;
+  border-collapse:collapse;
+  background:#e9e9e9;
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 6px 18px rgba(0,0,0,.2);
+}
+
+.order-table thead{
+  background:#c91414;
+  color:white;
+}
+
+.order-table th{
+  padding:14px;
+  font-weight:900;
+}
+
+.order-table td{
+  padding:12px;
+  text-align:center;
+}
+
+.order-table tr:nth-child(even){
+  background:#efefef;
+}
+
+.prod-name{
+  font-weight:800;
+}
+
+.qty-input{
+  width:60px;
+  padding:6px;
+  font-weight:800;
+  text-align:center;
+}
+
+.btn-ok{
+  background:#16a34a;
+  color:white;
+  padding:6px 12px;
+  border-radius:6px;
+  font-weight:800;
+  text-decoration:none;
+}
+
+.order-notes-box{
+  margin-top:30px;
+  text-align:center;
+}
+
+.order-notes-box textarea{
+  width:80%;
+  height:100px;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+
+.order-note-display{
+  width:80%;
+  margin:auto;
+  padding:15px;
+  background:white;
+  border-radius:10px;
+  box-shadow:0 4px 12px rgba(0,0,0,.15);
+}
+
+/* =========================
+   STATUS BADGE (GLOBAL)
+========================= */
+
+.status-badge{
+  padding:6px 16px;
+  border-radius:999px;
+  font-weight:900;
+  font-size:13px;
+  display:inline-block;
+  box-shadow:0 3px 0 rgba(0,0,0,.25);
+}
+
+/* STATUS CORES */
+
+.status-badge.SUBMITTED{
+  background:#f2c316;
+  color:#111;
+}
+
+.status-badge.PICKING{
+  background:#2563eb;
+  color:white;
+}
+
+.status-badge.DISPATCHED{
+  background:#16a34a;
+  color:white;
+}
+
+.status-badge.RECEIVED{
+  background:#15803d;
+  color:white;
+}
+
+.status-badge.CANCELLED{
+  background:#991b1b;
+  color:white;
+}
+
+
+/* =========================
+   TABELA MODERNA LISTA
+========================= */
+
+.table-wrap{
+  max-width:1100px;
+  margin:25px auto;
+}
+
+.order-table-modern{
+  width:100%;
+  border-collapse:collapse;
+  background:white;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 6px 20px rgba(0,0,0,.15);
+}
+
+.order-table-modern thead{
+  background:#c91414;
+  color:white;
+}
+
+.order-table-modern th{
+  padding:14px;
+  font-weight:900;
+  text-align:center;
+}
+
+.order-table-modern td{
+  padding:14px;
+  border-bottom:1px solid #eee;
+}
+
+.order-table-modern tr:nth-child(even){
+  background:#f5f5f5;
+}
+
+.center{
+  text-align:center;
+}
+
+.btn-mini{
+  background:#991b1b;
+  color:white;
+  padding:6px 12px;
+  border-radius:6px;
+  font-weight:900;
+  text-decoration:none;
+}
+
+/* STATUS BADGE */
+
+.status-badge{
+  padding:6px 14px;
+  border-radius:20px;
+  font-weight:900;
+  font-size:13px;
+}
+
+/* cores por status */
+.status-badge.SUBMITTED{
+  background:#facc15;
+}
+
+.status-badge.PICKING{
+  background:#f97316;
+  color:white;
+}
+
+.status-badge.DISPATCHED{
+  background:#16a34a;
+  color:white;
+}
+
+.status-badge.RECEIVED{
+  background:#15803d;
+  color:white;
+}
+
+.status-badge.CANCELLED{
+  background:#b91c1c;
+  color:white;
+}
+
+/* =====================================
+   ALERTA NOVO PEDIDO AUSTIN
+===================================== */
+
+.blink-alert{
+  animation: blinkButton 0.8s infinite alternate;
+}
+
+@keyframes blinkButton{
+  from{
+    background:#c91414;
+  }
+  to{
+    background:#ff0000;
+    transform:scale(1.05);
+  }
+}
+/* =======================================
+   AUSTIN — BOTÃO PEDIDOS RECEBIDOS ALERTA
+======================================= */
+
+.austin-alert-btn{
+  position:relative;
+  display:inline-block;
+}
+
+.austin-alert-btn.blinking{
+  animation: austinBlink 0.8s infinite alternate;
+}
+
+@keyframes austinBlink{
+  from{
+    background:#a51515;
+  }
+  to{
+    background:#ff0000;
+    transform:scale(1.05);
+  }
+}
+
+
+/* =======================================
+   AUSTIN — BOTÃO VOLTAR MENOR
+======================================= */
+
+.btn-back-small{
+  width:300px;       /* diminui largura */
+  padding:8px 12px;  /* menos altura */
+  font-size:13px;
+  margin:30px auto;
+  display:block;
+  border-radius:6px;
+}
+
+

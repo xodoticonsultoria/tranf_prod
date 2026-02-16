@@ -8,14 +8,13 @@
 
 <div class="order-status-box">
   <span class="order-status-label">Status:</span>
-  <span class="order-status-badge">
+  <span id="order-status-text" class="order-status-badge">
     {{ order.get_status_display|upper }}
   </span>
 </div>
 
 <div class="order-table-wrap">
   <table class="order-table">
-
     <thead>
       <tr>
         <th>Produto</th>
@@ -32,13 +31,9 @@
           {{ item.product.name|upper }}
         </td>
 
-        <td>
-          {{ item.qty_requested }}
-        </td>
+        <td>{{ item.qty_requested }}</td>
 
-        <td>
-          {{ item.qty_sent|default:0 }}
-        </td>
+        <td>{{ item.qty_sent|default:0 }}</td>
 
         <td>
           {% if item.qty_sent == item.qty_requested %}
@@ -52,14 +47,60 @@
       </tr>
       {% endfor %}
     </tbody>
-
   </table>
 </div>
 
+{% if order.status == "DISPATCHED" %}
 <div style="text-align:center; margin-top:25px;">
+  <a href="{% url 'q_receive_order' order.id %}"
+     class="x-save"
+     style="padding:10px 20px;"
+     onclick="return confirm('Confirmar que o pedido foi recebido?');">
+     CONFIRMAR RECEBIMENTO
+  </a>
+</div>
+{% endif %}
+
+<div style="text-align:center; margin-top:20px;">
   <a href="{% url 'q_orders' %}" class="x-side-btn" style="display:inline-block;">
     Voltar
   </a>
 </div>
+
+<hr>
+<h3>Histórico</h3>
+
+{% for log in order.logs.all %}
+  <div class="muted">
+    {{ log.created_at|date:"d/m/Y H:i:s" }} • {{ log.user.username }} • {{ log.action }}
+  </div>
+{% empty %}
+  <div class="muted">Sem histórico.</div>
+{% endfor %}
+
+<!-- ========================= -->
+<!-- TEMPO REAL -->
+<!-- ========================= -->
+
+<script>
+setInterval(function(){
+  fetch("/pedido/{{ order.id }}/poll/")
+    .then(r => r.json())
+    .then(data => {
+
+      const el = document.getElementById("order-status-text")
+
+      if(el && el.innerText !== data.status_display.toUpperCase()){
+        el.innerText = data.status_display.toUpperCase()
+        el.classList.add("pulse-status")
+
+        setTimeout(() => {
+          el.classList.remove("pulse-status")
+        }, 2000)
+      }
+
+    })
+}, 4000)
+</script>
 
 {% endblock %}
