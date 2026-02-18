@@ -108,13 +108,41 @@ def q_submit_order(request):
     return redirect("q_cart")
 
 
+from django.utils import timezone
+
 @require_queimados
 def q_orders(request):
-    orders = TransferOrder.objects.filter(
-        created_by=request.user
-    ).exclude(status=OrderStatus.DRAFT).order_by("-created_at")
 
-    return render(request, "queimados/orders.html", {"orders": orders})
+    today = timezone.localdate()
+
+    orders = TransferOrder.objects.filter(
+        created_by=request.user,
+        created_at__date=today
+    ).exclude(
+        status__in=[
+            OrderStatus.DRAFT,
+            OrderStatus.RECEIVED  # 🔥 Remove confirmados da tela
+        ]
+    ).order_by("-created_at")
+
+    return render(request, "queimados/orders.html", {
+        "orders": orders
+    })
+
+@require_queimados
+def q_remove_item(request, item_id):
+    item = get_object_or_404(
+        TransferOrderItem,
+        id=item_id,
+        order__created_by=request.user,
+        order__status=OrderStatus.DRAFT
+    )
+
+    item.delete()
+
+    messages.success(request, "Produto removido do carrinho.")
+    return redirect("q_cart")
+
 
 
 @require_queimados

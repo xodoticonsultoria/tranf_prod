@@ -8,41 +8,87 @@
   <div class="x-cart-box">
 
     <div class="x-grid">
+
       {% for item in items %}
-      <form method="post" action="{% url 'q_cart' %}" class="x-cart-item {% if item.product.image %}has-img{% endif %}">
+      <form method="post"
+            action="{% url 'q_cart' %}"
+            class="x-cart-item {% if item.product.image %}has-img{% endif %}">
         {% csrf_token %}
 
         {% if item.product.image %}
-          <img src="{{ item.product.image.url }}" class="x-cart-img" alt="">
+          <img src="{{ item.product.image.url }}"
+               class="x-cart-img"
+               alt="">
         {% endif %}
 
-        <div class="x-cart-name">{{ item.product.name|upper }}</div>
+        <div class="x-cart-name">
+          {{ item.product.name|upper }}
+        </div>
 
         <div class="x-qty">
           <button type="button" onclick="dec(this)">−</button>
-          <input name="qty_{{ item.id }}" value="{{ item.qty_requested }}">
+          <input name="qty_{{ item.id }}"
+                 value="{{ item.qty_requested }}">
           <button type="button" onclick="inc(this)">+</button>
         </div>
 
-        <button class="x-save">SALVAR</button>
+        <div class="x-actions">
+
+          <!-- SALVAR -->
+          <button type="submit" class="icon-btn save-icon" title="Salvar">
+            <svg viewBox="0 0 24 24" width="22" height="22">
+              <path fill="currentColor"
+                    d="M9 16.2l-3.5-3.5L4 14.2 9 19l12-12-1.5-1.5z"/>
+            </svg>
+          </button>
+
+          <!-- REMOVER -->
+          <a href="{% url 'q_remove_item' item.id %}"
+             class="icon-btn delete-icon"
+             title="Remover">
+
+            <svg viewBox="0 0 24 24" width="22" height="22">
+              <path fill="currentColor"
+                    d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm3.5-9h1v7h-1V10zm4 0h1v7h-1V10zM15.5 4l-1-1h-5l-1 1H5v2h14V4z"/>
+            </svg>
+
+          </a>
+
+        </div>
+
+
+
       </form>
       {% empty %}
-        <div style="padding:10px;font-weight:800;">Carrinho vazio</div>
+        <div style="padding:10px;font-weight:800;">
+          Carrinho vazio
+        </div>
       {% endfor %}
+
     </div>
 
   </div>
 </div>
 
-<form method="post" action="{% url 'q_submit_order' %}" class="x-submit-form">
+<!-- ===================== -->
+<!-- ENVIAR PEDIDO -->
+<!-- ===================== -->
+
+{% if items %}
+<form method="post"
+      action="{% url 'q_submit_order' %}"
+      class="x-submit-form">
   {% csrf_token %}
-  <button class="x-submit">ENVIAR PEDIDO</button>
+  <button class="x-submit">
+    ENVIAR PEDIDO
+  </button>
 </form>
+{% endif %}
 
 
-{# ============================= #}
-{# TOAST APENAS PARA ENVIO      #}
-{# ============================= #}
+<!-- ============================= -->
+<!-- TOAST APENAS PARA ENVIO      -->
+<!-- ============================= -->
 
 {% if messages %}
   {% for message in messages %}
@@ -71,6 +117,19 @@ document.addEventListener("DOMContentLoaded", function(){
   }
 
 });
+
+// Botões + e -
+function inc(btn){
+  const input = btn.parentElement.querySelector("input");
+  input.value = parseInt(input.value || 0) + 1;
+}
+
+function dec(btn){
+  const input = btn.parentElement.querySelector("input");
+  if(parseInt(input.value) > 0){
+    input.value = parseInt(input.value) - 1;
+  }
+}
 </script>
 
 {% endblock %}

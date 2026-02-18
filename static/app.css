@@ -1419,3 +1419,95 @@ body{
 }
 
 
+.x-remove-btn {
+    background: #c0392b;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.x-remove-btn:hover {
+    background: #a93226;
+}
+
+
+.x-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.x-remove-btn {
+    background: #c0392b;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.x-remove-btn:hover {
+    background: #a93226;
+}
+
+
+
+.x-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.x-icon-btn {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.x-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+/* BOTÃO BASE */
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s ease;
+}
+
+/* SALVAR */
+.save-icon {
+    color: #27ae60;
+}
+
+.save-icon:hover {
+    color: #1e8449;
+    transform: scale(1.2);
+}
+
+/* REMOVER */
+.delete-icon {
+    color: #c0392b;
+}
+
+.delete-icon:hover {
+    color: #922b21;
+    transform: scale(1.2);
+}
