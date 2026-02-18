@@ -1511,3 +1511,130 @@ body{
     color: #922b21;
     transform: scale(1.2);
 }
+
+
+.cart-btn {
+    position: relative;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+
+    background: #f1c40f;
+    color: black;
+
+    font-weight: bold;
+    font-size: 12px;
+
+    padding: 4px 7px;
+    border-radius: 50%;
+
+    min-width: 20px;
+    text-align: center;
+}
+
+/* 🔥 Efeito pulsando */
+.pulse {
+    animation: pulseAnim 1.2s infinite;
+}
+
+@keyframes pulseAnim {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.side-btn {
+    display: block;
+    width: 200px;
+    padding: 14px 0;
+    text-align: center;
+    background: #b11212;
+    color: white;
+    font-weight: 700;
+    border-radius: 10px;
+    text-decoration: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: 0.2s ease;
+}
+
+.side-btn:hover {
+    transform: translateY(-2px);
+}
+
+.cart-btn {
+    position: relative;
+}
+
+.cart-content {
+    position: relative;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -15px;
+
+    background: #f1c40f;
+    color: #000;
+
+    font-size: 12px;
+    font-weight: 800;
+
+    padding: 4px 8px;
+    border-radius: 50%;
+    min-width: 20px;
+
+    animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+
+.area-with-cart {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.cart-header-icon {
+    position: relative;
+    display: inline-block;
+}
+
+.cart-icon {
+    font-size: 35px;
+    color: #777;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+
+    background: #f1c40f;
+    color: #000;
+
+    font-size: 14px;
+    font-weight: 800;
+
+    padding: 6px 10px;
+    border-radius: 50%;
+    min-width: 24px;
+    text-align: center;
+
+    animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}

@@ -3,7 +3,20 @@
 {% block title %}Produtos{% endblock %}
 {% block content %}
 
-<h2 class="area-title">ÁREA DE PEDIDOS</h2>
+<h2 class="area-title area-with-cart">
+    ÁREA DE PEDIDOS
+
+    <div class="cart-header-icon">
+        <span class="cart-icon">🛒</span>
+
+        {% if cart_count > 0 %}
+            <span class="cart-badge">
+                {{ cart_count }}
+            </span>
+        {% endif %}
+    </div>
+</h2>
+
 
 {% for cat in categories %}
 <div class="x-cat">
