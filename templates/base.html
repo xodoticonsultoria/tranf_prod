@@ -5,7 +5,6 @@
 <meta charset="UTF-8">
 <title>{% block title %}Xodó{% endblock %}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <link rel="stylesheet" href="{% static 'app.css' %}">
 </head>
 
@@ -13,64 +12,98 @@
 
 <header class="x-header">
 
+  <!-- LOGO -->
   <div class="x-logo-box">
     <img src="{% static 'logo_xodo.png' %}" class="x-logo">
   </div>
 
   {% if request.user.is_authenticated %}
-  <div class="x-user-bar">
-    <span class="pill">Nome: {{ request.user.username }}</span>
+  <!-- MENU BUTTON -->
+  <div class="menu-area">
+    <div class="menu-button" onclick="toggleMenu(event)">
+      <span>Menu</span>
+      <div class="hamburger">
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
 
-    {% if request.user.groups.first %}
-      <span class="pill">
-        Filial: {{ request.user.groups.first.name }}
-      </span>
-    {% endif %}
+    <!-- DROPDOWN MENU -->
+    <div class="dropdown-menu" id="dropdownMenu">
 
-    <a href="{% url 'logout' %}" class="pill pill-light">Sair</a>
+      <div class="menu-user">
+        <strong>Nome:</strong> {{ request.user.username }}<br>
+        {% if request.user.groups.first %}
+          <strong>Filial:</strong> {{ request.user.groups.first.name }}
+        {% endif %}
+      </div>
+
+      {% if request.user.groups.first.name == "QUEIMADOS" %}
+        <a href="{% url 'q_cart' %}" class="menu-btn">Abrir Carrinho</a>
+        <a href="{% url 'q_products' %}" class="menu-btn">Produtos</a>
+        <a href="{% url 'q_orders' %}" class="menu-btn">Meus Pedidos</a>
+        <a href="{% url 'q_report' %}" class="menu-btn">Relatório</a>
+      {% endif %}
+
+      {% if request.user.groups.first.name == "AUSTIN" %}
+        <a href="{% url 'a_orders' %}" class="menu-btn">Pedidos Recebidos</a>
+        <a href="{% url 'a_report' %}" class="menu-btn">Relatório</a>
+      {% endif %}
+
+      <a href="{% url 'logout' %}" class="menu-exit">Sair</a>
+
+    </div>
   </div>
   {% endif %}
 
 </header>
+<div class="menu-overlay" id="menuOverlay"></div>
+
 
 
 <div class="x-layout">
-
   <main class="x-main">
     {% block content %}{% endblock %}
   </main>
-
-  {% if request.user.is_authenticated %}
-  <aside class="x-side">
-
-    <!-- ========================= -->
-    <!-- MENU QUEIMADOS -->
-    <!-- ========================= -->
-    {% if request.user.groups.first.name == "QUEIMADOS" %}
-      <a href="{% url 'q_cart' %}" class="x-side-btn">Abrir Carrinho</a>
-      <a href="{% url 'q_products' %}" class="x-side-btn">Produtos</a>
-      <a href="{% url 'q_orders' %}" class="x-side-btn">Meus Pedidos</a>
-      <a href="{% url 'q_report' %}" class="x-side-btn">Relatório</a>
-    {% endif %}
-
-    <!-- ========================= -->
-    <!-- MENU AUSTIN -->
-    <!-- ========================= -->
-    {% if request.user.groups.first.name == "AUSTIN" %}
-      <a href="{% url 'a_orders' %}" class="x-side-btn">Pedidos Recebidos</a>
-      <a href="{% url 'a_report' %}" class="x-side-btn">Relatório</a>
-    {% endif %}
-
-  </aside>
-  {% endif %}
-
 </div>
+
 
 <script src="{% static 'app.js' %}"></script>
 
+<script>
+function toggleMenu(event){
+  event.stopPropagation()
+
+  const menu = document.getElementById("dropdownMenu")
+  const overlay = document.getElementById("menuOverlay")
+  const button = document.querySelector(".menu-button")
+
+  menu.classList.toggle("open")
+  overlay.classList.toggle("open")
+  button.classList.toggle("active")
+}
+
+document.getElementById("menuOverlay").addEventListener("click", function(){
+  closeMenu()
+})
+
+function closeMenu(){
+  document.getElementById("dropdownMenu").classList.remove("open")
+  document.getElementById("menuOverlay").classList.remove("open")
+  document.querySelector(".menu-button").classList.remove("active")
+}
+
+/* Fecha ao clicar em opção */
+document.querySelectorAll(".menu-btn, .menu-exit").forEach(btn=>{
+  btn.addEventListener("click", closeMenu)
+})
+</script>
+
+
 
 <!-- ========================================= -->
-<!-- 🔄 POLLING PROFISSIONAL AUSTIN -->
+<!-- 🔄 POLLING PROFISSIONAL AUSTIN (mantido) -->
 <!-- ========================================= -->
 {% if request.user.is_authenticated and request.user.groups.first.name == "AUSTIN" %}
 
@@ -80,7 +113,6 @@ let lastOrderId = parseInt(localStorage.getItem("last_austin_order_id") || 0)
 let alreadyInsideOrders = window.location.pathname.includes("/austin/pedidos/")
 let btn = document.getElementById("austin-orders-btn")
 
-// Se entrou na tela de pedidos → para alerta
 if(alreadyInsideOrders){
     localStorage.setItem("last_austin_order_id", lastOrderId)
     if(btn) btn.classList.remove("blinking")
@@ -94,25 +126,19 @@ setInterval(function(){
 
         if(data.newest_id && data.newest_id > lastOrderId){
 
-            // Atualiza último ID salvo
             lastOrderId = data.newest_id
             localStorage.setItem("last_austin_order_id", lastOrderId)
 
-            // Só alerta se NÃO estiver na tela de pedidos
             if(!alreadyInsideOrders){
 
                 if(btn){
                     btn.classList.add("blinking")
                 }
 
-                // 🔔 Som só quando realmente chega novo
                 const audio = new Audio("{% static 'ding.mp3' %}")
                 audio.play()
-
             }
-
         }
-
     })
 
 }, 4000)
