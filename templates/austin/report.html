@@ -13,23 +13,57 @@
     <input type="date" name="start" value="{{ start }}">
     <input type="date" name="end" value="{{ end }}">
 
-    <input type="text" name="branch" placeholder="Filial origem"
-           value="{{ branch }}">
-
     <button class="btn-search">Buscar</button>
 
   </form>
 </div>
 
-<div class="table-wrap">
-    <div class="report-actions">
-      <a href="{% url 'a_report_pdf' %}" class="btn-export">
-        Exportar PDF
+{% if start and end %}
+    {% if orders %}
+    <div class="orders-wrap">
+
+      {% for order in orders %}
+      <div class="order-card-x">
+
+        <div class="order-card-top">
+          <div class="order-id">
+            Pedido #{{ order.id }}
+          </div>
+
+          <div class="order-status-badge">
+            {{ order.get_status_display }}
+          </div>
+        </div>
+
+        <div class="order-date">
+          Operador: {{ order.picking_by }} |
+          Pedido: {{ order.created_at|date:"d/m/Y H:i" }}
+        </div>
+
+        <div class="order-actions">
+          <a href="{% url 'a_report_pdf_single' order.id %}"
+             class="btn-export">
+             Baixar PDF
+          </a>
+        </div>
+
+      </div>
+      {% endfor %}
+
+    </div>
+
+    <div class="report-actions" style="margin-top:30px;">
+      <a href="{% url 'a_report_pdf' %}?start={{ start }}&end={{ end }}"
+         class="btn-export">
+         Baixar Todos do Filtro
       </a>
     </div>
 
-
-
-</div>
+    {% else %}
+      <div style="margin-top:20px;" class="muted">
+        Nenhum pedido encontrado nesse período.
+      </div>
+    {% endif %}
+{% endif %}
 
 {% endblock %}

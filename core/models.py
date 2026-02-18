@@ -57,10 +57,26 @@ class TransferOrder(models.Model):
 
     status = models.CharField(max_length=20, choices=OrderStatus.choices, default=OrderStatus.DRAFT)
 
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="orders_created")
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="orders_created"
+    )
+
+    # 🔹 Momento que o carrinho foi criado (rascunho)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    picking_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True, related_name="orders_picking")
+    # 🔥 NOVO — momento real que virou pedido
+    submitted_at = models.DateTimeField(null=True, blank=True)
+
+    picking_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="orders_picking"
+    )
+
     picking_at = models.DateTimeField(null=True, blank=True)
 
     dispatched_at = models.DateTimeField(null=True, blank=True)
@@ -73,7 +89,12 @@ class TransferOrder(models.Model):
 
 
 class TransferOrderItem(models.Model):
-    order = models.ForeignKey(TransferOrder, on_delete=models.CASCADE, related_name="items")
+    order = models.ForeignKey(
+        TransferOrder,
+        on_delete=models.CASCADE,
+        related_name="items"
+    )
+
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
 
     qty_requested = models.PositiveIntegerField()
@@ -96,19 +117,20 @@ class TransferOrderItem(models.Model):
         return f"{self.order_id} - {self.product.name}"
 
 
-# 🔥 NOVO HISTÓRICO
 class OrderLog(models.Model):
     order = models.ForeignKey(
         TransferOrder,
         on_delete=models.CASCADE,
         related_name="logs"
     )
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
+
     action = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 

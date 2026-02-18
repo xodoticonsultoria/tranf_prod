@@ -18,6 +18,10 @@ urlpatterns = [
 
     # 🔥 RELATÓRIO (corrigido)
     path("queimados/relatorio/", views.q_report, name="q_report"),
+# 🔥 RELATÓRIO QUEIMADOS
+    path("queimados/relatorio/", views.q_report, name="q_report"),
+    path("queimados/relatorio/pdf/", views.q_report_pdf, name="q_report_pdf"),
+    path("queimados/relatorio/pdf/<int:order_id>/", views.q_report_pdf_single, name="q_report_pdf_single"),
 
 
 
@@ -37,6 +41,8 @@ urlpatterns = [
     path("austin/pedidos/<int:order_id>/item/<int:item_id>/ok/", views.a_item_ok, name="a_item_ok"),
     path("austin/relatorio/", views.a_report, name="a_report"),
     path("austin/relatorio/pdf/", views.a_report_pdf, name="a_report_pdf"),
+    path("austin/relatorio/pdf/<int:order_id>/", views.a_report_pdf_single, name="a_report_pdf_single"),
+
 
 
 
