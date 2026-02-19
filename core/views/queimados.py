@@ -1,3 +1,5 @@
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db import transaction
@@ -98,6 +100,20 @@ def q_submit_order(request):
     cart.status = OrderStatus.SUBMITTED
     cart.save()
 
+    from channels.layers import get_channel_layer
+    from asgiref.sync import async_to_sync
+
+    channel_layer = get_channel_layer()
+
+    async_to_sync(channel_layer.group_send)(
+        "orders_group",
+        {
+            "type": "order_update",
+            "order_id": cart.id,
+            "status": cart.status,
+        }
+    )
+
     OrderLog.objects.create(
         order=cart,
         user=request.user,
@@ -175,6 +191,19 @@ def q_receive_order(request, order_id):
     order.status = OrderStatus.RECEIVED
     order.received_at = timezone.now()
     order.save()
+
+
+
+    channel_layer = get_channel_layer()
+
+    async_to_sync(channel_layer.group_send)(
+        "orders_group",
+        {
+            "type": "order_update",
+            "order_id": order.id,
+            "status": order.status,
+        }
+    )
 
     OrderLog.objects.create(
         order=order,

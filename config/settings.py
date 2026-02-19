@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     # cloudinary
     "cloudinary",
     "cloudinary_storage",
+    "channels",
 ]
 
 # ======================
@@ -85,6 +86,20 @@ TEMPLATES = [
         },
     }
 ]
+
+
+ASGI_APPLICATION = "config.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+
+
 
 WSGI_APPLICATION = "config.wsgi.application"
 

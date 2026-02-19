@@ -1,3 +1,5 @@
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
@@ -59,6 +61,17 @@ def a_start_picking(request, order_id):
     order.picking_at = timezone.now()
     order.save()
 
+    channel_layer = get_channel_layer()
+
+    async_to_sync(channel_layer.group_send)(
+        "orders_group",
+        {
+            "type": "order_update",
+            "order_id": order.id,
+            "status": order.status,
+        }
+    )
+
     OrderLog.objects.create(
         order=order,
         user=request.user,
@@ -79,6 +92,19 @@ def a_dispatch(request, order_id):
     order.status = OrderStatus.DISPATCHED
     order.dispatched_at = timezone.now()
     order.save()
+
+
+
+    channel_layer = get_channel_layer()
+
+    async_to_sync(channel_layer.group_send)(
+        "orders_group",
+        {
+            "type": "order_update",
+            "order_id": order.id,
+            "status": order.status,
+        }
+    )
 
     OrderLog.objects.create(
         order=order,
@@ -112,6 +138,17 @@ def a_item_ok(request, order_id, item_id):
 
     item.qty_sent = item.qty_requested
     item.save()
+
+    channel_layer = get_channel_layer()
+
+    async_to_sync(channel_layer.group_send)(
+        "orders_group",
+        {
+            "type": "order_update",
+            "order_id": order.id,
+            "status": order.status,
+        }
+    )
 
     OrderLog.objects.create(
         order=order,

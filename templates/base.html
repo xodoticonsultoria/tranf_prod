@@ -147,5 +147,25 @@ setInterval(function(){
 
 {% endif %}
 
+
+<script>
+const socket = new WebSocket(
+    "ws://" + window.location.host + "/ws/orders/"
+);
+
+socket.onmessage = function(e){
+    const data = JSON.parse(e.data);
+
+    console.log(data.message);
+
+    // Aqui você pode:
+    // atualizar badge
+    // atualizar status
+    // tocar som
+    // animar pedido
+};
+</script>
+
+
 </body>
 </html>
