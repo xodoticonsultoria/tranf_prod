@@ -94,7 +94,8 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.environ.get("REDIS_URL")],
+            "hosts": [os.environ.get("REDIS_URL", "redis://localhost:6379")],
+
         },
     },
 }
@@ -113,7 +114,7 @@ if db_url:
     DATABASES = {
         "default": dj_database_url.parse(
             db_url,
-            conn_max_age=600,
+            conn_max_age=0,
             ssl_require=True,
         )
     }
@@ -157,8 +158,6 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# WhiteNoise storage correto para produção
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 MEDIA_URL = "/media/"
