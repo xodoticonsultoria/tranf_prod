@@ -32,7 +32,7 @@ class Product(models.Model):
     sku = models.CharField(
         max_length=50,
         blank=True,
-        default="",
+        null=True,
     )
     name = models.CharField(max_length=200)
     active = models.BooleanField(default=True)
