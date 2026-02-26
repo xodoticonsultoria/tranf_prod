@@ -133,7 +133,7 @@ body{
 ========================= */
 
 .x-cat{
-  background:#777;
+  background:#b8cabe;
   border:2px solid #333;
   border-radius:6px;
   padding:16px 18px;
@@ -148,12 +148,12 @@ body{
   display:flex;
   align-items:center;
   gap:12px;
-  color:white;
+  color:black;
   cursor:pointer;
 }
 
 .x-cat-icon{
-  width:48px;
+  width:60px;
 }
 
 .x-cat-name{
