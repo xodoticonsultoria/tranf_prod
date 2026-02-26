@@ -90,7 +90,7 @@ def q_cart(request):
 
 @require_queimados
 @transaction.atomic
-def q_submit_order(request):
+def q_submit_order(request, order=None):
     cart = _get_or_create_cart(request.user)
 
     if cart.items.count() == 0:
@@ -109,8 +109,9 @@ def q_submit_order(request):
         "orders_group",
         {
             "type": "order_update",
-            "order_id": cart.id,
-            "status": cart.status,
+            "order_id": order.id,
+            "status": order.status,
+            "status_display": order.get_status_display(),
         }
     )
 
@@ -195,13 +196,13 @@ def q_receive_order(request, order_id):
 
 
     channel_layer = get_channel_layer()
-
     async_to_sync(channel_layer.group_send)(
         "orders_group",
         {
             "type": "order_update",
             "order_id": order.id,
             "status": order.status,
+            "status_display": order.get_status_display(),
         }
     )
 

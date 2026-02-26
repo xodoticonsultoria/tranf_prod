@@ -55,4 +55,45 @@
 
 </div>
 
+
+<script>
+const socket = new WebSocket(
+    "wss://" + window.location.host + "/ws/orders/"
+);
+
+socket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+
+    const orderRow = document.getElementById("order-row-" + data.order_id);
+
+    // Atualiza STATUS
+    if (orderRow) {
+
+        const badge = orderRow.querySelector(".status-badge");
+
+        if (badge) {
+            badge.innerText = data.status_display;
+        }
+
+        // 🔥 Se virou RECEIVED ou DISPATCHED, remove da tela
+        if (data.status === "RECEIVED" || data.status === "DISPATCHED") {
+            orderRow.style.transition = "0.3s";
+            orderRow.style.opacity = "0";
+            setTimeout(() => orderRow.remove(), 300);
+        }
+    }
+
+    // 🔥 Atualiza badge contador
+    updateBadge();
+};
+
+function updateBadge(){
+    const badge = document.getElementById("orders-badge");
+    if(!badge) return;
+
+    let count = document.querySelectorAll(".order-row").length;
+    badge.innerText = count;
+}
+</script>
+
 {% endblock %}

@@ -69,6 +69,7 @@ def a_start_picking(request, order_id):
             "type": "order_update",
             "order_id": order.id,
             "status": order.status,
+            "status_display": order.get_status_display(),
         }
     )
 
@@ -103,6 +104,7 @@ def a_dispatch(request, order_id):
             "type": "order_update",
             "order_id": order.id,
             "status": order.status,
+            "status_display": order.get_status_display(),
         }
     )
 
@@ -142,13 +144,14 @@ def a_item_ok(request, order_id, item_id):
     channel_layer = get_channel_layer()
 
     async_to_sync(channel_layer.group_send)(
-        "orders_group",
-        {
-            "type": "order_update",
-            "order_id": order.id,
-            "status": order.status,
-        }
-    )
+            "orders_group",
+            {
+                "type": "order_update",
+                "order_id": order.id,
+                "status": order.status,
+                "status_display": order.get_status_display(),
+            }
+        )
 
     OrderLog.objects.create(
         order=order,
