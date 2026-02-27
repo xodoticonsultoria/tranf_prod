@@ -18,17 +18,25 @@ from core.models import (
 from core.permissions import require_queimados
 
 
+# ==========================================================
+# CART HELPER
+# ==========================================================
+
 def _get_or_create_cart(user):
     cart, _ = TransferOrder.objects.get_or_create(
         created_by=user,
         status=OrderStatus.DRAFT,
         defaults={
             "from_branch": Branch.QUEIMADOS,
-            "to_branch": Branch.AUSTIN
+            "to_branch": Branch.AUSTIN,
         },
     )
     return cart
 
+
+# ==========================================================
+# PRODUCTS
+# ==========================================================
 
 @require_queimados
 def q_products(request):
@@ -59,9 +67,13 @@ def q_products(request):
 
     return render(request, "queimados/products.html", {
         "cart": cart,
-        "categories": categories
+        "categories": categories,
     })
 
+
+# ==========================================================
+# CART
+# ==========================================================
 
 @require_queimados
 def q_cart(request):
@@ -73,6 +85,7 @@ def q_cart(request):
             field = f"qty_{item.id}"
             if field in request.POST:
                 new_qty = int(request.POST[field])
+
                 if new_qty <= 0:
                     item.delete()
                 else:
@@ -84,13 +97,17 @@ def q_cart(request):
 
     return render(request, "queimados/cart.html", {
         "cart": cart,
-        "items": items
+        "items": items,
     })
 
 
+# ==========================================================
+# SUBMIT ORDER (COM WEBSOCKET SEGURO)
+# ==========================================================
+
 @require_queimados
 @transaction.atomic
-def q_submit_order(request, order=None):
+def q_submit_order(request):
     cart = _get_or_create_cart(request.user)
 
     if cart.items.count() == 0:
@@ -98,53 +115,59 @@ def q_submit_order(request, order=None):
         return redirect("q_cart")
 
     cart.status = OrderStatus.SUBMITTED
+    cart.submitted_at = timezone.now()
     cart.save()
 
-    from channels.layers import get_channel_layer
-    from asgiref.sync import async_to_sync
-
-    channel_layer = get_channel_layer()
-
-    async_to_sync(channel_layer.group_send)(
-        "orders_group",
-        {
-            "type": "order_update",
-            "order_id": order.id,
-            "status": order.status,
-            "status_display": order.get_status_display(),
-        }
-    )
+    # 🔥 WebSocket protegido (não derruba sistema se Redis cair)
+    try:
+        channel_layer = get_channel_layer()
+        if channel_layer:
+            async_to_sync(channel_layer.group_send)(
+                "orders_group",
+                {
+                    "type": "order_update",
+                    "order_id": cart.id,
+                    "status": cart.status,
+                    "status_display": cart.get_status_display(),
+                }
+            )
+    except Exception:
+        # Se Redis estiver offline, o sistema continua funcionando
+        pass
 
     OrderLog.objects.create(
         order=cart,
         user=request.user,
-        action="Enviou o pedido para Austin"
+        action="Enviou o pedido para Austin",
     )
 
     messages.success(request, f"Pedido #{cart.id} enviado com sucesso!")
     return redirect("q_cart")
 
 
-from django.utils import timezone
+# ==========================================================
+# LISTA DE PEDIDOS DO DIA
+# ==========================================================
 
 @require_queimados
 def q_orders(request):
-
     today = timezone.localdate()
 
-    orders = TransferOrder.objects.filter(
-        created_by=request.user,
-        created_at__date=today
-    ).exclude(
-        status__in=[
-            OrderStatus.DRAFT,
-            OrderStatus.RECEIVED  # 🔥 Remove confirmados da tela
-        ]
-    ).order_by("-created_at")
+    orders = (
+        TransferOrder.objects
+        .filter(created_by=request.user, created_at__date=today)
+        .exclude(status__in=[OrderStatus.DRAFT, OrderStatus.RECEIVED])
+        .order_by("-created_at")
+    )
 
     return render(request, "queimados/orders.html", {
-        "orders": orders
+        "orders": orders,
     })
+
+
+# ==========================================================
+# REMOVE ITEM
+# ==========================================================
 
 @require_queimados
 def q_remove_item(request, item_id):
@@ -152,7 +175,7 @@ def q_remove_item(request, item_id):
         TransferOrderItem,
         id=item_id,
         order__created_by=request.user,
-        order__status=OrderStatus.DRAFT
+        order__status=OrderStatus.DRAFT,
     )
 
     item.delete()
@@ -161,28 +184,36 @@ def q_remove_item(request, item_id):
     return redirect("q_cart")
 
 
+# ==========================================================
+# DETAIL
+# ==========================================================
 
 @require_queimados
 def q_order_detail(request, order_id):
     order = get_object_or_404(
         TransferOrder,
         id=order_id,
-        created_by=request.user
+        created_by=request.user,
     )
+
     items = order.items.select_related("product")
 
     return render(request, "queimados/order_detail.html", {
         "order": order,
-        "items": items
+        "items": items,
     })
 
+
+# ==========================================================
+# RECEIVE ORDER (COM WEBSOCKET SEGURO)
+# ==========================================================
 
 @require_queimados
 def q_receive_order(request, order_id):
     order = get_object_or_404(
         TransferOrder,
         id=order_id,
-        created_by=request.user
+        created_by=request.user,
     )
 
     if order.status != OrderStatus.DISPATCHED:
@@ -193,31 +224,40 @@ def q_receive_order(request, order_id):
     order.received_at = timezone.now()
     order.save()
 
-
-
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)(
-        "orders_group",
-        {
-            "type": "order_update",
-            "order_id": order.id,
-            "status": order.status,
-            "status_display": order.get_status_display(),
-        }
-    )
+    # 🔥 WebSocket protegido
+    try:
+        channel_layer = get_channel_layer()
+        if channel_layer:
+            async_to_sync(channel_layer.group_send)(
+                "orders_group",
+                {
+                    "type": "order_update",
+                    "order_id": order.id,
+                    "status": order.status,
+                    "status_display": order.get_status_display(),
+                }
+            )
+    except Exception:
+        pass
 
     OrderLog.objects.create(
         order=order,
         user=request.user,
-        action="Confirmou recebimento do pedido"
+        action="Confirmou recebimento do pedido",
     )
 
     messages.success(request, f"Pedido #{order.id} confirmado.")
     return redirect("q_order_detail", order_id=order.id)
 
+
+# ==========================================================
+# CATEGORIES
+# ==========================================================
+
 @require_queimados
 def queimados_categories(request):
     categories = Category.objects.filter(active=True).prefetch_related("products")
+
     return render(
         request,
         "queimados/categories.html",
