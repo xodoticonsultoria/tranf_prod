@@ -90,8 +90,8 @@ body{
 
 .x-side-btn{
   display:block;
-  background:#a51515;
-  color:white;
+  background:white;
+  color:#a51515;
   text-decoration:none;
   padding:9px 10px;
   border-radius:8px;
@@ -103,15 +103,33 @@ body{
 }
 
 .btn-small{
-  padding:6px 5px;
+  padding:4px 18px;
   font-size:13px;
   border-radius:6px;
+  width:50px;
+  background-color:#E7BA15;
+  color:white;
+  text-decoration:none;
+  font-weight: 800;
+   border-radius:4px;
+}
+
+.btn-small:hover{
+ color:#991b1b;
+ background:white;
+ transition: 0.5s;
 
 }
 
-
 .x-side-btn:hover{
   filter:brightness(1.05);
+}
+
+.muted{
+color:white;
+}
+h3{
+color:white;
 }
 
 /* =========================
@@ -126,7 +144,6 @@ body{
   margin:22px 0 18px;
   font-size:22px;
 }
-
 
 /* =========================
    CATEGORIAS
@@ -287,14 +304,41 @@ body{
 }
 
 .x-save{
-  background:#991b1b;
-  color:white;
+  background:white;
+  color:#991b1b;
   border:none;
-  padding:6px 10px;
+  padding:8px;
   font-size:12px;
   font-weight:900;
   cursor:pointer;
+  border-radius:6px;
+  text-decoration:none;
 }
+.x-save:hover{
+background:#991b1b;
+color:white;
+transition:all 0.5s;
+}
+
+.btn-observacao{
+  color:white;
+  border:none;
+  padding:10px;
+  font-size:8px;
+  font-weight:900;
+  cursor:pointer;
+  border-radius:6px;
+  text-decoration:none;
+  background:green
+
+}
+.btn-observacao:hover{
+background:#991b1b;
+color:white;
+transition:all 0.5s;
+}
+
+
 
 .x-submit-form{
   text-align:center;
@@ -400,6 +444,11 @@ body{
   border-radius:4px;
   box-shadow:0 3px 0 rgba(0,0,0,.35);
 }
+
+
+
+
+
 
 /* =========================
    MOBILE
@@ -716,6 +765,7 @@ body{
 .order-status-label{
   font-weight:800;
   margin-right:8px;
+  color:white;
 }
 
 .order-status-badge{
@@ -1222,6 +1272,7 @@ body{
 .order-notes-box{
   margin-top:30px;
   text-align:center;
+  color:white;
 }
 
 .order-notes-box textarea{
@@ -1252,6 +1303,7 @@ body{
   font-size:13px;
   display:inline-block;
   box-shadow:0 3px 0 rgba(0,0,0,.25);
+
 }
 
 /* STATUS CORES */
@@ -1325,12 +1377,20 @@ body{
 }
 
 .btn-mini{
-  background:#991b1b;
-  color:white;
-  padding:6px 12px;
-  border-radius:6px;
-  font-weight:900;
-  text-decoration:none;
+  padding:5px 10px;
+    background:#8f1212;
+    color:white;
+    font-weight:700;
+    border-radius:4px;
+    text-decoration:none;
+    font-size:12px
+}
+
+.btn-mini:hover{
+color:#8f1212;
+background:white;
+transition:0.5s;
+
 }
 
 /* STATUS BADGE */
