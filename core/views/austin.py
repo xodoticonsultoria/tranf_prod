@@ -84,17 +84,40 @@ def a_start_picking(request, order_id):
 
 @require_austin
 def a_dispatch(request, order_id):
+
+    if request.method != "POST":
+        return redirect("a_order_detail", order_id=order_id)
+
     order = get_object_or_404(TransferOrder, id=order_id)
 
     if order.status != OrderStatus.PICKING:
         messages.error(request, "Só pode despachar durante separação.")
         return redirect("a_order_detail", order_id=order.id)
 
+    # 🔥 SALVAR QUANTIDADES ENVIADAS
+    for item in order.items.all():
+        field = f"sent_{item.id}"
+
+        if field in request.POST:
+            try:
+                val = int(request.POST.get(field))
+                item.qty_sent = max(0, val)
+                item.save()
+            except (ValueError, TypeError):
+                pass
+
+    # 🔥 SALVAR OBSERVAÇÃO
+    order.notes_from_austin = request.POST.get("notes_from_austin", "")
+
     order.status = OrderStatus.DISPATCHED
     order.dispatched_at = timezone.now()
     order.save()
 
-
+    log = OrderLog.objects.create(
+        order=order,
+        user=request.user,
+        action="Despachou o pedido"
+    )
 
     channel_layer = get_channel_layer()
 
@@ -105,29 +128,15 @@ def a_dispatch(request, order_id):
             "order_id": order.id,
             "status": order.status,
             "status_display": order.get_status_display(),
+            "log": {
+                "created_at": log.created_at.strftime("%d/%m/%Y %H:%M:%S"),
+                "user": log.user.username,
+                "action": log.action,
+            }
         }
     )
 
-    OrderLog.objects.create(
-        order=order,
-        user=request.user,
-        action="Despachou o pedido"
-    )
-
     return redirect("a_order_detail", order_id=order.id)
-
-
-@require_austin
-@require_GET
-def austin_poll(request):
-    qs = TransferOrder.objects.filter(status=OrderStatus.SUBMITTED)
-    newest = qs.order_by("-id").first()
-
-    return JsonResponse({
-        "count": qs.count(),
-        "newest_id": newest.id if newest else 0
-    })
-
 
 @require_austin
 def a_item_ok(request, order_id, item_id):

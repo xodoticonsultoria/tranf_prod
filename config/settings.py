@@ -40,13 +40,12 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    # app
-    "core",
+    "channels",
 
-    # cloudinary
+    "core",
     "cloudinary",
     "cloudinary_storage",
-    "channels",
+
 ]
 
 # ======================
@@ -89,6 +88,7 @@ TEMPLATES = [
 
 
 ASGI_APPLICATION = "config.asgi.application"
+
 
 # ==========================================================
 # CHANNEL LAYERS (LOCAL SEM REDIS / PRODUÇÃO COM REDIS)

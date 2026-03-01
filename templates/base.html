@@ -12,13 +12,11 @@
 
 <header class="x-header">
 
-  <!-- LOGO -->
   <div class="x-logo-box">
     <img src="{% static 'logo_xodo.png' %}" class="x-logo">
   </div>
 
   {% if request.user.is_authenticated %}
-  <!-- MENU BUTTON -->
   <div class="menu-area">
     <div class="menu-button" onclick="toggleMenu(event)">
       <span>Menu</span>
@@ -29,7 +27,6 @@
       </div>
     </div>
 
-    <!-- DROPDOWN MENU -->
     <div class="dropdown-menu" id="dropdownMenu">
 
       <div class="menu-user">
@@ -40,14 +37,18 @@
       </div>
 
       {% if request.user.groups.first.name == "QUEIMADOS" %}
-        <a href="{% url 'q_cart' %}" class="menu-btn">Abrir Carrinho</a>
+        <a href="{% url 'q_cart' %}" class="menu-btn">
+          Abrir Carrinho
+        </a>
         <a href="{% url 'q_products' %}" class="menu-btn">Produtos</a>
         <a href="{% url 'q_orders' %}" class="menu-btn">Meus Pedidos</a>
         <a href="{% url 'q_report' %}" class="menu-btn">Relatório</a>
       {% endif %}
 
       {% if request.user.groups.first.name == "AUSTIN" %}
-        <a href="{% url 'a_orders' %}" class="menu-btn">Pedidos Recebidos</a>
+        <a href="{% url 'a_orders' %}" class="menu-btn">
+          Pedidos Recebidos
+        </a>
         <a href="{% url 'a_report' %}" class="menu-btn">Relatório</a>
       {% endif %}
 
@@ -58,9 +59,8 @@
   {% endif %}
 
 </header>
+
 <div class="menu-overlay" id="menuOverlay"></div>
-
-
 
 <div class="x-layout">
   <main class="x-main">
@@ -68,13 +68,12 @@
   </main>
 </div>
 
-
 <script src="{% static 'app.js' %}"></script>
 
+<!-- MENU SCRIPT -->
 <script>
 function toggleMenu(event){
   event.stopPropagation()
-
   const menu = document.getElementById("dropdownMenu")
   const overlay = document.getElementById("menuOverlay")
   const button = document.querySelector(".menu-button")
@@ -84,9 +83,7 @@ function toggleMenu(event){
   button.classList.toggle("active")
 }
 
-document.getElementById("menuOverlay").addEventListener("click", function(){
-  closeMenu()
-})
+document.getElementById("menuOverlay").addEventListener("click", closeMenu)
 
 function closeMenu(){
   document.getElementById("dropdownMenu").classList.remove("open")
@@ -94,78 +91,85 @@ function closeMenu(){
   document.querySelector(".menu-button").classList.remove("active")
 }
 
-/* Fecha ao clicar em opção */
 document.querySelectorAll(".menu-btn, .menu-exit").forEach(btn=>{
   btn.addEventListener("click", closeMenu)
 })
 </script>
 
-
-
-<!-- ========================================= -->
-<!-- 🔄 POLLING PROFISSIONAL AUSTIN (mantido) -->
-<!-- ========================================= -->
+<!-- POLLING AUSTIN -->
 {% if request.user.is_authenticated and request.user.groups.first.name == "AUSTIN" %}
-
 <script>
-
 let lastOrderId = parseInt(localStorage.getItem("last_austin_order_id") || 0)
-let alreadyInsideOrders = window.location.pathname.includes("/austin/pedidos/")
-let btn = document.getElementById("austin-orders-btn")
-
-if(alreadyInsideOrders){
-    localStorage.setItem("last_austin_order_id", lastOrderId)
-    if(btn) btn.classList.remove("blinking")
-}
 
 setInterval(function(){
-
     fetch("/austin/api/badge/")
     .then(r => r.json())
     .then(data => {
-
         if(data.newest_id && data.newest_id > lastOrderId){
-
             lastOrderId = data.newest_id
             localStorage.setItem("last_austin_order_id", lastOrderId)
-
-            if(!alreadyInsideOrders){
-
-                if(btn){
-                    btn.classList.add("blinking")
-                }
-
-                const audio = new Audio("{% static 'ding.mp3' %}")
-                audio.play()
-            }
+            const audio = new Audio("{% static 'ding.mp3' %}")
+            audio.play()
         }
     })
-
 }, 4000)
-
 </script>
-
 {% endif %}
 
-
 <script>
-const socket = new WebSocket(
-    "ws://" + window.location.host + "/ws/orders/"
-);
+document.addEventListener("DOMContentLoaded", function(){
 
-socket.onmessage = function(e){
-    const data = JSON.parse(e.data);
+    const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
 
-    console.log(data.message);
+    const socket = new WebSocket(
+        protocol + window.location.host + "/ws/orders/"
+    );
 
-    // Aqui você pode:
-    // atualizar badge
-    // atualizar status
-    // tocar som
-    // animar pedido
-};
+    socket.onopen = function(){
+        console.log("🔥 WebSocket conectado");
+    };
+
+    socket.onmessage = function(e){
+
+        const data = JSON.parse(e.data);
+        console.log("📦 EVENTO RECEBIDO:", data);
+
+        // 🔹 Atualiza LISTA
+        const row = document.getElementById("order-row-" + data.order_id);
+
+        if (row) {
+            const badge = row.querySelector(".status-badge");
+
+            if (badge) {
+                badge.innerText = data.status_display.toUpperCase();
+            }
+
+            if (data.status === "RECEIVED") {
+                row.remove();
+            }
+        }
+
+        // 🔥 Atualiza DETALHE
+        if (
+            typeof window.CURRENT_ORDER_ID !== "undefined" &&
+            parseInt(data.order_id) === parseInt(window.CURRENT_ORDER_ID)
+        ) {
+
+            const badge = document.querySelector(".order-status-text");
+
+            if (badge) {
+                badge.innerText = data.status_display.toUpperCase();
+                badge.className = "order-status-badge " + data.status;
+            }
+
+            if (data.status === "RECEIVED") {
+                location.reload();
+            }
+        }
+
+    };
+
+});
 </script>
-
-
 </body>
 </html>

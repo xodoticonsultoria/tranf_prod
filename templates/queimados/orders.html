@@ -21,13 +21,13 @@
 
     <tbody>
       {% for o in orders %}
-      <tr>
+      <tr id="order-row-{{ o.id }}" class="order-row">
         <td class="prod-name">
           #{{ o.id }}
         </td>
 
         <td>
-          <span class="order-status-badge">
+          <span class="status-badge">
             {{ o.get_status_display|upper }}
           </span>
         </td>
@@ -55,10 +55,11 @@
 
 </div>
 
-
 <script>
+const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+
 const socket = new WebSocket(
-    "wss://" + window.location.host + "/ws/orders/"
+    protocol + window.location.host + "/ws/orders/"
 );
 
 socket.onmessage = function(e) {
@@ -66,34 +67,21 @@ socket.onmessage = function(e) {
 
     const orderRow = document.getElementById("order-row-" + data.order_id);
 
-    // Atualiza STATUS
     if (orderRow) {
 
         const badge = orderRow.querySelector(".status-badge");
 
         if (badge) {
-            badge.innerText = data.status_display;
+            badge.innerText = data.status_display.toUpperCase();
         }
 
-        // 🔥 Se virou RECEIVED ou DISPATCHED, remove da tela
         if (data.status === "RECEIVED" || data.status === "DISPATCHED") {
             orderRow.style.transition = "0.3s";
             orderRow.style.opacity = "0";
             setTimeout(() => orderRow.remove(), 300);
         }
     }
-
-    // 🔥 Atualiza badge contador
-    updateBadge();
 };
-
-function updateBadge(){
-    const badge = document.getElementById("orders-badge");
-    if(!badge) return;
-
-    let count = document.querySelectorAll(".order-row").length;
-    badge.innerText = count;
-}
 </script>
 
 {% endblock %}

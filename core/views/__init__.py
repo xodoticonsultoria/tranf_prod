@@ -35,7 +35,6 @@ from .austin import (
     a_dispatch,
     a_item_ok,
     austin_badge,
-    austin_poll,
 )
 
 # =====================

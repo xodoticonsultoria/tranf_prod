@@ -116,6 +116,9 @@ class TransferOrderItem(models.Model):
     @property
     def is_fulfilled(self):
         return self.qty_sent >= self.qty_requested
+    @property
+    def extra_qty(self):
+        return max(0, self.qty_sent - self.qty_requested)
 
     def __str__(self):
         return f"{self.order_id} - {self.product.name}"

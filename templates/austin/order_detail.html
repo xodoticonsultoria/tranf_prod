@@ -14,59 +14,54 @@
   </span>
 </div>
 
+{% if order.status == "PICKING" %}
+<form method="post" action="{% url 'a_dispatch' order.id %}">
+  {% csrf_token %}
+{% endif %}
+
 <div class="order-table-wrap">
-
   <table class="order-table">
-
     <thead>
       <tr>
         <th>Produto</th>
         <th>Pedido</th>
         <th>Enviado</th>
-        <th>Ação</th>
       </tr>
     </thead>
 
     <tbody>
-
       {% for it in items %}
       <tr>
-
         <td class="prod-name">
+           (cod
+            <span class="muted_sku">{{ it.product.sku }})</span>
           {{ it.product.name|upper }}
-          <span class="muted">({{ it.product.sku }})</span>
         </td>
 
         <td>{{ it.qty_requested }}</td>
 
         <td>
           {% if order.status == "PICKING" %}
-            <input type="number"
-                   name="sent_{{ it.id }}"
-                   min="0"
-                   value="{{ it.qty_sent }}"
-                   class="qty-input">
+            <div class="qty-wrapper">
+              <button type="button" class="mais_menos" onclick="decrease({{ it.id }})">−</button>
+
+              <input type="number"
+                     id="sent_{{ it.id }}"
+                     name="sent_{{ it.id }}"
+                     min="0"
+                     value="{{ it.qty_sent }}"
+                     class="qty-input">
+
+              <button type="button" class="mais_menos" onclick="increase({{ it.id }})">+</button>
+            </div>
           {% else %}
-            {{ it.qty_sent }}
+              {{ it.qty_sent }}
           {% endif %}
         </td>
-
-        <td>
-          {% if order.status == "PICKING" %}
-            <a href="{% url 'a_item_ok' order.id it.id %}"
-               class="btn-ok">
-              OK
-            </a>
-          {% endif %}
-        </td>
-
       </tr>
       {% endfor %}
-
     </tbody>
-
   </table>
-
 </div>
 
 <!-- OBSERVAÇÃO -->
@@ -75,21 +70,14 @@
   <h3>Observação (Austin)</h3>
 
   {% if order.status == "PICKING" %}
-    <form method="post">
-      {% csrf_token %}
       <textarea name="notes_from_austin"
                 placeholder="Ex: faltou rosquinha, enviando 3...">
         {{ order.notes_from_austin }}
       </textarea>
-
-      <div style="text-align:center; margin-top:10px;">
-        <button class="btn-observacao">SALVAR OBSERVAÇÃO</button>
-      </div>
-    </form>
   {% else %}
-    <div class="order-note-display">
-      {{ order.notes_from_austin|default:"(sem observações)" }}
-    </div>
+      <div class="order-note-display">
+        {{ order.notes_from_austin|default:"(sem observações)" }}
+      </div>
   {% endif %}
 </div>
 
@@ -106,16 +94,41 @@
   {% endif %}
 
   {% if order.status == "PICKING" %}
-    <a href="{% url 'a_dispatch' order.id %}"
-       class="x-save"
-       onclick="return confirm('Despachar pedido?');">
-       DESPACHAR
-    </a>
+      <button type="submit"
+              class="x-save"
+              onclick="return confirm('Despachar pedido?');">
+          DESPACHAR
+      </button>
   {% endif %}
 
-  <br><br>
-
-    <a href="{% url 'a_orders' %}" class="btn-small">Voltar</a>
 </div>
+
+{% if order.status == "PICKING" %}
+</form>
+{% endif %}
+
+<div style="text-align:center; margin-top:20px;">
+  <a href="{% url 'a_orders' %}" class="btn-small">Voltar</a>
+</div>
+
+
+<script>
+function increase(id){
+    let input = document.getElementById("sent_" + id);
+    input.value = parseInt(input.value || 0) + 1;
+}
+
+function decrease(id){
+    let input = document.getElementById("sent_" + id);
+    let val = parseInt(input.value || 0);
+    if(val > 0){
+        input.value = val - 1;
+    }
+}
+</script>
+
+<script>
+    window.CURRENT_ORDER_ID = {{ order.id }};
+</script>
 
 {% endblock %}

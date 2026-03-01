@@ -213,8 +213,8 @@ def q_receive_order(request, order_id):
     order = get_object_or_404(
         TransferOrder,
         id=order_id,
-        created_by=request.user,
     )
+    print("STATUS REAL NO B:", order.status)
 
     if order.status != OrderStatus.DISPATCHED:
         messages.error(request, "Só pode confirmar quando Austin despachar.")

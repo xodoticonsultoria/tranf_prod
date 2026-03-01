@@ -72,36 +72,40 @@
 <!-- ========================= -->
 
 <script>
-let lastNewestId = 0
+const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
 
-setInterval(function(){
+const socket = new WebSocket(
+    protocol + window.location.host + "/ws/orders/"
+);
 
-  fetch("/austin/api/poll/")
-    .then(r => r.json())
-    .then(data => {
+socket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
 
-      // 🔔 Tocar som somente quando realmente chega novo pedido
-      if(data.newest_id > lastNewestId){
-          lastNewestId = data.newest_id
+    const row = document.getElementById("order-row-" + data.order_id);
 
-          const audio = new Audio("/static/ding.mp3")
-          audio.play()
+    if (row) {
 
-          // Fazer linha piscar se existir
-          const row = document.getElementById("order-row-" + data.newest_id)
-          if(row){
-              row.classList.add("pulse-row")
+        const badge = row.querySelector(".status-badge");
 
-              setTimeout(() => {
-                row.classList.remove("pulse-row")
-              }, 3000)
-          }
-      }
+        badge.innerText = data.status_display.toUpperCase();
+        badge.className = "status-badge " + data.status;
 
-    })
+        row.classList.add("pulse-row");
 
-}, 5000)
+        setTimeout(() => {
+            row.classList.remove("pulse-row");
+        }, 3000);
+
+    } else {
+        const audio = new Audio("/static/ding.mp3");
+        audio.play();
+
+        location.reload();
+    }
+};
+
+socket.onclose = function() {
+    console.log("WebSocket desconectado.");
+};
 </script>
-
-
 {% endblock %}

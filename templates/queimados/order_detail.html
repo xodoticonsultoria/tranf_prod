@@ -8,7 +8,8 @@
 
 <div class="order-status-box">
   <span class="order-status-label">Status:</span>
-  <span id="order-status-text" class="order-status-badge">
+  <span id="order-status-text"
+        class="order-status-badge {{ order.status }}">
     {{ order.get_status_display|upper }}
   </span>
 </div>
@@ -38,9 +39,13 @@
         <td>
           {% if item.qty_sent == item.qty_requested %}
             <span class="result-ok">✔ OK</span>
-          {% else %}
+          {% elif item.qty_sent < item.qty_requested %}
             <span class="result-missing">
               ⚠ Faltou {{ item.qty_requested|add:"-item.qty_sent" }}
+            </span>
+          {% elif item.qty_sent > item.qty_requested %}
+            <span class="result-extra">
+              🟢 Enviado a mais {{ item.extra_qty }}
             </span>
           {% endif %}
         </td>
@@ -50,16 +55,14 @@
   </table>
 </div>
 
-{% if order.status == "DISPATCHED" %}
-<div style="text-align:center; margin-top:25px;">
-  <a href="{% url 'q_receive_order' order.id %}"
-     class="x-save"
-     style="padding:10px 20px;"
-     onclick="return confirm('Confirmar que o pedido foi recebido?');">
-     CONFIRMAR RECEBIMENTO
-  </a>
+<div id="confirm-box" style="text-align:center; margin-top:25px;">
+    <a href="{% url 'q_receive_order' order.id %}"
+       class="x-save">
+       CONFIRMAR RECEBIMENTO
+    </a>
+
 </div>
-{% endif %}
+
 
 <div style="text-align:center; margin-top:20px;">
   <a href="{% url 'q_orders' %}" class="btn-small" style="display:inline-block;">
@@ -70,6 +73,7 @@
 <hr>
 <h3>Histórico</h3>
 
+<div id="order-history">
 {% for log in order.logs.all %}
   <div class="muted">
     {{ log.created_at|date:"d/m/Y H:i:s" }} • {{ log.user.username }} • {{ log.action }}
@@ -77,30 +81,31 @@
 {% empty %}
   <div class="muted">Sem histórico.</div>
 {% endfor %}
+</div>
 
 <!-- ========================= -->
 <!-- TEMPO REAL -->
 <!-- ========================= -->
 
-<script>
-setInterval(function(){
-  fetch("/pedido/{{ order.id }}/poll/")
-    .then(r => r.json())
-    .then(data => {
+<!--<script>-->
+<!--setInterval(function(){-->
+<!--  fetch("/pedido/{{ order.id }}/poll/")-->
+<!--    .then(r => r.json())-->
+<!--    .then(data => {-->
 
-      const el = document.getElementById("order-status-text")
+<!--      const el = document.getElementById("order-status-text");-->
 
-      if(el && el.innerText !== data.status_display.toUpperCase()){
-        el.innerText = data.status_display.toUpperCase()
-        el.classList.add("pulse-status")
+<!--      if(el && el.innerText !== data.status_display.toUpperCase()){-->
+<!--        el.innerText = data.status_display.toUpperCase();-->
+<!--        el.classList.add("pulse-status");-->
 
-        setTimeout(() => {
-          el.classList.remove("pulse-status")
-        }, 2000)
-      }
+<!--        setTimeout(() => {-->
+<!--          el.classList.remove("pulse-status");-->
+<!--        }, 2000);-->
+<!--      }-->
 
-    })
-}, 4000)
-</script>
+<!--    })-->
+<!--}, 4000);-->
+<!--</script>-->
 
 {% endblock %}

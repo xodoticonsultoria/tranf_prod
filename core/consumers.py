@@ -1,9 +1,11 @@
-import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+import json
+
 
 class OrderConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
+        print("🔥 CONECTOU")
         await self.channel_layer.group_add(
             "orders_group",
             self.channel_name
@@ -11,15 +13,12 @@ class OrderConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
+        print("❌ DESCONECTOU")
         await self.channel_layer.group_discard(
             "orders_group",
             self.channel_name
         )
 
     async def order_update(self, event):
-        await self.send(text_data=json.dumps({
-            "order_id": event["order_id"],
-            "status": event["status"],
-            "status_display": event["status_display"],
-        }))
-
+        print("📩 RECEBEU EVENTO:", event)
+        await self.send(text_data=json.dumps(event))

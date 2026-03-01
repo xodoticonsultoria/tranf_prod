@@ -13,8 +13,14 @@ urlpatterns = [
     path("queimados/carrinho/enviar/", views.q_submit_order, name="q_submit_order"),
 
     path("queimados/pedidos/", views.q_orders, name="q_orders"),
-    path("queimados/pedidos/<int:order_id>/", views.q_order_detail, name="q_order_detail"),
+
+    # 🔥 ROTA ESPECÍFICA PRIMEIRO
     path("queimados/pedidos/<int:order_id>/receber/", views.q_receive_order, name="q_receive_order"),
+
+    # 🔥 ROTA GENÉRICA DEPOIS
+    path("queimados/pedidos/<int:order_id>/", views.q_order_detail, name="q_order_detail"),
+
+
 
     # 🔥 RELATÓRIO (corrigido)
     path("queimados/relatorio/", views.q_report, name="q_report"),
@@ -54,7 +60,7 @@ urlpatterns = [
     # =====================
 
     path("austin/api/badge/", views.austin_badge, name="austin_badge"),
-    path("austin/api/poll/", views.austin_poll, name="austin_poll"),
+
 
     # =====================
     # TESTE
