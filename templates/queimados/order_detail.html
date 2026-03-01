@@ -6,6 +6,10 @@
   Queimados • Pedido #{{ order.id }}
 </h2>
 
+<SCRIPT>
+    window.CURRENT_ORDER = {{ order.id }};
+</SCRIPT>
+
 <div class="order-status-box">
   <span class="order-status-label">Status:</span>
   <span id="order-status-text"
@@ -83,9 +87,7 @@
 {% endfor %}
 </div>
 
-<SCRIPT>
-    window.CURRENT_ORDER = {{ order.id }};
-</SCRIPT>
+
 <!-- ========================= -->
 <!-- TEMPO REAL -->
 <!-- ========================= -->
