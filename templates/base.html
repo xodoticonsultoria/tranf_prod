@@ -144,9 +144,9 @@ document.addEventListener("DOMContentLoaded", function(){
                 badge.innerText = data.status_display.toUpperCase();
             }
 
-            if (data.status === "RECEIVED") {
-                row.remove();
-            }
+<!--            if (data.status === "RECEIVED") {-->
+<!--                row.remove();-->
+<!--            }-->
         }
 
         // 🔥 Atualiza DETALHE
@@ -154,14 +154,15 @@ document.addEventListener("DOMContentLoaded", function(){
             typeof window.CURRENT_ORDER_ID !== "undefined" &&
             String(data.order_id) === String(window.CURRENT_ORDER_ID)
         ) {
-
-            const badge = document.getElementById(".order-status-text");
+            console.log("Recebido:", data.order_id);
+            console.log("Página:", window.CURRENT_ORDER_ID);
+            console.log("Comparação:", String(data.order_id) === String(window.CURRENT_ORDER_ID));
+            const badge = document.getElementById("order-status-text");
 
             if (badge) {
                 badge.innerText = data.status_display.toUpperCase();
                 badge.className = "order-status-badge " + data.status;
             }
-
             if (data.status === "RECEIVED") {
                 location.reload();
             }
