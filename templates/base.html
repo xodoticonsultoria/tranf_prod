@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", function(){
         // 🔥 Atualiza DETALHE
         if (
             typeof window.CURRENT_ORDER_ID !== "undefined" &&
-            parseInt(data.order_id) === parseInt(window.CURRENT_ORDER_ID)
+            String(data.order_id) === String(window.CURRENT_ORDER_ID)
         ) {
 
             const badge = document.getElementById(".order-status-text");
