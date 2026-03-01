@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", function(){
             parseInt(data.order_id) === parseInt(window.CURRENT_ORDER_ID)
         ) {
 
-            const badge = document.querySelector(".order-status-text");
+            const badge = document.getElementById(".order-status-text");
 
             if (badge) {
                 badge.innerText = data.status_display.toUpperCase();
