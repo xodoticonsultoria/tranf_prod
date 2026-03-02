@@ -75,7 +75,7 @@ socket.onmessage = function(e) {
             badge.innerText = data.status_display.toUpperCase();
         }
 
-        if (data.status === "RECEIVED" || data.status === "DISPATCHED") {
+        if (data.status === "RECEIVED") {
             orderRow.style.transition = "0.3s";
             orderRow.style.opacity = "0";
             setTimeout(() => orderRow.remove(), 300);
