@@ -97,4 +97,28 @@ function dec(btn){
 }
 </script>
 
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    // 🔹 Restaurar posição
+    const savedPosition = sessionStorage.getItem("scrollPosition");
+    if (savedPosition) {
+        window.scrollTo(0, parseInt(savedPosition));
+        sessionStorage.removeItem("scrollPosition");
+    }
+
+    // 🔹 Salvar posição antes de enviar form
+    const forms = document.querySelectorAll("form");
+
+    forms.forEach(form => {
+        form.addEventListener("submit", function() {
+            sessionStorage.setItem("scrollPosition", window.scrollY);
+        });
+    });
+
+});
+</script>
+
 {% endblock %}
