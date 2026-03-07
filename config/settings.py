@@ -97,7 +97,7 @@ ASGI_APPLICATION = "config.asgi.application"
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "BACKEND": "channels_layer.InMemoryChannelLayer",
     },
 }
 
@@ -207,3 +207,5 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = False  # Render já usa HTTPS
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
+print("chanel layers:", CHANNEL_LAYERS)
