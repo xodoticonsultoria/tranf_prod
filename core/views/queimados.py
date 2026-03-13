@@ -22,16 +22,27 @@ from core.permissions import require_queimados
 # CART HELPER
 # ==========================================================
 
+from django.utils import timezone
+
 def _get_or_create_cart(user):
-    cart, _ = TransferOrder.objects.get_or_create(
+
+    today = timezone.localdate()
+
+    cart = TransferOrder.objects.filter(
         created_by=user,
         status=OrderStatus.DRAFT,
-        defaults={
-            "from_branch": Branch.QUEIMADOS,
-            "to_branch": Branch.AUSTIN,
-        },
+        created_at__date=today
+    ).first()
+
+    if cart:
+        return cart
+
+    return TransferOrder.objects.create(
+        created_by=user,
+        status=OrderStatus.DRAFT,
+        from_branch=Branch.QUEIMADOS,
+        to_branch=Branch.AUSTIN,
     )
-    return cart
 
 
 # ==========================================================
@@ -117,6 +128,8 @@ def q_submit_order(request):
     cart.status = OrderStatus.SUBMITTED
     cart.submitted_at = timezone.now()
     cart.save()
+    # cria novo carrinho vazio
+    _get_or_create_cart(request.user)
 
     # 🔥 WebSocket protegido (não derruba sistema se Redis cair)
     try:
@@ -157,7 +170,7 @@ def q_orders(request):
         TransferOrder.objects
         .filter(created_by=request.user, created_at__date=today)
         .exclude(status__in=[OrderStatus.DRAFT, OrderStatus.RECEIVED])
-        .order_by("-created_at")
+        .order_by("-submitted_at")
     )
 
     return render(request, "queimados/orders.html", {
