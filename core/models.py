@@ -103,7 +103,7 @@ class TransferOrderItem(models.Model):
 
     qty_requested = models.PositiveIntegerField()
     qty_sent = models.PositiveIntegerField(default=0)
-
+    created_at = models.DateTimeField(auto_now_add=True)  # 👈 NOVO CAMPO
     note = models.CharField(max_length=255, blank=True, default="")
 
     class Meta:

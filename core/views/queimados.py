@@ -78,7 +78,7 @@ def q_products(request):
 @require_queimados
 def q_cart(request):
     cart = _get_or_create_cart(request.user)
-    items = cart.items.select_related("product")
+    items = cart.items.select_related("product").order_by("id")
 
     if request.method == "POST":
         for item in items:
