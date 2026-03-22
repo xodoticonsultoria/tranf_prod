@@ -19,13 +19,13 @@ DEBUG = os.environ.get("DEBUG", "0") == "1"
 # ======================
 
 ALLOWED_HOSTS = [
-    "tranf-prod.onrender.com",
+    "tranf-prod-x7v0.onrender.com",
     "127.0.0.1",
     "localhost",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://tranf-prod.onrender.com",
+    "https://tranf-prod-x7v0.onrender.com",
 ]
 
 # ======================
