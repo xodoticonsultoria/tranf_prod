@@ -26,6 +26,7 @@ ALLOWED_HOSTS = [
 
 CSRF_TRUSTED_ORIGINS = [
     "https://tranf-prod-x7v0.onrender.com",
+    "https://*.onrender.com",
 ]
 
 # ======================
@@ -225,3 +226,7 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = False  # Render já usa HTTPS
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_HTTPONLY = "Lax"
+
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
