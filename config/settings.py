@@ -25,7 +25,7 @@ ALLOWED_HOSTS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "tranf-prod-x7v0.onrender.com",
+    "https://tranf-prod-x7v0.onrender.com",
 ]
 
 # ======================
