@@ -183,6 +183,15 @@ CLOUDINARY_STORAGE = {
     "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET"),
 }
 
+import cloudinary
+
+cloudinary.config(
+    cloud_name="dcxrdp3vu",
+    api_key="759123492249086",
+    api_secret="SUA_API_SECRET_AQUI",
+    secure=True
+)
+
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
