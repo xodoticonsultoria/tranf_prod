@@ -321,7 +321,7 @@ if db_url:
     DATABASES = {
         "default": dj_database_url.parse(
             db_url,
-            conn_max_age=60,
+            conn_max_age=600,
             ssl_require=True,
         )
     }
