@@ -210,49 +210,34 @@ def q_order_detail(request, order_id):
 
 @require_queimados
 def q_receive_order(request, order_id):
-    order = get_object_or_404(
-        TransferOrder,
-        id=order_id,
-    )
-    print("STATUS REAL NO B:", order.status)
+
+    order = get_object_or_404(TransferOrder, id=order_id)
 
     if order.status != OrderStatus.DISPATCHED:
-        messages.error(request, "Só pode confirmar quando Austin despachar.")
+        messages.error(request, "Pedido ainda não foi despachado.")
         return redirect("q_order_detail", order_id=order.id)
+
+    # 🔥 NÃO MEXE NOS ITENS
+    # 🔥 NÃO ALTERA qty_sent
 
     order.status = OrderStatus.RECEIVED
     order.received_at = timezone.now()
-    order.save()
-
-    # 🔥 WebSocket protegido
-    try:
-        channel_layer = get_channel_layer()
-        if channel_layer:
-            async_to_sync(channel_layer.group_send)(
-                "orders_group",
-                {
-                    "type": "order_update",
-                    "order_id": order.id,
-                    "status": order.status,
-                    "status_display": order.get_status_display(),
-                }
-            )
-    except Exception:
-        pass
+    order.save(update_fields=["status", "received_at"])
 
     OrderLog.objects.create(
         order=order,
         user=request.user,
-        action="Confirmou recebimento do pedido",
+        action="Confirmou recebimento"
     )
 
-    messages.success(request, f"Pedido #{order.id} confirmado.")
+    messages.success(request, "Recebimento confirmado.")
+
     return redirect("q_order_detail", order_id=order.id)
 
 
 # ==========================================================
 # CATEGORIES
-# ==========================================================
+# =========================================================
 
 @require_queimados
 def queimados_categories(request):

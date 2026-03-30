@@ -125,7 +125,7 @@ if db_url:
     DATABASES = {
         "default": dj_database_url.parse(
             db_url,
-            conn_max_age=0,
+            conn_max_age=600,
             ssl_require=True,
         )
     }
@@ -166,7 +166,8 @@ USE_TZ = True
 # ======================
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
+if DEBUG:
+    STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
@@ -187,9 +188,9 @@ CLOUDINARY_STORAGE = {
 import cloudinary
 
 cloudinary.config(
-    cloud_name="dcxrdp3vu",
-    api_key="759123492249086",
-    api_secret="SUA_API_SECRET_AQUI",
+    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.environ.get("CLOUDINARY_API_KEY"),
+    api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
     secure=True
 )
 
@@ -226,7 +227,7 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = False  # Render já usa HTTPS
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    CSRF_COOKIE_HTTPONLY = "Lax"
+    CSRF_COOKIE_HTTPONLY = True
 
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

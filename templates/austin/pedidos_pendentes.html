@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="area-title">ENVIO COMPLEMENTAR</h2>
+
+<div class="x-cart-wrap">
+  <div class="x-cart-box">
+    <div class="x-grid">
+
+      {% for pedido in pedidos %}
+        <div class="x-cart-item">
+            <div>
+                Pedido #{{ pedido.id }}
+            </div>
+
+            <div>
+                Status: {{ pedido.status_envio }}
+            </div>
+
+            <a href="{% url 'envio_complementar' pedido.id %}"
+               class="x-submit">
+               ENVIAR COMPLEMENTO
+            </a>
+        </div>
+      {% empty %}
+        <div style="padding:10px;font-weight:800;">
+          Nenhum pedido com pendência
+        </div>
+      {% endfor %}
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

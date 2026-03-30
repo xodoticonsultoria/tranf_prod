@@ -5,10 +5,24 @@ from django.contrib import messages
 from django.utils import timezone
 from django.views.decorators.http import require_GET
 from django.http import JsonResponse
+from django.db.models import F
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
 
-from core.models import TransferOrder, OrderStatus, TransferOrderItem, OrderLog
+from core.models import (
+    TransferOrder,
+    OrderStatus,
+    OrderLog,
+    Despacho,
+    DespachoItem,
+)
+
 from core.permissions import require_austin
 
+
+# =====================================================
+# LISTA DE PEDIDOS
+# =====================================================
 
 @require_austin
 def a_orders(request):
@@ -19,34 +33,24 @@ def a_orders(request):
     return render(request, "austin/orders.html", {"orders": orders})
 
 
+# =====================================================
+# DETALHE DO PEDIDO
+# =====================================================
+
 @require_austin
 def a_order_detail(request, order_id):
     order = get_object_or_404(TransferOrder, id=order_id)
     items = order.items.select_related("product")
-
-    if request.method == "POST":
-        if order.status != OrderStatus.PICKING:
-            messages.error(request, "Só pode alterar durante separação.")
-            return redirect("a_order_detail", order_id=order.id)
-
-        for item in items:
-            field = f"sent_{item.id}"
-            if field in request.POST:
-                val = int(request.POST[field])
-                item.qty_sent = max(0, val)
-                item.save()
-
-        order.notes_from_austin = request.POST.get("notes_from_austin", "")
-        order.save()
-
-        messages.success(request, "Quantidades atualizadas.")
-        return redirect("a_order_detail", order_id=order.id)
 
     return render(request, "austin/order_detail.html", {
         "order": order,
         "items": items
     })
 
+
+# =====================================================
+# INICIAR SEPARAÇÃO
+# =====================================================
 
 @require_austin
 def a_start_picking(request, order_id):
@@ -61,18 +65,6 @@ def a_start_picking(request, order_id):
     order.picking_at = timezone.now()
     order.save()
 
-    channel_layer = get_channel_layer()
-
-    async_to_sync(channel_layer.group_send)(
-        "orders_group",
-        {
-            "type": "order_update",
-            "order_id": order.id,
-            "status": order.status,
-            "status_display": order.get_status_display(),
-        }
-    )
-
     OrderLog.objects.create(
         order=order,
         user=request.user,
@@ -82,6 +74,10 @@ def a_start_picking(request, order_id):
     return redirect("a_order_detail", order_id=order.id)
 
 
+# =====================================================
+# DESPACHO PRINCIPAL (CORRETO)
+# =====================================================
+
 @require_austin
 def a_dispatch(request, order_id):
 
@@ -89,87 +85,184 @@ def a_dispatch(request, order_id):
         return redirect("a_order_detail", order_id=order_id)
 
     order = get_object_or_404(TransferOrder, id=order_id)
+    items = order.items.select_related("product")
 
     if order.status != OrderStatus.PICKING:
         messages.error(request, "Só pode despachar durante separação.")
         return redirect("a_order_detail", order_id=order.id)
 
-    # 🔥 SALVAR QUANTIDADES ENVIADAS
-    for item in order.items.all():
-        field = f"sent_{item.id}"
+    with transaction.atomic():
 
-        if field in request.POST:
+        despacho = Despacho.objects.create(
+            order=order,
+            created_by=request.user,
+            is_complementar=False  # 🔥 explícito
+        )
+
+        OrderLog.objects.create(
+            order=order,
+            user=request.user,
+            action="Despachou o pedido"
+        )
+
+        for item in items:
+
+            field = f"sent_{item.id}"
+
             try:
-                val = int(request.POST.get(field))
-                item.qty_sent = max(0, val)
-                item.save()
-            except (ValueError, TypeError):
-                pass
+                enviar = int(request.POST.get(field, 0))
+            except:
+                continue
 
-    # 🔥 SALVAR OBSERVAÇÃO
-    order.notes_from_austin = request.POST.get("notes_from_austin", "")
+            falta = item.qty_requested - item.qty_sent
 
+            if enviar > 0 and enviar <= falta:
+                DespachoItem.objects.create(
+                    despacho=despacho,
+                    order_item=item,
+                    qty_sent_now=enviar
+                )
+
+    # 🔥 REGRA NOVA: SEMPRE DESPACHADO
     order.status = OrderStatus.DISPATCHED
     order.dispatched_at = timezone.now()
-    order.save()
+    order.save(update_fields=["status", "dispatched_at"])
 
-    log = OrderLog.objects.create(
+    OrderLog.objects.create(
         order=order,
         user=request.user,
         action="Despachou o pedido"
     )
 
-    channel_layer = get_channel_layer()
-
-    async_to_sync(channel_layer.group_send)(
-        "orders_group",
-        {
-            "type": "order_update",
-            "order_id": order.id,
-            "status": order.status,
-            "status_display": order.get_status_display(),
-            "log": {
-                "created_at": log.created_at.strftime("%d/%m/%Y %H:%M:%S"),
-                "user": log.user.username,
-                "action": log.action,
-            }
-        }
-    )
-
     return redirect("a_order_detail", order_id=order.id)
 
+
+# =====================================================
+# LISTA DE ENVIO COMPLEMENTAR
+# =====================================================
+
 @require_austin
-def a_item_ok(request, order_id, item_id):
+def lista_envio_complementar(request):
+
+    pedidos = TransferOrder.objects.filter(
+    status__in=[
+        OrderStatus.DISPATCHED,
+        OrderStatus.RECEIVED
+    ]
+).prefetch_related("items").order_by("-id")
+
+    pedidos_com_info = []
+
+    for pedido in pedidos:
+        total = sum(i.qty_requested for i in pedido.items.all())
+        enviado = sum(i.qty_sent for i in pedido.items.all())
+
+        if total == 0:
+            continue
+
+        if enviado < total:
+            progresso = int((enviado / total) * 100)
+
+            pedidos_com_info.append({
+                "pedido": pedido,
+                "total": total,
+                "enviado": enviado,
+                "progresso": progresso,
+                "faltando": total - enviado
+            })
+
+    return render(request, "austin/lista_envio_complementar.html", {
+        "pedidos": pedidos_com_info
+    })
+
+    return render(request, "austin/lista_envio_complementar.html", {
+        "pedidos": pedidos_com_info
+    })
+
+
+# =====================================================
+# ENVIO COMPLEMENTAR (CORRETO)
+# =====================================================
+
+@require_austin
+def envio_complementar(request, order_id):
+
     order = get_object_or_404(TransferOrder, id=order_id)
-    item = get_object_or_404(TransferOrderItem, id=item_id, order=order)
 
-    if order.status != OrderStatus.PICKING:
-        messages.error(request, "Só pode marcar OK durante separação.")
-        return redirect("a_order_detail", order_id=order.id)
+    items = order.items.filter(
+        qty_requested__gt=F("qty_sent")
+    ).select_related("product")
 
-    item.qty_sent = item.qty_requested
-    item.save()
+    for item in items:
+        item.faltando = item.qty_requested - item.qty_sent
 
-    channel_layer = get_channel_layer()
+    if request.method == "POST":
 
-    async_to_sync(channel_layer.group_send)(
-            "orders_group",
-            {
-                "type": "order_update",
-                "order_id": order.id,
-                "status": order.status,
-                "status_display": order.get_status_display(),
-            }
+        with transaction.atomic():
+
+            despacho = Despacho.objects.create(
+                order=order,
+                created_by=request.user,
+                is_complementar=True  # 🔥 AQUI É A CHAVE
+            )
+
+            for item in items:
+
+                try:
+                    enviar = int(request.POST.get(f"qty_{item.id}", 0))
+                except:
+                    continue
+
+                if enviar > 0 and enviar <= item.faltando:
+                    DespachoItem.objects.create(
+                        despacho=despacho,
+                        order_item=item,
+                        qty_sent_now=enviar
+                    )
+
+        # 🔥 NÃO muda lógica de status
+        order.status = OrderStatus.DISPATCHED
+        order.dispatched_at = timezone.now()
+        order.save(update_fields=["status", "dispatched_at"])
+
+        # 🔥 LOG DIFERENCIADO
+        OrderLog.objects.create(
+            order=order,
+            user=request.user,
+            action="Envio complementar despachado"
         )
 
-    OrderLog.objects.create(
-        order=order,
-        user=request.user,
-        action=f"Marcou OK para {item.product.name}"
+        messages.success(request, "Envio complementar realizado.")
+        return redirect("lista_envio_complementar")
+
+    return render(request, "austin/envio_complementar.html", {
+        "order": order,
+        "items": items
+    })
+
+
+# =====================================================
+# HISTÓRICO
+# =====================================================
+
+@require_austin
+def historico_despacho(request, order_id):
+    order = get_object_or_404(TransferOrder, id=order_id)
+
+    despachos = order.despachos.prefetch_related(
+        "itens__order_item__product"
     )
 
-    return redirect("a_order_detail", order_id=order.id)
-@require_austin
+    return render(request, "austin/historico_despacho.html", {
+        "order": order,
+        "despachos": despachos
+    })
+
+
+# =====================================================
+# BADGE
+# =====================================================
+
 @require_GET
 def austin_badge(request):
     count = TransferOrder.objects.filter(
@@ -179,7 +272,9 @@ def austin_badge(request):
     return JsonResponse({"count": count})
 
 
-from django.contrib.auth.decorators import login_required
+# =====================================================
+# POLL STATUS
+# =====================================================
 
 @login_required
 def order_status_poll(request, order_id):

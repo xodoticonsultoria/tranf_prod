@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="area-title">
+    HISTÓRICO DE DESPACHO — PEDIDO {{ order.id }}
+</h2>
+
+<div class="x-cart-wrap">
+  <div class="x-cart-box">
+
+    {% for despacho in despachos %}
+      <div class="x-cart-item">
+
+        <div style="font-weight:800; margin-bottom:8px;">
+          📦 Despacho #{{ despacho.id }}
+          <br>
+          <small>{{ despacho.created_at|date:"d/m/Y H:i" }}</small>
+        </div>
+
+        {% for item in despacho.itens.all %}
+          <div style="margin-left:15px;">
+            • {{ item.order_item.product.name }}
+            — {{ item.qty_sent_now }} unidades
+          </div>
+        {% endfor %}
+
+      </div>
+    {% empty %}
+      <div style="padding:10px;font-weight:800;">
+        Nenhum despacho realizado
+      </div>
+    {% endfor %}
+
+  </div>
+</div>
+
+{% endblock %}

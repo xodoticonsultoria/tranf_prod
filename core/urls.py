@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.urls import path
 from . import views
+from .views import envio_complementar, lista_envio_complementar
 
 urlpatterns = [
 
@@ -47,10 +48,19 @@ urlpatterns = [
     path("austin/pedidos/<int:order_id>/", views.a_order_detail, name="a_order_detail"),
     path("austin/pedidos/<int:order_id>/iniciar-separacao/", views.a_start_picking, name="a_start_picking"),
     path("austin/pedidos/<int:order_id>/despachar/", views.a_dispatch, name="a_dispatch"),
-    path("austin/pedidos/<int:order_id>/item/<int:item_id>/ok/", views.a_item_ok, name="a_item_ok"),
     path("austin/relatorio/", views.a_report, name="a_report"),
     path("austin/relatorio/pdf/", views.a_report_pdf, name="a_report_pdf"),
     path("austin/relatorio/pdf/<int:order_id>/", views.a_report_pdf_single, name="a_report_pdf_single"),
+    path("pedido/<int:order_id>/historico/", views.historico_despacho, name="historico_despacho"),
+    path("austin/envio-complementar/", lista_envio_complementar, name="lista_envio_complementar"),
+
+    # EXECUTAR ENVIO
+    path(
+        "austin/envio-complementar/<int:order_id>/",
+        envio_complementar,
+        name="envio_complementar"
+    ),
+
 
 
 

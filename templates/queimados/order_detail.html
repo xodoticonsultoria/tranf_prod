@@ -75,16 +75,36 @@
 </div>
 
 <hr>
-<h3>Histórico</h3>
+<div class="order-history">
+  <h3>Histórico</h3>
 
-<div id="order-history">
-{% for log in order.logs.all %}
-  <div class="muted">
-    {{ log.created_at|date:"d/m/Y H:i:s" }} • {{ log.user.username }} • {{ log.action }}
-  </div>
-{% empty %}
-  <div class="muted">Sem histórico.</div>
-{% endfor %}
+  {% for log in order.logs.all %}
+    <div class="history-line">
+
+      <span class="history-date">
+        {{ log.created_at|date:"d/m/Y H:i:s" }}
+      </span>
+
+      •
+
+      <strong>{{ log.user }}</strong>
+
+      •
+
+      {% if "complementar" in log.action|lower %}
+        <span style="color:#f2c316; font-weight:bold;">
+          📦 {{ log.action }}
+        </span>
+      {% else %}
+        <span>
+          {{ log.action }}
+        </span>
+      {% endif %}
+
+    </div>
+  {% empty %}
+    <p>Sem histórico</p>
+  {% endfor %}
 </div>
 
 

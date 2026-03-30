@@ -33,8 +33,7 @@
       {% for it in items %}
       <tr>
         <td class="prod-name">
-           (cod
-            <span class="muted_sku">{{ it.product.sku }})</span>
+          (cod <span class="muted_sku">{{ it.product.sku }})</span>
           {{ it.product.name|upper }}
         </td>
 
@@ -43,17 +42,34 @@
         <td>
           {% if order.status == "PICKING" %}
             <div class="qty-wrapper">
-              <button type="button" class="mais_menos" onclick="decrease({{ it.id }})">−</button>
+
+              <button type="button"
+                      class="mais_menos"
+                      onclick="decrease({{ it.id }})">
+                −
+              </button>
 
               <input type="number"
                      id="sent_{{ it.id }}"
                      name="sent_{{ it.id }}"
                      min="0"
-                     value="{{ it.qty_sent }}"
+                     max="{{ it.missing_qty }}"
+                     value="0"
+                     placeholder="Falta: {{ it.missing_qty }}"
                      class="qty-input">
 
-              <button type="button" class="mais_menos" onclick="increase({{ it.id }})">+</button>
+              <button type="button"
+                      class="mais_menos"
+                      onclick="increase({{ it.id }})">
+                +
+              </button>
+
             </div>
+
+            {% if it.missing_qty == 0 %}
+              <small style="color: green;">✔ Completo</small>
+            {% endif %}
+
           {% else %}
               {{ it.qty_sent }}
           {% endif %}
@@ -72,7 +88,7 @@
   {% if order.status == "PICKING" %}
       <textarea name="notes_from_austin"
                 placeholder="Ex: faltou rosquinha, enviando 3...">
-        {{ order.notes_from_austin }}
+{{ order.notes_from_austin }}
       </textarea>
   {% else %}
       <div class="order-note-display">
@@ -111,16 +127,23 @@
   <a href="{% url 'a_orders' %}" class="btn-small">Voltar</a>
 </div>
 
+<!-- JS -->
 
 <script>
 function increase(id){
     let input = document.getElementById("sent_" + id);
-    input.value = parseInt(input.value || 0) + 1;
+    let max = parseInt(input.max || 0);
+    let current = parseInt(input.value || 0);
+
+    if(current < max){
+        input.value = current + 1;
+    }
 }
 
 function decrease(id){
     let input = document.getElementById("sent_" + id);
     let val = parseInt(input.value || 0);
+
     if(val > 0){
         input.value = val - 1;
     }

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="area-title">
+  ENVIO COMPLEMENTAR - Pedido #{{ order.id }}
+</h2>
+
+<form method="post">
+  {% csrf_token %}
+
+  <div class="order-table-wrap">
+    <table class="order-table">
+      <thead>
+        <tr>
+          <th>Produto</th>
+          <th>Pedido</th>
+          <th>Enviado</th>
+          <th>Faltando</th>
+          <th>Enviar</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td class="prod-name">
+            {{ item.product.name|upper }}
+          </td>
+
+          <td>{{ item.qty_requested }}</td>
+
+          <td>{{ item.qty_sent }}</td>
+
+          <td>{{ item.faltando }}</td>
+
+          <td>
+            <div class="qty-wrapper">
+
+              <button type="button"
+                      class="mais_menos"
+                      onclick="decrease({{ item.id }})">−</button>
+
+              <input type="number"
+                     id="qty_{{ item.id }}"
+                     name="qty_{{ item.id }}"
+                     min="0"
+                     max="{{ item.faltando }}"
+                     value="0"
+                     class="qty-input">
+
+              <button type="button"
+                      class="mais_menos"
+                      onclick="increase({{ item.id }})">+</button>
+
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5">Nenhum item pendente</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div style="text-align:center; margin-top:25px;">
+    <button type="submit" class="x-save">
+      ENVIAR COMPLEMENTO
+    </button>
+  </div>
+
+</form>
+
+<div style="text-align:center; margin-top:15px;">
+  <a href="{% url 'lista_envio_complementar' %}" class="btn-small">
+    Voltar
+  </a>
+</div>
+
+<!-- JS FUNCIONAL -->
+
+<script>
+function increase(id){
+    const input = document.getElementById(`qty_${id}`);
+    if(!input) return;
+
+    const max = parseInt(input.max) || 0;
+    let val = parseInt(input.value) || 0;
+
+    if(val < max){
+        input.value = val + 1;
+    }
+}
+
+function decrease(id){
+    const input = document.getElementById(`qty_${id}`);
+    if(!input) return;
+
+    let val = parseInt(input.value) || 0;
+
+    if(val > 0){
+        input.value = val - 1;
+    }
+}
+</script>
+
+{% endblock %}

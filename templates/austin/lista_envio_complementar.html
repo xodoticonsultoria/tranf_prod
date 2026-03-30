@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <h2 class="titulo">ENVIO COMPLEMENTAR</h2>
+
+    {% if pedidos %}
+
+        {% for p in pedidos %}
+        <div class="pedido-card">
+
+            <div class="pedido-header">
+                <strong>Pedido #{{ p.pedido.id }}</strong>
+                <span>{{ p.progresso }}%</span>
+            </div>
+
+            <!-- 🔥 Barra de progresso -->
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ p.progresso }}%"></div>
+            </div>
+
+            <!-- 🔥 Info -->
+            <div class="pedido-info">
+                Enviado: {{ p.enviado }} / {{ p.total }}
+            </div>
+
+            {% if p.faltando > 0 %}
+                <div class="alerta">
+                    ⚠️ Faltam {{ p.faltando }} itens
+                </div>
+            {% endif %}
+
+            <a href="{% url 'envio_complementar' p.pedido.id %}" class="btn-enviar">
+                Completar envio
+            </a>
+
+        </div>
+        {% endfor %}
+
+    {% else %}
+
+        <div class="empty">
+            Nenhum pedido pendente 🎉
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
