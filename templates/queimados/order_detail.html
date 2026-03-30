@@ -45,7 +45,7 @@
             <span class="result-ok">✔ OK</span>
           {% elif item.qty_sent < item.qty_requested %}
             <span class="result-missing">
-              ⚠ Faltou {{ item.qty_requested|add:-item.qty_sent }}
+              ⚠ Faltou {{ item.faltando }}
             </span>
           {% elif item.qty_sent > item.qty_requested %}
             <span class="result-extra">

@@ -190,17 +190,16 @@ def q_remove_item(request, item_id):
 
 @require_queimados
 def q_order_detail(request, order_id):
-    order = get_object_or_404(
-        TransferOrder,
-        id=order_id,
-        created_by=request.user,
-    )
-
+    order = get_object_or_404(TransferOrder, id=order_id)
     items = order.items.select_related("product")
+
+    # 🔥 ADICIONA ISSO AQUI
+    for item in items:
+        item.faltando = (item.qty_requested or 0) - (item.qty_sent or 0)
 
     return render(request, "queimados/order_detail.html", {
         "order": order,
-        "items": items,
+        "items": items
     })
 
 
