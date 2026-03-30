@@ -6,9 +6,9 @@
   Queimados • Pedido #{{ order.id }}
 </h2>
 
-<SCRIPT>
+<script>
     window.CURRENT_ORDER_ID = {{ order.id }};
-</SCRIPT>
+</script>
 
 <div class="order-status-box">
   <span class="order-status-label">Status:</span>
@@ -45,7 +45,7 @@
             <span class="result-ok">✔ OK</span>
           {% elif item.qty_sent < item.qty_requested %}
             <span class="result-missing">
-              ⚠ Faltou {{ item.qty_requested|add:"-item.qty_sent" }}
+              ⚠ Faltou {{ item.qty_requested|add:-item.qty_sent }}
             </span>
           {% elif item.qty_sent > item.qty_requested %}
             <span class="result-extra">
@@ -64,22 +64,21 @@
        class="x-save">
        CONFIRMAR RECEBIMENTO
     </a>
-
 </div>
 
-
 <div style="text-align:center; margin-top:20px;">
-  <a href="{% url 'q_orders' %}" class="btn-small" style="display:inline-block;">
+  <a href="{% url 'q_orders' %}" class="btn-small">
     Voltar
   </a>
 </div>
 
 <hr>
+
 <div class="order-history">
   <h3>Histórico</h3>
 
   {% for log in order.logs.all %}
-    <div class="history-line">
+    <div class="CC">
 
       <span class="history-date">
         {{ log.created_at|date:"d/m/Y H:i:s" }}
@@ -107,30 +106,19 @@
   {% endfor %}
 </div>
 
-
-<!-- ========================= -->
 <!-- TEMPO REAL -->
-<!-- ========================= -->
+<script>
+setInterval(() => {
+    fetch(`/pedido/{{ order.id }}/poll/`)
+        .then(res => res.json())
+        .then(data => {
 
-<!--<script>-->
-<!--setInterval(function(){-->
-<!--  fetch("/pedido/{{ order.id }}/poll/")-->
-<!--    .then(r => r.json())-->
-<!--    .then(data => {-->
+            if(data.status !== "{{ order.status }}"){
+                location.reload();
+            }
 
-<!--      const el = document.getElementById("order-status-text");-->
-
-<!--      if(el && el.innerText !== data.status_display.toUpperCase()){-->
-<!--        el.innerText = data.status_display.toUpperCase();-->
-<!--        el.classList.add("pulse-status");-->
-
-<!--        setTimeout(() => {-->
-<!--          el.classList.remove("pulse-status");-->
-<!--        }, 2000);-->
-<!--      }-->
-
-<!--    })-->
-<!--}, 4000);-->
-<!--</script>-->
+        });
+}, 4000);
+</script>
 
 {% endblock %}

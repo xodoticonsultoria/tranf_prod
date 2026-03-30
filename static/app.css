@@ -145,6 +145,22 @@ color:white;
   font-size:22px;
 }
 
+.titulo{
+  color:white;
+  font-weight:900;
+  letter-spacing:1px;
+  margin:22px 0 18px;
+  font-size:22px;
+}
+
+.empty{
+  color:white;
+  font-weight:600;
+  letter-spacing:1px;
+  margin:22px 0 18px;
+  font-size:16px;
+}
+
 /* =========================
    CATEGORIAS
 ========================= */
@@ -2141,4 +2157,9 @@ color: black;
     border-radius: 6px;
     font-size: 12px;
     text-decoration: none;
+}
+
+
+.CC{
+color: white;
 }
