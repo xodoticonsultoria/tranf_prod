@@ -365,7 +365,7 @@ if DEBUG:
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # 🔥 ESSENCIAL PRA PRODUÇÃO
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 
 MEDIA_URL = "/media/"
