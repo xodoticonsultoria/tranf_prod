@@ -108,17 +108,17 @@
 
 <!-- TEMPO REAL -->
 <script>
-setInterval(() => {
-    fetch(`/pedido/{{ order.id }}/poll/`)
-        .then(res => res.json())
-        .then(data => {
-
-            if(data.status !== "{{ order.status }}"){
-                location.reload();
-            }
-
-        });
-}, 4000);
+if ("{{ order.status }}" !== "RECEIVED"){
+    setInterval(() => {
+        fetch(`/pedido/{{ order.id }}/poll/`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.status !== "{{ order.status }}"){
+                    location.reload();
+                }
+            });
+    }, 10000);
+}
 </script>
 
 {% endblock %}
