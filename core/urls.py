@@ -39,6 +39,11 @@ urlpatterns = [
          name="q_remove_item"),
 
 
+    path("q/add-product/", views.q_add_product, name="q_add_product"),
+    path("q/update-item/", views.q_update_item),
+    path("q/remove-item/", views.q_remove_item_api),
+
+
 
     # =====================
     # AUSTIN

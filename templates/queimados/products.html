@@ -3,20 +3,27 @@
 {% block title %}Produtos{% endblock %}
 {% block content %}
 
+<!-- CSRF GLOBAL -->
+<form style="display:none;">
+  {% csrf_token %}
+</form>
+
 <h2 class="area-title area-with-cart">
     ÁREA DE PEDIDOS
 
     <div class="cart-header-icon">
         <span class="cart-icon">🛒</span>
 
-        {% if cart_count > 0 %}
-            <span class="cart-badge">
-                {{ cart_count }}
-            </span>
+         <span
+          class="cart-badge"
+          id="cart-count"
+          {% if cart_count == 0 %}style="display:none;"{% endif %}
+        >
+          {{ cart_count }}
+        </span>
         {% endif %}
     </div>
 </h2>
-
 
 {% for cat in categories %}
 <div class="x-cat">
@@ -36,19 +43,13 @@
 
     </div>
 
-
   <div id="cat-body-{{ cat.id }}" class="x-cat-body">
 
     <div class="x-grid">
 
       {% for p in cat.products.all %}
       {% if p.active %}
-      <form method="post"
-            action="{% url 'q_products' %}"
-            class="x-prod {% if p.image %}has-img{% else %}no-img{% endif %}">
-
-        {% csrf_token %}
-        <input type="hidden" name="product_id" value="{{ p.id }}">
+      <div class="x-prod {% if p.image %}has-img{% else %}no-img{% endif %}">
 
         {% if p.image %}
           <img src="{{ p.image.url }}" class="x-prod-img">
@@ -60,15 +61,18 @@
 
         <div class="x-qty">
           <button type="button" onclick="dec(this)">−</button>
-          <input type="number" name="qty" value="1" min="1">
+          <input type="number" value="1" min="1">
           <button type="button" onclick="inc(this)">+</button>
         </div>
 
-        <button type="submit" class="x-save">
+        <button
+          type="button"
+          class="x-save"
+          onclick="addProductWithQty(this, {{ p.id }})">
           SALVAR
         </button>
 
-      </form>
+      </div>
       {% endif %}
       {% endfor %}
 
@@ -78,6 +82,10 @@
 
 </div>
 {% endfor %}
+
+<!-- ========================= -->
+<!-- JS LOCAL -->
+<!-- ========================= -->
 
 <script>
 function toggleCat(id){
@@ -97,13 +105,15 @@ function dec(btn){
 }
 </script>
 
+<!-- ========================= -->
+<!-- SCROLL PERSISTENTE -->
+<!-- ========================= -->
+
 <script>
-// 🔥 salva posição antes de sair
 window.addEventListener("beforeunload", function () {
     localStorage.setItem("scrollPos", window.scrollY);
 });
 
-// 🔥 volta pra posição depois que carrega
 window.addEventListener("load", function () {
     const scrollPos = localStorage.getItem("scrollPos");
     if (scrollPos) {
@@ -111,5 +121,11 @@ window.addEventListener("load", function () {
     }
 });
 </script>
+
+<!-- ========================= -->
+<!-- JS EXTERNO -->
+<!-- ========================= -->
+
+<script src="{% static 'js/cart.js' %}"></script>
 
 {% endblock %}

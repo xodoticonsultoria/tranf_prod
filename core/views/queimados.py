@@ -21,18 +21,32 @@ from core.permissions import require_queimados
 # ==========================================================
 # CART HELPER
 # ==========================================================
+from django.utils.timezone import now
 
 def _get_or_create_cart(user):
-    cart, _ = TransferOrder.objects.get_or_create(
+    # 🔥 pega só carrinho de HOJE
+    cart = TransferOrder.objects.filter(
         created_by=user,
         status=OrderStatus.DRAFT,
-        defaults={
-            "from_branch": Branch.QUEIMADOS,
-            "to_branch": Branch.AUSTIN,
-        },
-    )
-    return cart
+        created_at__date=now().date()
+    ).first()
 
+    TransferOrder.objects.filter(
+        created_by=user,
+        status=OrderStatus.DRAFT
+    ).exclude(
+        created_at__date=now().date()
+    ).delete()
+
+    if not cart:
+        cart = TransferOrder.objects.create(
+            created_by=user,
+            status=OrderStatus.DRAFT,
+            from_branch=Branch.QUEIMADOS,
+            to_branch=Branch.AUSTIN,
+        )
+
+    return cart
 
 # ==========================================================
 # PRODUCTS
@@ -104,7 +118,6 @@ def q_cart(request):
 # ==========================================================
 # SUBMIT ORDER (COM WEBSOCKET SEGURO)
 # ==========================================================
-
 @require_queimados
 @transaction.atomic
 def q_submit_order(request):
@@ -247,3 +260,104 @@ def queimados_categories(request):
         "queimados/categories.html",
         {"categories": categories},
     )
+
+
+
+from django.http import JsonResponse
+import json
+
+@require_queimados
+def q_add_product(request):
+    if request.method != "POST":
+        return JsonResponse({"success": False, "error": "Método inválido"})
+
+    try:
+        data = json.loads(request.body)
+        product_id = int(data.get("product_id"))
+        qty = int(data.get("qty", 1))
+
+        if qty <= 0:
+            return JsonResponse({"success": False, "error": "Quantidade inválida"})
+
+        product = get_object_or_404(Product, id=product_id, active=True)
+        cart = _get_or_create_cart(request.user)
+
+        item, created = TransferOrderItem.objects.get_or_create(
+            order=cart,
+            product=product,
+            defaults={"qty_requested": qty},
+        )
+
+        if not created:
+            item.qty_requested += qty
+            item.save()
+
+        return JsonResponse({
+            "success": True,
+            "cart_total_items": cart.items.count()
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            "success": False,
+            "error": str(e)
+        })
+
+
+
+from django.http import JsonResponse
+import json
+
+@require_queimados
+def q_update_item(request):
+    if request.method != "POST":
+        return JsonResponse({"success": False})
+
+    try:
+        data = json.loads(request.body)
+        item_id = int(data.get("item_id"))
+        qty = int(data.get("qty"))
+
+        item = get_object_or_404(
+            TransferOrderItem,
+            id=item_id,
+            order__created_by=request.user,
+            order__status=OrderStatus.DRAFT
+        )
+
+        if qty <= 0:
+            item.delete()
+            return JsonResponse({"success": True, "deleted": True})
+
+        item.qty_requested = qty
+        item.save()
+
+        return JsonResponse({"success": True})
+
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)})
+
+
+
+@require_queimados
+def q_remove_item_api(request):
+    if request.method != "POST":
+        return JsonResponse({"success": False})
+
+    try:
+        data = json.loads(request.body)
+        item_id = int(data.get("item_id"))
+
+        item = get_object_or_404(
+            TransferOrderItem,
+            id=item_id,
+            order__created_by=request.user,
+            order__status=OrderStatus.DRAFT
+        )
+
+        item.delete()
+
+        return JsonResponse({"success": True})
+
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)})
