@@ -3,7 +3,6 @@
 {% block title %}Carrinho{% endblock %}
 {% block content %}
 
-<!-- CSRF -->
 <form style="display:none;">
   {% csrf_token %}
 </form>
@@ -13,18 +12,18 @@
 </h2>
 
 {% if items %}
-<div class="cart-container">
+<div class="x-grid">
 
   {% for item in items %}
-  <div class="cart-item">
+  <div class="x-prod">
 
-    <div class="cart-item-info">
-      <strong>{{ item.product.name }}</strong>
+    <div class="x-prod-name">
+      {{ item.product.name|upper }}
     </div>
 
-    <div class="cart-item-actions">
+    <div class="x-qty">
+      <button type="button" onclick="dec(this)">−</button>
 
-      <!-- QTD -->
       <input
         type="number"
         value="{{ item.qty_requested }}"
@@ -32,25 +31,24 @@
         onchange="updateItem(this, {{ item.id }})"
       >
 
-      <!-- REMOVER -->
-      <button
-        type="button"
-        class="btn-remove"
-        onclick="removeItem(this, {{ item.id }})"
-      >
-        ❌
-      </button>
-
+      <button type="button" onclick="inc(this)">+</button>
     </div>
+
+    <button
+      type="button"
+      class="x-save"
+      onclick="removeItem(this, {{ item.id }})"
+    >
+      REMOVER
+    </button>
 
   </div>
   {% endfor %}
 
 </div>
 
-<!-- BOTÃO ENVIAR -->
 <div style="margin-top:20px;">
-  <a href="{% url 'q_submit_order' %}" class="btn-primary">
+  <a href="{% url 'q_submit_order' %}" class="x-save">
     ENVIAR PEDIDO
   </a>
 </div>
@@ -59,6 +57,20 @@
 <p>Carrinho vazio.</p>
 {% endif %}
 
-<script src="{% static 'js/cart.js' %}"></script>
+<script>
+
+// mesmas funções do products
+function inc(btn){
+  const input = btn.parentElement.querySelector("input")
+  input.value = parseInt(input.value || 1) + 1
+}
+
+function dec(btn){
+  const input = btn.parentElement.querySelector("input")
+  const v = parseInt(input.value || 1)
+  if(v > 1) input.value = v - 1
+}
+
+</script>
 
 {% endblock %}

@@ -128,26 +128,19 @@ function addProductWithQty(btn, productId) {
   .then(res => res.json())
   .then(data => {
 
-    if (data.success) {
+   if (data.success) {
 
-      if (qtyInput) qtyInput.value = 1;
+  if (qtyInput) qtyInput.value = 1;
 
-      btn.innerText = "✔";
-      setTimeout(() => {
-        btn.innerText = "SALVAR";
-        btn.disabled = false;
-      }, 800);
+  // 🔥 só atualiza badge
+  const badge = document.getElementById("cart-count");
+  if (badge) {
+    badge.style.display = "inline-block";
+    badge.innerText = data.cart_total_items ?? 0;
+  }
 
-      const badge = document.getElementById("cart-count");
-      if (badge) {
-        badge.style.display = "inline-block";
-        badge.innerText = data.cart_total_items ?? 0;
-      }
-
-    } else {
-      alert(data.error || "Erro ao adicionar");
-      btn.disabled = false;
-    }
+  btn.disabled = false;
+}
 
   })
   .catch(err => {
