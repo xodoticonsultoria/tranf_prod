@@ -14,14 +14,14 @@
     <div class="cart-header-icon">
         <span class="cart-icon">🛒</span>
 
-         <span
+        <span
           class="cart-badge"
           id="cart-count"
           {% if cart_count == 0 %}style="display:none;"{% endif %}
         >
           {{ cart_count }}
         </span>
-        {% endif %}
+
     </div>
 </h2>
 
@@ -84,15 +84,82 @@
 {% endfor %}
 
 <!-- ========================= -->
-<!-- JS LOCAL -->
+<!-- JS COMPLETO -->
 <!-- ========================= -->
 
 <script>
-function toggleCat(id){
-  const el = document.getElementById("cat-body-"+id)
-  el.style.display = el.style.display === "block" ? "none" : "block"
+
+// =========================
+// CSRF
+// =========================
+function getCSRFToken() {
+  const token = document.querySelector('[name=csrfmiddlewaretoken]');
+  return token ? token.value : "";
 }
 
+// =========================
+// ADD PRODUCT
+// =========================
+function addProductWithQty(btn, productId) {
+
+  if (!btn) return;
+
+  const container = btn.closest(".x-prod");
+  if (!container) return;
+
+  const qtyInput = container.querySelector("input");
+  let qty = parseInt(qtyInput?.value);
+
+  if (isNaN(qty) || qty <= 0) qty = 1;
+
+  btn.disabled = true;
+
+  fetch("/q/add-product/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": getCSRFToken()
+    },
+    body: JSON.stringify({
+      product_id: productId,
+      qty: qty
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+
+    if (data.success) {
+
+      if (qtyInput) qtyInput.value = 1;
+
+      btn.innerText = "✔";
+      setTimeout(() => {
+        btn.innerText = "SALVAR";
+        btn.disabled = false;
+      }, 800);
+
+      const badge = document.getElementById("cart-count");
+      if (badge) {
+        badge.style.display = "inline-block";
+        badge.innerText = data.cart_total_items ?? 0;
+      }
+
+    } else {
+      alert(data.error || "Erro ao adicionar");
+      btn.disabled = false;
+    }
+
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Erro de conexão");
+    btn.disabled = false;
+  });
+}
+
+// =========================
+// CONTROLE QTD
+// =========================
 function inc(btn){
   const input = btn.parentElement.querySelector("input")
   input.value = parseInt(input.value || 1) + 1
@@ -103,13 +170,19 @@ function dec(btn){
   const v = parseInt(input.value || 1)
   if(v > 1) input.value = v - 1
 }
-</script>
 
-<!-- ========================= -->
-<!-- SCROLL PERSISTENTE -->
-<!-- ========================= -->
+// =========================
+// TOGGLE CATEGORIA
+// =========================
+function toggleCat(id){
+  const el = document.getElementById("cat-body-"+id)
+  const isVisible = window.getComputedStyle(el).display === "block"
+  el.style.display = isVisible ? "none" : "block"
+}
 
-<script>
+// =========================
+// SCROLL PERSISTENTE
+// =========================
 window.addEventListener("beforeunload", function () {
     localStorage.setItem("scrollPos", window.scrollY);
 });
@@ -120,12 +193,7 @@ window.addEventListener("load", function () {
         window.scrollTo(0, parseInt(scrollPos));
     }
 });
+
 </script>
-
-<!-- ========================= -->
-<!-- JS EXTERNO -->
-<!-- ========================= -->
-
-<script src="{% static 'js/cart.js' %}"></script>
 
 {% endblock %}
