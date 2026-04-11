@@ -113,6 +113,30 @@ def q_cart(request):
         "cart": cart,
         "items": items,
     })
+@require_queimados
+def q_cart(request):
+    cart = _get_or_create_cart(request.user)
+    items = cart.items.select_related("product").order_by("id")
+
+    if request.method == "POST":
+        for item in items:
+            field = f"qty_{item.id}"
+            if field in request.POST:
+                new_qty = int(request.POST[field])
+
+                if new_qty <= 0:
+                    item.delete()
+                else:
+                    item.qty_requested = new_qty
+                    item.save()
+
+        messages.success(request, "Carrinho atualizado.")
+        return redirect("q_cart")
+
+    return render(request, "queimados/cart.html", {
+        "cart": cart,
+        "items": items,
+    })
 
 
 # ==========================================================
