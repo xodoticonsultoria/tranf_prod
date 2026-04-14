@@ -24,21 +24,17 @@ from core.permissions import require_queimados
 from django.utils.timezone import now
 
 def _get_or_create_cart(user):
-    # 🔥 pega só carrinho de HOJE
-    cart = TransferOrder.objects.filter(
-        created_by=user,
-        status=OrderStatus.DRAFT,
-        created_at__date=now().date()
-    ).first()
-
-    TransferOrder.objects.filter(
+    carts = TransferOrder.objects.filter(
         created_by=user,
         status=OrderStatus.DRAFT
-    ).exclude(
-        created_at__date=now().date()
-    ).delete()
+    ).order_by("id")
 
-    if not cart:
+    if carts.exists():
+        cart = carts.first()
+
+        # 🔥 remove duplicados
+        carts.exclude(id=cart.id).delete()
+    else:
         cart = TransferOrder.objects.create(
             created_by=user,
             status=OrderStatus.DRAFT,

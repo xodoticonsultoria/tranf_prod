@@ -202,3 +202,6 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     CSRF_COOKIE_HTTPONLY = True
+
+
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
