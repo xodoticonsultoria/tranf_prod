@@ -30,8 +30,7 @@ urlpatterns = [
     path("queimados/relatorio/pdf/", views.q_report_pdf, name="q_report_pdf"),
     path("queimados/relatorio/pdf/<int:order_id>/", views.q_report_pdf_single, name="q_report_pdf_single"),
 
-    # Categorias
-    path("queimados/categorias/", views.queimados_categories, name="q_categories"),
+
 
     #Removdor de item do carrinho
     path("queimados/carrinho/remover/<int:item_id>/",
