@@ -22,7 +22,6 @@ from .queimados import (
     q_orders,
     q_order_detail,
     q_receive_order,
-    queimados_categories,
 )
 
 # =====================
