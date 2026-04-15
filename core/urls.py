@@ -15,34 +15,29 @@ urlpatterns = [
 
     path("queimados/pedidos/", views.q_orders, name="q_orders"),
 
-    # 🔥 ROTA ESPECÍFICA PRIMEIRO
+    # 🔥 ESPECÍFICA PRIMEIRO
     path("queimados/pedidos/<int:order_id>/receber/", views.q_receive_order, name="q_receive_order"),
 
-    # 🔥 ROTA GENÉRICA DEPOIS
+    # 🔥 GENÉRICA DEPOIS
     path("queimados/pedidos/<int:order_id>/", views.q_order_detail, name="q_order_detail"),
 
-
-
-    # 🔥 RELATÓRIO (corrigido)
-    path("queimados/relatorio/", views.q_report, name="q_report"),
-# 🔥 RELATÓRIO QUEIMADOS
+    # 🔥 RELATÓRIO
     path("queimados/relatorio/", views.q_report, name="q_report"),
     path("queimados/relatorio/pdf/", views.q_report_pdf, name="q_report_pdf"),
     path("queimados/relatorio/pdf/<int:order_id>/", views.q_report_pdf_single, name="q_report_pdf_single"),
 
+    # ❌ REMOVIDO (não existe na view)
+    # path("queimados/categorias/", views.q_categories, name="q_categories"),
 
-
-    #Removdor de item do carrinho
+    # REMOVER ITEM
     path("queimados/carrinho/remover/<int:item_id>/",
          views.q_remove_item,
          name="q_remove_item"),
 
-
+    # APIs
     path("q/add-product/", views.q_add_product, name="q_add_product"),
     path("q/update-item/", views.q_update_item),
     path("q/remove-item/", views.q_remove_item_api),
-
-
 
     # =====================
     # AUSTIN
@@ -52,22 +47,16 @@ urlpatterns = [
     path("austin/pedidos/<int:order_id>/", views.a_order_detail, name="a_order_detail"),
     path("austin/pedidos/<int:order_id>/iniciar-separacao/", views.a_start_picking, name="a_start_picking"),
     path("austin/pedidos/<int:order_id>/despachar/", views.a_dispatch, name="a_dispatch"),
+
     path("austin/relatorio/", views.a_report, name="a_report"),
     path("austin/relatorio/pdf/", views.a_report_pdf, name="a_report_pdf"),
     path("austin/relatorio/pdf/<int:order_id>/", views.a_report_pdf_single, name="a_report_pdf_single"),
+
     path("pedido/<int:order_id>/historico/", views.historico_despacho, name="historico_despacho"),
+
+    # ENVIO COMPLEMENTAR
     path("austin/envio-complementar/", lista_envio_complementar, name="lista_envio_complementar"),
-
-    # EXECUTAR ENVIO
-    path(
-        "austin/envio-complementar/<int:order_id>/",
-        envio_complementar,
-        name="envio_complementar"
-    ),
-
-
-
-
+    path("austin/envio-complementar/<int:order_id>/", envio_complementar, name="envio_complementar"),
 
     # =====================
     # API
@@ -75,15 +64,10 @@ urlpatterns = [
 
     path("austin/api/badge/", views.austin_badge, name="austin_badge"),
 
-
     # =====================
     # TESTE
     # =====================
 
     path("teste/", lambda r: render(r, "test.html")),
     path("pedido/<int:order_id>/poll/", views.order_status_poll, name="order_status_poll"),
-
 ]
-
-
-
