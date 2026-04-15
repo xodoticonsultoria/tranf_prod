@@ -184,14 +184,11 @@ def q_submit_order(request):
 
 @require_queimados
 def q_orders(request):
-    today = timezone.localdate()
-
-    orders = (
-        TransferOrder.objects
-        .filter(created_by=request.user, created_at__date=today)
-        .exclude(status__in=[OrderStatus.DRAFT, OrderStatus.RECEIVED])
-        .order_by("-created_at")
-    )
+    orders = TransferOrder.objects.filter(
+        created_by=request.user
+    ).exclude(
+        status=OrderStatus.DRAFT
+    ).order_by("-created_at")
 
     return render(request, "queimados/orders.html", {
         "orders": orders,
