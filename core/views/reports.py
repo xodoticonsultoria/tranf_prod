@@ -42,7 +42,7 @@ def a_report(request):
     start = request.GET.get("start")
     end = request.GET.get("end")
 
-    orders = None  # Tela começa limpa
+    orders = None
 
     if start and end:
         orders = TransferOrder.objects.exclude(
@@ -110,7 +110,7 @@ def q_report(request):
     start = request.GET.get("start")
     end = request.GET.get("end")
 
-    orders = None  # Tela começa limpa
+    orders = None
 
     if start and end:
         orders = TransferOrder.objects.exclude(
@@ -178,7 +178,16 @@ def _generate_pdf_response(orders, filename, title, operator_field):
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer)
+
+    # 🔥 MENOS ESPAÇO NO TOPO
+    doc = SimpleDocTemplate(
+        buffer,
+        topMargin=10,
+        bottomMargin=20,
+        leftMargin=30,
+        rightMargin=30
+    )
+
     elements = []
     styles = getSampleStyleSheet()
 
@@ -186,14 +195,14 @@ def _generate_pdf_response(orders, filename, title, operator_field):
     logo_path = os.path.join(settings.BASE_DIR, "static", "xodo.png")
 
     if os.path.exists(logo_path):
-        logo = Image(logo_path, width=120, height=80)
+        logo = Image(logo_path, width=100, height=70)
         logo.hAlign = "RIGHT"
         elements.append(logo)
-        elements.append(Spacer(1, 0.2 * inch))
+        elements.append(Spacer(1, 0.1 * inch))
 
     # TÍTULO
     elements.append(Paragraph(f"<b>{title}</b>", styles["Title"]))
-    elements.append(Spacer(1, 0.3 * inch))
+    elements.append(Spacer(1, 0.05 * inch))
 
     # PEDIDOS
     for order in orders:
@@ -202,29 +211,14 @@ def _generate_pdf_response(orders, filename, title, operator_field):
         operator_name = operator.username if operator else "-"
 
         elements.append(Paragraph(f"<b>Pedido #{order.id}</b>", styles["Heading2"]))
-        elements.append(Spacer(1, 0.2 * inch))
+        elements.append(Spacer(1, 0.1 * inch))
 
-        elements.append(Paragraph(
-            f"Operador: {operator_name}",
-            styles["Normal"]
-        ))
+        elements.append(Paragraph(f"Operador: {operator_name}", styles["Normal"]))
+        elements.append(Paragraph(f"Data Pedido: {_fmt(order.created_at)}", styles["Normal"]))
+        elements.append(Paragraph(f"Início Separação: {_fmt(order.picking_at)}", styles["Normal"]))
+        elements.append(Paragraph(f"Despacho: {_fmt(order.dispatched_at)}", styles["Normal"]))
 
-        elements.append(Paragraph(
-            f"Data Pedido: {_fmt(order.created_at)}",
-            styles["Normal"]
-        ))
-
-        elements.append(Paragraph(
-            f"Início Separação: {_fmt(order.picking_at)}",
-            styles["Normal"]
-        ))
-
-        elements.append(Paragraph(
-            f"Despacho: {_fmt(order.dispatched_at)}",
-            styles["Normal"]
-        ))
-
-        elements.append(Spacer(1, 0.2 * inch))
+        elements.append(Spacer(1, 0.1 * inch))
 
         data = [["Produto", "Pedido", "Enviado"]]
 
@@ -237,14 +231,28 @@ def _generate_pdf_response(orders, filename, title, operator_field):
 
         table = Table(data, colWidths=[250, 80, 80])
         table.setStyle(TableStyle([
+
             ("BACKGROUND", (0, 0), (-1, 0), colors.red),
             ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-            ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+
+            ("GRID", (0, 0), (-1, -1), 0.3, colors.grey),
+
             ("ALIGN", (1, 1), (-1, -1), "CENTER"),
+
+            # 🔥 FONTE MENOR
+            ("FONTSIZE", (0, 0), (-1, -1), 7),
+
+            # 🔥 LINHAS MAIS FINAS
+            ("TOPPADDING", (0, 0), (-1, -1), 2),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
+
+            ("LEFTPADDING", (0, 0), (-1, -1), 4),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+
         ]))
 
         elements.append(table)
-        elements.append(Spacer(1, 0.5 * inch))
+        elements.append(Spacer(1, 0.3 * inch))
 
     doc.build(elements)
 
