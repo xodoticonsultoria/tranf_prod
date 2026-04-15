@@ -4,6 +4,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db import transaction
 from django.utils import timezone
+from django.http import JsonResponse
+import json
 
 from core.models import (
     Category,
@@ -21,8 +23,6 @@ from core.permissions import require_queimados
 # ==========================================================
 # CART HELPER
 # ==========================================================
-from django.utils.timezone import now
-
 def _get_or_create_cart(user):
     carts = TransferOrder.objects.filter(
         created_by=user,
@@ -31,8 +31,6 @@ def _get_or_create_cart(user):
 
     if carts.exists():
         cart = carts.first()
-
-        # 🔥 remove duplicados
         carts.exclude(id=cart.id).delete()
     else:
         cart = TransferOrder.objects.create(
@@ -44,10 +42,10 @@ def _get_or_create_cart(user):
 
     return cart
 
+
 # ==========================================================
 # PRODUCTS
 # ==========================================================
-
 @require_queimados
 def q_products(request):
     cart = _get_or_create_cart(request.user)
@@ -84,31 +82,6 @@ def q_products(request):
 # ==========================================================
 # CART
 # ==========================================================
-
-@require_queimados
-def q_cart(request):
-    cart = _get_or_create_cart(request.user)
-    items = cart.items.select_related("product")
-
-    if request.method == "POST":
-        for item in items:
-            field = f"qty_{item.id}"
-            if field in request.POST:
-                new_qty = int(request.POST[field])
-
-                if new_qty <= 0:
-                    item.delete()
-                else:
-                    item.qty_requested = new_qty
-                    item.save()
-
-        messages.success(request, "Carrinho atualizado.")
-        return redirect("q_cart")
-
-    return render(request, "queimados/cart.html", {
-        "cart": cart,
-        "items": items,
-    })
 @require_queimados
 def q_cart(request):
     cart = _get_or_create_cart(request.user)
@@ -136,11 +109,14 @@ def q_cart(request):
 
 
 # ==========================================================
-# SUBMIT ORDER (COM WEBSOCKET SEGURO)
+# SUBMIT ORDER
 # ==========================================================
 @require_queimados
 @transaction.atomic
 def q_submit_order(request):
+    if request.method != "POST":
+        return redirect("q_cart")
+
     cart = _get_or_create_cart(request.user)
 
     if cart.items.count() == 0:
@@ -151,7 +127,6 @@ def q_submit_order(request):
     cart.submitted_at = timezone.now()
     cart.save()
 
-    # 🔥 WebSocket protegido (não derruba sistema se Redis cair)
     try:
         channel_layer = get_channel_layer()
         if channel_layer:
@@ -165,7 +140,6 @@ def q_submit_order(request):
                 }
             )
     except Exception:
-        # Se Redis estiver offline, o sistema continua funcionando
         pass
 
     OrderLog.objects.create(
@@ -179,9 +153,8 @@ def q_submit_order(request):
 
 
 # ==========================================================
-# LISTA DE PEDIDOS DO DIA
+# LISTA DE PEDIDOS
 # ==========================================================
-
 @require_queimados
 def q_orders(request):
     orders = TransferOrder.objects.filter(
@@ -198,7 +171,6 @@ def q_orders(request):
 # ==========================================================
 # REMOVE ITEM
 # ==========================================================
-
 @require_queimados
 def q_remove_item(request, item_id):
     item = get_object_or_404(
@@ -209,7 +181,6 @@ def q_remove_item(request, item_id):
     )
 
     item.delete()
-
     messages.success(request, "Produto removido do carrinho.")
     return redirect("q_cart")
 
@@ -217,13 +188,16 @@ def q_remove_item(request, item_id):
 # ==========================================================
 # DETAIL
 # ==========================================================
-
 @require_queimados
 def q_order_detail(request, order_id):
-    order = get_object_or_404(TransferOrder, id=order_id)
+    order = get_object_or_404(
+        TransferOrder,
+        id=order_id,
+        created_by=request.user  # 🔥 SEGURANÇA
+    )
+
     items = order.items.select_related("product")
 
-    # 🔥 ADICIONA ISSO AQUI
     for item in items:
         item.faltando = (item.qty_requested or 0) - (item.qty_sent or 0)
 
@@ -234,20 +208,19 @@ def q_order_detail(request, order_id):
 
 
 # ==========================================================
-# RECEIVE ORDER (COM WEBSOCKET SEGURO)
+# RECEIVE ORDER
 # ==========================================================
-
 @require_queimados
 def q_receive_order(request, order_id):
-
-    order = get_object_or_404(TransferOrder, id=order_id)
+    order = get_object_or_404(
+        TransferOrder,
+        id=order_id,
+        created_by=request.user  # 🔥 SEGURANÇA
+    )
 
     if order.status != OrderStatus.DISPATCHED:
         messages.error(request, "Pedido ainda não foi despachado.")
         return redirect("q_order_detail", order_id=order.id)
-
-    # 🔥 NÃO MEXE NOS ITENS
-    # 🔥 NÃO ALTERA qty_sent
 
     order.status = OrderStatus.RECEIVED
     order.received_at = timezone.now()
@@ -260,29 +233,12 @@ def q_receive_order(request, order_id):
     )
 
     messages.success(request, "Recebimento confirmado.")
-
     return redirect("q_order_detail", order_id=order.id)
 
 
 # ==========================================================
-# CATEGORIES
-# =========================================================
-
-@require_queimados
-def queimados_categories(request):
-    categories = Category.objects.filter(active=True).prefetch_related("products")
-
-    return render(
-        request,
-        "queimados/categories.html",
-        {"categories": categories},
-    )
-
-
-
-from django.http import JsonResponse
-import json
-
+# API ADD PRODUCT
+# ==========================================================
 @require_queimados
 def q_add_product(request):
     if request.method != "POST":
@@ -315,20 +271,16 @@ def q_add_product(request):
         })
 
     except Exception as e:
-        return JsonResponse({
-            "success": False,
-            "error": str(e)
-        })
+        return JsonResponse({"success": False, "error": str(e)})
 
 
-
-from django.http import JsonResponse
-import json
-
+# ==========================================================
+# API UPDATE ITEM
+# ==========================================================
 @require_queimados
 def q_update_item(request):
     if request.method != "POST":
-        return JsonResponse({"success": False})
+        return JsonResponse({"success": False, "error": "Método inválido"})
 
     try:
         data = json.loads(request.body)
@@ -355,11 +307,13 @@ def q_update_item(request):
         return JsonResponse({"success": False, "error": str(e)})
 
 
-
+# ==========================================================
+# API REMOVE ITEM
+# ==========================================================
 @require_queimados
 def q_remove_item_api(request):
     if request.method != "POST":
-        return JsonResponse({"success": False})
+        return JsonResponse({"success": False, "error": "Método inválido"})
 
     try:
         data = json.loads(request.body)
@@ -373,7 +327,6 @@ def q_remove_item_api(request):
         )
 
         item.delete()
-
         return JsonResponse({"success": True})
 
     except Exception as e:
