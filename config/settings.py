@@ -17,11 +17,7 @@ DEBUG = os.environ.get("DEBUG", "0") == "1"
 # ======================
 # HOSTS
 # ======================
-ALLOWED_HOSTS = [
-    "tranfprod-production.up.railway.app",
-    "127.0.0.1",
-    "localhost",
-]
+ALLOWED_HOSTS = [".railway.app"]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://tranfprod-production.up.railway.app",
