@@ -18,13 +18,13 @@ DEBUG = os.environ.get("DEBUG", "0") == "1"
 # HOSTS
 # ======================
 ALLOWED_HOSTS = [
-    "https://tranfprod-production.up.railway.app",
+    "tranfprod-production.up.railway.app",
     "127.0.0.1",
     "localhost",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://https://tranfprod-production.up.railway.app",
+    "https://tranfprod-production.up.railway.app",
 ]
 
 # ======================
@@ -113,11 +113,10 @@ db_url = os.environ.get("DATABASE_URL", "").strip()
 
 if db_url:
     DATABASES = {
-        "default": dj_database_url.parse(
-            db_url,
-            conn_max_age=0,  # 🔥 ESSENCIAL
-            ssl_require=True,
-        )
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
 else:
     DATABASES = {
@@ -160,9 +159,9 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME"),
-    "API_KEY": os.environ.get("CLOUDINARY_API_KEY"),
-    "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET"),
+    "CLOUD_NAME": os.environ.get("CLOUD_NAME"),
+    "API_KEY": os.environ.get("API_KEY"),
+    "API_SECRET": os.environ.get("API_SECRET"),
 }
 
 import cloudinary
