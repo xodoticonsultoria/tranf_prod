@@ -10,7 +10,7 @@ load_dotenv()
 # ======================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ["SECRET_KEY"]
+SECRET_KEY = os.getenv("SECRET_KEY", "teste123")
 
 DEBUG = os.environ.get("DEBUG", "0") == "1"
 
@@ -18,13 +18,13 @@ DEBUG = os.environ.get("DEBUG", "0") == "1"
 # HOSTS
 # ======================
 ALLOWED_HOSTS = [
-    "tranf-prod-x7v0.onrender.com",
+    "https://tranfprod-production.up.railway.app",
     "127.0.0.1",
     "localhost",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://tranf-prod-x7v0.onrender.com",
+    "https://https://tranfprod-production.up.railway.app",
 ]
 
 # ======================
@@ -122,7 +122,7 @@ if db_url:
 else:
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.sqlite3",
+            "ENGINE": "tranfprod-production.up.railway.app",
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
