@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY", "teste123")
 
-DEBUG = os.environ.get("DEBUG", "0") == "1"
+DEBUG = os.getenv("DEBUG", "0") == "1"
 
 # ======================
 # HOSTS
@@ -20,6 +20,7 @@ DEBUG = os.environ.get("DEBUG", "0") == "1"
 ALLOWED_HOSTS = [".railway.app"]
 
 CSRF_TRUSTED_ORIGINS = ["https://*.railway.app"]
+
 # ======================
 # APPS
 # ======================
@@ -81,7 +82,7 @@ ASGI_APPLICATION = "config.asgi.application"
 WSGI_APPLICATION = "config.wsgi.application"
 
 # ======================
-# CHANNELS (SEM REDIS = DEV)
+# CHANNELS
 # ======================
 if os.environ.get("REDIS_URL"):
     CHANNEL_LAYERS = {
@@ -100,24 +101,15 @@ else:
     }
 
 # ======================
-# DATABASE
+# DATABASE (CORRETO 🔥)
 # ======================
-db_url = os.environ.get("DATABASE_URL", "").strip()
-
-if db_url:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "tranfprod-production.up.railway.app",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+DATABASES = {
+    "default": dj_database_url.parse(
+        os.getenv("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True
+    )
+}
 
 # ======================
 # PASSWORD VALIDATION
@@ -142,31 +134,28 @@ USE_TZ = True
 # ======================
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # ======================
 # MEDIA (CLOUDINARY)
 # ======================
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
 
 CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": os.environ.get("CLOUD_NAME"),
-    "API_KEY": os.environ.get("API_KEY"),
-    "API_SECRET": os.environ.get("API_SECRET"),
+    "CLOUD_NAME": os.getenv("CLOUD_NAME"),
+    "API_KEY": os.getenv("API_KEY"),
+    "API_SECRET": os.getenv("API_SECRET"),
 }
 
 import cloudinary
 
 cloudinary.config(
-    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
-    api_key=os.environ.get("CLOUDINARY_API_KEY"),
-    api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
+    cloud_name=os.getenv("CLOUD_NAME"),
+    api_key=os.getenv("API_KEY"),
+    api_secret=os.getenv("API_SECRET"),
     secure=True
 )
 
-# STORAGE MODERNO (SEM CONFLITO)
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
@@ -186,7 +175,7 @@ LOGOUT_REDIRECT_URL = "/login/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # ======================
-# SECURITY (RENDER)
+# SECURITY
 # ======================
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
@@ -194,6 +183,5 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     CSRF_COOKIE_HTTPONLY = True
-
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"

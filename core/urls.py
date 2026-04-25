@@ -10,10 +10,6 @@ def teste(request):
 
 urlpatterns = [
 
-    # =====================
-    # TESTE (RAIZ)
-    # =====================
-    path("", teste),
 
     # =====================
     # QUEIMADOS
