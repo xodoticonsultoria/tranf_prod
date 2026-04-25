@@ -92,7 +92,7 @@ class TransferOrder(models.Model):
 
     @property
     def is_fully_sent(self):
-        return all(item.is_fulfilled for item in self.items.all())
+        return all(item.qty_sent >= item.qty_requested for item in self.items.all())
 
     @property
     def is_partially_sent(self):
@@ -116,10 +116,8 @@ class TransferOrder(models.Model):
 
 
 # ======================
-# ORDER ITEM (CORRIGIDO 🔥)
+# ORDER ITEM
 # ======================
-# 🔥 SOMENTE ALTERAÇÕES CRÍTICAS (product + despacho corrigido)
-
 class TransferOrderItem(models.Model):
     order = models.ForeignKey(
         TransferOrder,
@@ -176,7 +174,7 @@ class OrderLog(models.Model):
 
 
 # ======================
-# DESPACHO (CORRIGIDO 🔥🔥🔥)
+# DESPACHO
 # ======================
 class Despacho(models.Model):
     order = models.ForeignKey(TransferOrder, related_name="despachos", on_delete=models.CASCADE)
@@ -197,7 +195,7 @@ class Despacho(models.Model):
 
 
 # ======================
-# DESPACHO ITEM
+# DESPACHO ITEM (CORRIGIDO 🔥)
 # ======================
 class DespachoItem(models.Model):
     despacho = models.ForeignKey(
@@ -220,7 +218,10 @@ class DespachoItem(models.Model):
         if self.qty_sent_now <= 0:
             raise ValueError("Quantidade deve ser maior que zero.")
 
-        if self.qty_sent_now > self.order_item.missing_qty:
+        # 🔥 CORREÇÃO AQUI
+        faltando = max(0, self.order_item.qty_requested - self.order_item.qty_sent)
+
+        if self.qty_sent_now > faltando:
             raise ValueError("Quantidade maior que o faltante.")
 
         super().save(*args, **kwargs)
