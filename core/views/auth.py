@@ -22,6 +22,10 @@ def login_view(request):
             messages.error(request, "Usuário ou senha inválidos.")
             return redirect("login")
 
+        if not user.is_active:
+            messages.error(request, "Usuário inativo.")
+            return redirect("login")
+
         login(request, user)
         return redirect("home")
 

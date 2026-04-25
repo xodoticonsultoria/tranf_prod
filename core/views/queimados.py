@@ -198,8 +198,10 @@ def q_order_detail(request, order_id):
 
     items = order.items.select_related("product")
 
+    # 🔥 SOMENTE AJUSTE DE SEGURANÇA
+
     for item in items:
-        item.faltando = (item.qty_requested or 0) - (item.qty_sent or 0)
+        item.faltando = max(0, (item.qty_requested or 0) - (item.qty_sent or 0))
 
     return render(request, "queimados/order_detail.html", {
         "order": order,

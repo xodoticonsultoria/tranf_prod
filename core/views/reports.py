@@ -222,9 +222,11 @@ def _generate_pdf_response(orders, filename, title, operator_field):
 
         data = [["Produto", "Pedido", "Enviado"]]
 
+        # 🔥 CORREÇÃO DO CRASH NO PDF
+
         for item in order.items.all():
             data.append([
-                item.product.name,
+                item.product.name if item.product else "REMOVIDO",
                 str(item.qty_requested),
                 str(item.qty_sent or 0)
             ])

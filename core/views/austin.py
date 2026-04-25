@@ -141,15 +141,14 @@ def a_dispatch(request, order_id):
 # LISTA DE ENVIO COMPLEMENTAR
 # =====================================================
 
+# 🔥 SOMENTE ALTERAÇÃO: remove return duplicado
+
 @require_austin
 def lista_envio_complementar(request):
 
     pedidos = TransferOrder.objects.filter(
-    status__in=[
-        OrderStatus.DISPATCHED,
-        OrderStatus.RECEIVED
-    ]
-).prefetch_related("items").order_by("-id")
+        status__in=[OrderStatus.DISPATCHED, OrderStatus.RECEIVED]
+    ).prefetch_related("items").order_by("-id")
 
     pedidos_com_info = []
 
@@ -174,11 +173,6 @@ def lista_envio_complementar(request):
     return render(request, "austin/lista_envio_complementar.html", {
         "pedidos": pedidos_com_info
     })
-
-    return render(request, "austin/lista_envio_complementar.html", {
-        "pedidos": pedidos_com_info
-    })
-
 
 # =====================================================
 # ENVIO COMPLEMENTAR (CORRETO)

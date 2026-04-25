@@ -118,6 +118,8 @@ class TransferOrder(models.Model):
 # ======================
 # ORDER ITEM (CORRIGIDO 🔥)
 # ======================
+# 🔥 SOMENTE ALTERAÇÕES CRÍTICAS (product + despacho corrigido)
+
 class TransferOrderItem(models.Model):
     order = models.ForeignKey(
         TransferOrder,
@@ -127,7 +129,7 @@ class TransferOrderItem(models.Model):
 
     product = models.ForeignKey(
         Product,
-        on_delete=models.SET_NULL,  # 🔥 evita crash
+        on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
@@ -139,14 +141,6 @@ class TransferOrderItem(models.Model):
 
     class Meta:
         unique_together = [("order", "product")]
-
-    @property
-    def missing_qty(self):
-        return max(0, self.qty_requested - self.qty_sent)
-
-    @property
-    def is_fulfilled(self):
-        return self.qty_sent >= self.qty_requested
 
     def __str__(self):
         if self.product:
