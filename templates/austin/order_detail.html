@@ -131,27 +131,35 @@
 
 <script>
 function increase(id){
-    let input = document.getElementById("sent_" + id);
+    const input = document.getElementById("sent_" + id);
+
+    if (!input) {
+        console.error("Input não encontrado:", id);
+        return;
+    }
+
     let max = parseInt(input.max || 0);
     let current = parseInt(input.value || 0);
 
-    if(current < max){
+    if (current < max) {
         input.value = current + 1;
     }
 }
 
 function decrease(id){
-    let input = document.getElementById("sent_" + id);
+    const input = document.getElementById("sent_" + id);
+
+    if (!input) {
+        console.error("Input não encontrado:", id);
+        return;
+    }
+
     let val = parseInt(input.value || 0);
 
-    if(val > 0){
+    if (val > 0) {
         input.value = val - 1;
     }
 }
-</script>
-
-<script>
-    window.CURRENT_ORDER_ID = {{ order.id }};
 </script>
 
 {% endblock %}
