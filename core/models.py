@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
-from django.db.models import F, Sum
-from django.core.exceptions import ValidationError
+from django.db.models import F
 
 
 class Branch(models.TextChoices):
@@ -14,10 +13,13 @@ class OrderStatus(models.TextChoices):
     SUBMITTED = "SUBMITTED", "Enviado para Austin"
     PICKING = "PICKING", "Em separação"
     DISPATCHED = "DISPATCHED", "Despachado/Enviado"
-    RECEIVED = "RECEIVED", "Recebido (confirmado)"
+    RECEIVED = "RECEIVED", "Recebido"
     CANCELLED = "CANCELLED", "Cancelado"
 
 
+# ======================
+# CATEGORY
+# ======================
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     image = models.ImageField(upload_to="categories/", null=True, blank=True)
@@ -30,6 +32,9 @@ class Category(models.Model):
         return self.name
 
 
+# ======================
+# PRODUCT
+# ======================
 class Product(models.Model):
     sku = models.CharField(max_length=50, blank=True, null=True)
     name = models.CharField(max_length=200)
@@ -53,6 +58,9 @@ class Product(models.Model):
         return f"{self.name} ({self.sku or '-'})"
 
 
+# ======================
+# ORDER
+# ======================
 class TransferOrder(models.Model):
     from_branch = models.CharField(max_length=20, choices=Branch.choices, default=Branch.QUEIMADOS)
     to_branch = models.CharField(max_length=20, choices=Branch.choices, default=Branch.AUSTIN)
@@ -82,7 +90,6 @@ class TransferOrder(models.Model):
 
     notes_from_austin = models.TextField(blank=True, default="")
 
-    # 🔥 status automático baseado nos itens
     @property
     def is_fully_sent(self):
         return all(item.is_fulfilled for item in self.items.all())
@@ -97,19 +104,20 @@ class TransferOrder(models.Model):
 
         if self.is_fully_sent:
             self.status = OrderStatus.DISPATCHED
-
         elif self.is_partially_sent:
             self.status = OrderStatus.PICKING
-
         else:
             self.status = OrderStatus.SUBMITTED
 
         self.save(update_fields=["status"])
 
     def __str__(self):
-        return f"Pedido #{self.id} {self.from_branch}->{self.to_branch} ({self.status})"
+        return f"Pedido #{self.id} {self.from_branch}->{self.to_branch}"
 
 
+# ======================
+# ORDER ITEM (CORRIGIDO 🔥)
+# ======================
 class TransferOrderItem(models.Model):
     order = models.ForeignKey(
         TransferOrder,
@@ -117,7 +125,12 @@ class TransferOrderItem(models.Model):
         related_name="items"
     )
 
-    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.SET_NULL,  # 🔥 evita crash
+        null=True,
+        blank=True
+    )
 
     qty_requested = models.PositiveIntegerField()
     qty_sent = models.PositiveIntegerField(default=0)
@@ -135,14 +148,15 @@ class TransferOrderItem(models.Model):
     def is_fulfilled(self):
         return self.qty_sent >= self.qty_requested
 
-    @property
-    def extra_qty(self):
-        return max(0, self.qty_sent - self.qty_requested)
-
     def __str__(self):
-        return f"{self.order_id} - {self.product.name}"
+        if self.product:
+            return f"{self.order_id} - {self.product.name}"
+        return f"{self.order_id} - PRODUTO REMOVIDO"
 
 
+# ======================
+# LOG
+# ======================
 class OrderLog(models.Model):
     order = models.ForeignKey(
         TransferOrder,
@@ -167,16 +181,12 @@ class OrderLog(models.Model):
         return f"#{self.order.id} - {self.action}"
 
 
+# ======================
+# DESPACHO (CORRIGIDO 🔥🔥🔥)
+# ======================
 class Despacho(models.Model):
-    order = models.ForeignKey("TransferOrder", related_name="despachos", on_delete=models.CASCADE)
-    created_by = models.ForeignKey("auth.User", on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    order = models.ForeignKey(TransferOrder, related_name="despachos", on_delete=models.CASCADE)
 
-    # 🔥 NOVO CAMPO
-    is_complementar = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"Despacho {self.id} - Pedido {self.order.id}"
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -186,10 +196,15 @@ class Despacho(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    is_complementar = models.BooleanField(default=False)
+
     def __str__(self):
         return f"Despacho #{self.id} - Pedido {self.order.id}"
 
 
+# ======================
+# DESPACHO ITEM
+# ======================
 class DespachoItem(models.Model):
     despacho = models.ForeignKey(
         Despacho,
@@ -219,14 +234,7 @@ class DespachoItem(models.Model):
         self.order_item.qty_sent = F("qty_sent") + self.qty_sent_now
         self.order_item.save(update_fields=["qty_sent"])
 
-        # 🔥 atualiza item
-        self.order_item.refresh_from_db()
-
-        # 🔥 pega order atualizado
-        order = self.order_item.order
-        order.refresh_from_db()
-
-
-
     def __str__(self):
-        return f"{self.order_item.product.name} - {self.qty_sent_now}"
+        if self.order_item.product:
+            return f"{self.order_item.product.name} - {self.qty_sent_now}"
+        return f"Produto removido - {self.qty_sent_now}"
