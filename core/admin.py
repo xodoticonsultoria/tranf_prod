@@ -18,11 +18,11 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "active")
     list_filter = ("active",)
     search_fields = ("name",)
-    inlines = [ProductInline]  # 🔥 NOVO (não quebra nada)
+    inlines = [ProductInline]
 
 
 # ==========================================================
-# PRODUCT ADMIN
+# PRODUCT ADMIN (SÓ UM!!!)
 # ==========================================================
 
 @admin.register(Product)
@@ -30,7 +30,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ("id", "sku", "name", "category", "active")
     list_filter = ("active", "category")
     search_fields = ("name", "sku")
-    autocomplete_fields = ("category",)  # 🔥 melhoria opcional
+    autocomplete_fields = ("category",)
 
 
 # ==========================================================
@@ -43,8 +43,8 @@ class TransferOrderItemInline(admin.TabularInline):
     autocomplete_fields = ["product"]  # 🔥 ESSENCIAL
 
 
-@admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
-    list_display = ("id", "sku", "name", "category", "active")
-    list_filter = ("active", "category")
-    search_fields = ("name", "sku")  # 🔥 obrigatório pro autocomplete
+@admin.register(TransferOrder)
+class TransferOrderAdmin(admin.ModelAdmin):
+    list_display = ("id", "from_branch", "to_branch", "status", "created_at")
+    list_filter = ("status", "from_branch", "to_branch")
+    inlines = [TransferOrderItemInline]
