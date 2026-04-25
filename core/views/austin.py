@@ -42,6 +42,10 @@ def a_order_detail(request, order_id):
     order = get_object_or_404(TransferOrder, id=order_id)
     items = order.items.select_related("product")
 
+    # 🔥 CALCULA QUANTO FALTA
+    for item in items:
+        item.missing_qty = max(0, item.qty_requested - item.qty_sent)
+
     return render(request, "austin/order_detail.html", {
         "order": order,
         "items": items
