@@ -40,10 +40,11 @@ class ProductAdmin(admin.ModelAdmin):
 class TransferOrderItemInline(admin.TabularInline):
     model = TransferOrderItem
     extra = 0
+    autocomplete_fields = ["product"]  # 🔥 ESSENCIAL
 
 
-@admin.register(TransferOrder)
-class TransferOrderAdmin(admin.ModelAdmin):
-    list_display = ("id", "from_branch", "to_branch", "status", "created_at")
-    list_filter = ("status", "from_branch", "to_branch")
-    inlines = [TransferOrderItemInline]
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ("id", "sku", "name", "category", "active")
+    list_filter = ("active", "category")
+    search_fields = ("name", "sku")  # 🔥 obrigatório pro autocomplete
