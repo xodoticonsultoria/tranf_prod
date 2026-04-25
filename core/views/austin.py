@@ -94,6 +94,33 @@ def a_dispatch(request, order_id):
         messages.error(request, "Só pode despachar durante separação.")
         return redirect("a_order_detail", order_id=order.id)
 
+    itens_enviados = []
+
+    # 🔥 PRIMEIRO: validar tudo antes
+    for item in items:
+
+        field = f"sent_{item.id}"
+
+        try:
+            enviar = int(request.POST.get(field, 0))
+        except (ValueError, TypeError):
+            continue
+
+        falta = max(0, item.qty_requested - item.qty_sent)
+
+        if enviar <= 0:
+            continue
+
+        enviar = min(enviar, falta)
+
+        if enviar > 0:
+            itens_enviados.append((item, enviar))
+
+    # 🔥 SE NÃO TEM NADA PRA ENVIAR → BLOQUEIA
+    if not itens_enviados:
+        messages.error(request, "Nenhum item válido para envio.")
+        return redirect("a_order_detail", order_id=order.id)
+
     with transaction.atomic():
 
         despacho = Despacho.objects.create(
@@ -102,37 +129,22 @@ def a_dispatch(request, order_id):
             is_complementar=False
         )
 
-        for item in items:
+        for item, enviar in itens_enviados:
 
-            field = f"sent_{item.id}"
+            DespachoItem.objects.create(
+                despacho=despacho,
+                order_item=item,
+                qty_sent_now=enviar
+            )
 
-            try:
-                enviar = int(request.POST.get(field, 0))
-            except (ValueError, TypeError):
-                continue
+            item.qty_sent += enviar
+            item.save(update_fields=["qty_sent"])
 
-            # 🔥 garante que não dá valor negativo ou bug
-            falta = max(0, item.qty_requested - item.qty_sent)
-
-            if enviar > 0 and enviar <= falta:
-
-                # salva no despacho
-                DespachoItem.objects.create(
-                    despacho=despacho,
-                    order_item=item,
-                    qty_sent_now=enviar
-                )
-
-                # 🔥 ATUALIZA O ITEM (ESSENCIAL)
-                item.qty_sent += enviar
-                item.save(update_fields=["qty_sent"])
-
-        # 🔥 STATUS FINAL
+        # 🔥 ATUALIZA STATUS
         order.status = OrderStatus.DISPATCHED
         order.dispatched_at = timezone.now()
         order.save(update_fields=["status", "dispatched_at"])
 
-        # 🔥 LOG
         OrderLog.objects.create(
             order=order,
             user=request.user,
