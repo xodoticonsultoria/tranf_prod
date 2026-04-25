@@ -77,7 +77,6 @@ def a_start_picking(request, order_id):
 # =====================================================
 # DESPACHO PRINCIPAL (CORRETO)
 # =====================================================
-
 @require_austin
 def a_dispatch(request, order_id):
 
@@ -96,13 +95,7 @@ def a_dispatch(request, order_id):
         despacho = Despacho.objects.create(
             order=order,
             created_by=request.user,
-            is_complementar=False  # 🔥 explícito
-        )
-
-        OrderLog.objects.create(
-            order=order,
-            user=request.user,
-            action="Despachou o pedido"
+            is_complementar=False
         )
 
         for item in items:
@@ -111,28 +104,38 @@ def a_dispatch(request, order_id):
 
             try:
                 enviar = int(request.POST.get(field, 0))
-            except:
+            except (ValueError, TypeError):
                 continue
 
-            falta = item.qty_requested - item.qty_sent
+            # 🔥 garante que não dá valor negativo ou bug
+            falta = max(0, item.qty_requested - item.qty_sent)
 
             if enviar > 0 and enviar <= falta:
+
+                # salva no despacho
                 DespachoItem.objects.create(
                     despacho=despacho,
                     order_item=item,
                     qty_sent_now=enviar
                 )
 
-    # 🔥 REGRA NOVA: SEMPRE DESPACHADO
-    order.status = OrderStatus.DISPATCHED
-    order.dispatched_at = timezone.now()
-    order.save(update_fields=["status", "dispatched_at"])
+                # 🔥 ATUALIZA O ITEM (ESSENCIAL)
+                item.qty_sent += enviar
+                item.save(update_fields=["qty_sent"])
 
-    OrderLog.objects.create(
-        order=order,
-        user=request.user,
-        action="Despachou o pedido"
-    )
+        # 🔥 STATUS FINAL
+        order.status = OrderStatus.DISPATCHED
+        order.dispatched_at = timezone.now()
+        order.save(update_fields=["status", "dispatched_at"])
+
+        # 🔥 LOG
+        OrderLog.objects.create(
+            order=order,
+            user=request.user,
+            action="Despachou o pedido"
+        )
+
+    messages.success(request, "Pedido despachado com sucesso!")
 
     return redirect("a_order_detail", order_id=order.id)
 
