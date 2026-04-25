@@ -1,9 +1,19 @@
 from django.shortcuts import render
 from django.urls import path
+from django.http import HttpResponse
 from . import views
 from .views import envio_complementar, lista_envio_complementar
 
+# 🔥 TESTE DE VIDA
+def teste(request):
+    return HttpResponse("OK")
+
 urlpatterns = [
+
+    # =====================
+    # TESTE (RAIZ)
+    # =====================
+    path("", teste),
 
     # =====================
     # QUEIMADOS
@@ -26,13 +36,8 @@ urlpatterns = [
     path("queimados/relatorio/pdf/", views.q_report_pdf, name="q_report_pdf"),
     path("queimados/relatorio/pdf/<int:order_id>/", views.q_report_pdf_single, name="q_report_pdf_single"),
 
-    # ❌ REMOVIDO (não existe na view)
-    # path("queimados/categorias/", views.q_categories, name="q_categories"),
-
     # REMOVER ITEM
-    path("queimados/carrinho/remover/<int:item_id>/",
-         views.q_remove_item,
-         name="q_remove_item"),
+    path("queimados/carrinho/remover/<int:item_id>/", views.q_remove_item, name="q_remove_item"),
 
     # APIs
     path("q/add-product/", views.q_add_product, name="q_add_product"),
@@ -65,20 +70,9 @@ urlpatterns = [
     path("austin/api/badge/", views.austin_badge, name="austin_badge"),
 
     # =====================
-    # TESTE
+    # TESTE EXTRA
     # =====================
 
     path("teste/", lambda r: render(r, "test.html")),
     path("pedido/<int:order_id>/poll/", views.order_status_poll, name="order_status_poll"),
-
-]
-
-
-from django.http import HttpResponse
-
-def teste(request):
-    return HttpResponse("OK")
-
-urlpatterns = [
-    path("", teste),
 ]
