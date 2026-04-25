@@ -54,7 +54,7 @@ def q_products(request):
     categories = Category.objects.filter(active=True).prefetch_related(
         models.Prefetch(
             "products",
-            queryset=Product.objects.filter(active=True).only("id", "name")
+            queryset=Product.objects.filter(active=True).select_related("category")
         )
     )
     if request.method == "POST":

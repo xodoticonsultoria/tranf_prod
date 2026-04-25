@@ -38,7 +38,7 @@
 
       <div>
         <div class="x-cat-name">{{ cat.name|upper }}</div>
-        <div class="x-cat-count">{{ cat.products.count }} PRODUTOS</div>
+        <div class="x-cat-count">{{ cat.products.all|length }} PRODUTOS</div>
       </div>
 
     </div>
