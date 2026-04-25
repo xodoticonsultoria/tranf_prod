@@ -70,4 +70,15 @@ urlpatterns = [
 
     path("teste/", lambda r: render(r, "test.html")),
     path("pedido/<int:order_id>/poll/", views.order_status_poll, name="order_status_poll"),
+
+]
+
+
+from django.http import HttpResponse
+
+def teste(request):
+    return HttpResponse("OK")
+
+urlpatterns = [
+    path("", teste),
 ]

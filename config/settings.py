@@ -19,10 +19,7 @@ DEBUG = os.environ.get("DEBUG", "0") == "1"
 # ======================
 ALLOWED_HOSTS = [".railway.app"]
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://tranfprod-production.up.railway.app",
-]
-
+CSRF_TRUSTED_ORIGINS = ["https://*.railway.app"]
 # ======================
 # APPS
 # ======================
