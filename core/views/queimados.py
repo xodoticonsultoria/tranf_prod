@@ -339,3 +339,16 @@ def q_remove_item_api(request):
 
     except Exception as e:
         return JsonResponse({"success": False, "error": str(e)})
+
+
+
+# @require_queimados
+# def q_categoria_produtos(request, cat_id):
+#     produtos = Product.objects.filter(
+#         category_id=cat_id,
+#         active=True
+#     )
+#
+#     return render(request, "queimados/partials/products_grid.html", {
+#         "products": produtos
+#     })
