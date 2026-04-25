@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.http import JsonResponse
 import json
 
+from django.db import models
 from core.models import (
     Category,
     Product,
@@ -49,8 +50,13 @@ def _get_or_create_cart(user):
 @require_queimados
 def q_products(request):
     cart = _get_or_create_cart(request.user)
-    categories = Category.objects.filter(active=True).prefetch_related("products")
 
+    categories = Category.objects.filter(active=True).prefetch_related(
+        models.Prefetch(
+            "products",
+            queryset=Product.objects.filter(active=True).only("id", "name")[:200]
+        )
+    )
     if request.method == "POST":
         product_id = int(request.POST["product_id"])
         qty = int(request.POST["qty"])
