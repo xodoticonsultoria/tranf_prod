@@ -297,3 +297,27 @@ def order_status_poll(request, order_id):
         "status": order.status,
         "status_display": order.get_status_display(),
     })
+
+
+# =====================================================
+# API LISTA AUSTIN (TEMPO REAL)
+# =====================================================
+
+@login_required
+def a_orders_api(request):
+    orders = TransferOrder.objects.filter(
+        status__in=[OrderStatus.SUBMITTED, OrderStatus.PICKING]
+    ).order_by("-created_at")
+
+    data = [
+        {
+            "id": o.id,
+            "status": o.status,
+            "status_display": o.get_status_display(),
+            "created_at": o.created_at.strftime("%d/%m/%Y %H:%M"),
+            "from_branch": o.from_branch.name if o.from_branch else "-"
+        }
+        for o in orders
+    ]
+
+    return JsonResponse({"orders": data})

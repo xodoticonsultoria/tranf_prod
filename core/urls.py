@@ -39,6 +39,8 @@ urlpatterns = [
     path("q/add-product/", views.q_add_product, name="q_add_product"),
     path("q/update-item/", views.q_update_item),
     path("q/remove-item/", views.q_remove_item_api),
+    path("austin/api/orders/", views.a_orders_api, name="a_orders_api"),
+
 
 
 

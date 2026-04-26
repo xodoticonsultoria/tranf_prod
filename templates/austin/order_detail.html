@@ -10,7 +10,7 @@
 <div class="order-status-box">
   <span class="order-status-label">Status:</span>
   <span id="order-status-text"
-      class="order-status-badge {{ order.status }}">
+        class="order-status-badge {{ order.status }}">
     {{ order.get_status_display|upper }}
   </span>
 </div>
@@ -51,6 +51,8 @@
               </button>
 
               <input type="number"
+                     inputmode="numeric"
+                     pattern="[0-9]*"
                      id="sent_{{ it.id }}"
                      name="sent_{{ it.id }}"
                      min="0"
@@ -128,7 +130,9 @@
   <a href="{% url 'a_orders' %}" class="btn-small">Voltar</a>
 </div>
 
-<!-- JS -->
+<!-- ========================= -->
+<!-- JS QUANTIDADE -->
+<!-- ========================= -->
 
 <script>
 function increase(id){
@@ -139,8 +143,8 @@ function increase(id){
         return;
     }
 
-    let max = parseInt(input.max || 0);
-    let current = parseInt(input.value || 0);
+    let max = parseInt(input.max || "0");
+    let current = parseInt(input.value || "0");
 
     if (current < max) {
         input.value = current + 1;
@@ -155,7 +159,7 @@ function decrease(id){
         return;
     }
 
-    let val = parseInt(input.value || 0);
+    let val = parseInt(input.value || "0");
 
     if (val > 0) {
         input.value = val - 1;
@@ -163,7 +167,12 @@ function decrease(id){
 }
 </script>
 
+<!-- ========================= -->
+<!-- 🔥 ATIVA POLLING GLOBAL -->
+<!-- ========================= -->
+
 <script>
     window.CURRENT_ORDER_ID = {{ order.id }};
 </script>
+
 {% endblock %}
