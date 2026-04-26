@@ -96,17 +96,15 @@ def a_dispatch(request, order_id):
 
     itens_enviados = []
 
-    # 🔥 VALIDAÇÃO DOS ITENS
     for item in items:
-
         field = f"sent_{item.id}"
 
         try:
             enviar = int(request.POST.get(field, 0))
-        except (ValueError, TypeError):
+        except:
             continue
 
-        falta = max(0, (item.qty_requested or 0) - (item.qty_sent or 0))
+        falta = max(0, item.qty_requested - item.qty_sent)
 
         if enviar <= 0:
             continue
@@ -116,7 +114,6 @@ def a_dispatch(request, order_id):
         if enviar > 0:
             itens_enviados.append((item, enviar))
 
-    # 🔥 SE NÃO TEM NADA PRA ENVIAR
     if not itens_enviados:
         messages.error(request, "Nenhum item válido para envio.")
         return redirect("a_order_detail", order_id=order.id)
@@ -124,34 +121,23 @@ def a_dispatch(request, order_id):
     try:
         with transaction.atomic():
 
-            # 🔥 CRIA DESPACHO (AJUSTE AQUI SE TIVER CAMPOS OBRIGATÓRIOS)
             despacho = Despacho.objects.create(
                 order=order,
                 created_by=request.user,
-                is_complementar=False,
-                # 👇 SEU MODEL TIVER CAMPOS OBRIGATÓRIOS, ADICIONE AQUI
-                # exemplo:
-                # branch=order.from_branch,
+                is_complementar=False
             )
 
             for item, enviar in itens_enviados:
-
                 DespachoItem.objects.create(
                     despacho=despacho,
                     order_item=item,
                     qty_sent_now=enviar
                 )
 
-                # 🔥 PROTEÇÃO CONTRA NULL
-                item.qty_sent = (item.qty_sent or 0) + enviar
-                item.save(update_fields=["qty_sent"])
-
-            # 🔥 ATUALIZA STATUS
             order.status = OrderStatus.DISPATCHED
             order.dispatched_at = timezone.now()
             order.save(update_fields=["status", "dispatched_at"])
 
-            # 🔥 LOG
             OrderLog.objects.create(
                 order=order,
                 user=request.user,
@@ -159,12 +145,11 @@ def a_dispatch(request, order_id):
             )
 
     except Exception as e:
-        print("💣 ERRO NO DESPACHO:", e)
-        messages.error(request, f"Erro ao despachar: {str(e)}")
+        print("💣 ERRO:", e)
+        messages.error(request, f"Erro: {str(e)}")
         return redirect("a_order_detail", order_id=order.id)
 
     messages.success(request, "Pedido despachado com sucesso!")
-
     return redirect("a_order_detail", order_id=order.id)
 
 
@@ -228,7 +213,7 @@ def envio_complementar(request, order_id):
             despacho = Despacho.objects.create(
                 order=order,
                 created_by=request.user,
-                is_complementar=True  # 🔥 AQUI É A CHAVE
+                is_complementar=True
             )
 
             for item in items:
@@ -238,19 +223,22 @@ def envio_complementar(request, order_id):
                 except:
                     continue
 
-                if enviar > 0 and enviar <= item.faltando:
+                if enviar <= 0:
+                    continue
+
+                enviar = min(enviar, item.faltando)
+
+                if enviar > 0:
                     DespachoItem.objects.create(
                         despacho=despacho,
                         order_item=item,
                         qty_sent_now=enviar
                     )
 
-        # 🔥 NÃO muda lógica de status
         order.status = OrderStatus.DISPATCHED
         order.dispatched_at = timezone.now()
         order.save(update_fields=["status", "dispatched_at"])
 
-        # 🔥 LOG DIFERENCIADO
         OrderLog.objects.create(
             order=order,
             user=request.user,
