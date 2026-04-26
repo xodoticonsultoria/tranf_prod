@@ -214,18 +214,35 @@ function decrease(id){
 
 <script>
 function atualizarPedido(){
+
     fetch("/austin/api/order/{{ order.id }}/")
     .then(res => res.json())
     .then(data => {
 
-        // 🔥 atualizar faltante
+        // 🔥 atualiza só o faltante
         document.querySelector(".faltante-box").innerHTML =
             data.faltando > 0
             ? `⚠️ Faltam <strong>${data.faltando}</strong> itens`
             : `✅ Pedido completo`;
 
-        // 🔥 atualizar histórico (simples reload parcial)
-        location.reload();
+        // 🔥 atualiza timeline SEM RECARREGAR
+        const timeline = document.querySelector(".timeline");
+
+        const logsHtml = data.logs.map(log => `
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-time">${log.time}</div>
+                    <div class="timeline-text">
+                        <strong>${log.user}</strong> — ${log.action}
+                    </div>
+                </div>
+            </div>
+        `).join("");
+
+        timeline.innerHTML = `
+            <h3 class="timeline-title">Histórico</h3>
+            ${logsHtml}
+        `;
     });
 }
 

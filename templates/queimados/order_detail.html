@@ -59,6 +59,7 @@
   </table>
 </div>
 
+<!-- BOTÃO -->
 <div id="confirm-box" style="text-align:center; margin-top:25px;">
     <a href="{% url 'q_receive_order' order.id %}"
        class="x-save">
@@ -74,36 +75,47 @@
 
 <hr>
 
-<div class="order-history">
-  <h3>Histórico</h3>
+<!-- ========================= -->
+<!-- 🔥 HISTÓRICO NOVO (TIMELINE) -->
+<!-- ========================= -->
 
-  {% for log in order.logs.all %}
-    <div class="CC">
+<div class="timeline">
 
-      <span class="history-date">
-        {{ log.created_at|date:"d/m/Y H:i:s" }}
-      </span>
+  <h3 class="timeline-title">Histórico</h3>
 
-      •
+  {% if order.logs.all %}
+    {% for log in order.logs.all|dictsortreversed:"created_at" %}
+      <div class="timeline-item">
 
-      <strong>{{ log.user }}</strong>
+        <div class="timeline-dot
+          {% if "Despachou" in log.action %}done
+          {% elif "Iniciou" in log.action %}working
+          {% elif "Enviou" in log.action %}sent
+          {% elif "Confirmou" in log.action %}done
+          {% elif "complementar" in log.action|lower %}sent
+          {% else %}default
+          {% endif %}
+        "></div>
 
-      •
+        <div class="timeline-content">
+          <div class="timeline-time">
+            {{ log.created_at|date:"d/m/Y H:i:s" }}
+          </div>
 
-      {% if "complementar" in log.action|lower %}
-        <span style="color:#f2c316; font-weight:bold;">
-          📦 {{ log.action }}
-        </span>
-      {% else %}
-        <span>
-          {{ log.action }}
-        </span>
-      {% endif %}
+          <div class="timeline-text">
+            <strong>{{ log.user }}</strong> —
+            {{ log.display_action|default:log.action }}
+          </div>
+        </div>
 
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="timeline-empty">
+      Nenhum histórico disponível.
     </div>
-  {% empty %}
-    <p>Sem histórico</p>
-  {% endfor %}
+  {% endif %}
+
 </div>
 
 <!-- TEMPO REAL -->
