@@ -163,11 +163,19 @@ def q_submit_order(request):
 # ==========================================================
 @require_queimados
 def q_orders(request):
-    orders = TransferOrder.objects.filter(
-        created_by=request.user
-    ).exclude(
+    orders = TransferOrder.objects.exclude(
         status=OrderStatus.DRAFT
     ).order_by("-created_at")
+
+    ativos = orders.exclude(status=OrderStatus.RECEIVED)
+    recebidos = orders.filter(status=OrderStatus.RECEIVED)[:5]
+
+    # 🔥 junta e ORDENA DE NOVO
+    orders = sorted(
+        list(ativos) + list(recebidos),
+        key=lambda x: x.created_at,
+        reverse=True
+    )
 
     return render(request, "queimados/orders.html", {
         "orders": orders,
