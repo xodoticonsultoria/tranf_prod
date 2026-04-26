@@ -2,15 +2,14 @@ from django.shortcuts import render
 from django.urls import path
 from django.http import HttpResponse
 from . import views
-from .views import envio_complementar, lista_envio_complementar, a_order_detail_api
 
 
 # 🔥 TESTE DE VIDA
 def teste(request):
     return HttpResponse("OK")
 
-urlpatterns = [
 
+urlpatterns = [
 
     # =====================
     # QUEIMADOS
@@ -36,15 +35,10 @@ urlpatterns = [
     # REMOVER ITEM
     path("queimados/carrinho/remover/<int:item_id>/", views.q_remove_item, name="q_remove_item"),
 
-    # APIs
+    # APIs QUEIMADOS
     path("q/add-product/", views.q_add_product, name="q_add_product"),
-    path("q/update-item/", views.q_update_item),
-    path("q/remove-item/", views.q_remove_item_api),
-    path("austin/api/orders/", views.a_orders_api, name="a_orders_api"),
-    path("austin/api/order/<int:order_id>/", a_order_detail_api, name="a_order_detail_api"),
-
-
-
+    path("q/update-item/", views.q_update_item, name="q_update_item"),
+    path("q/remove-item/", views.q_remove_item_api, name="q_remove_item_api"),
 
 
     # =====================
@@ -63,19 +57,24 @@ urlpatterns = [
     path("pedido/<int:order_id>/historico/", views.historico_despacho, name="historico_despacho"),
 
     # ENVIO COMPLEMENTAR
-    path("austin/envio-complementar/", lista_envio_complementar, name="lista_envio_complementar"),
-    path("austin/envio-complementar/<int:order_id>/", envio_complementar, name="envio_complementar"),
+    path("austin/envio-complementar/", views.lista_envio_complementar, name="lista_envio_complementar"),
+    path("austin/envio-complementar/<int:order_id>/", views.envio_complementar, name="envio_complementar"),
+
 
     # =====================
-    # API
+    # API (AUSTIN)
     # =====================
 
+    path("austin/api/orders/", views.a_orders_api, name="a_orders_api"),
+    path("austin/api/order/<int:order_id>/", views.a_order_detail_api, name="a_order_detail_api"),
     path("austin/api/badge/", views.austin_badge, name="austin_badge"),
 
+    path("pedido/<int:order_id>/poll/", views.order_status_poll, name="order_status_poll"),
+
+
     # =====================
-    # TESTE EXTRA
+    # TESTE
     # =====================
 
-    path("teste/", lambda r: render(r, "test.html")),
-    path("pedido/<int:order_id>/poll/", views.order_status_poll, name="order_status_poll"),
+    path("teste/", teste),
 ]
