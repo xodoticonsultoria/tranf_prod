@@ -375,18 +375,14 @@ def a_orders_api(request):
             status=OrderStatus.DRAFT
         ).order_by("-created_at")
 
-        # 🔥 ativos primeiro
         ativos = base.exclude(status=OrderStatus.RECEIVED)
-
-        # 🔥 só 5 recebidos
         recebidos = base.filter(status=OrderStatus.RECEIVED)[:5]
 
-        # 🔥 junta e ordena
         orders = sorted(
             list(ativos) + list(recebidos),
             key=lambda x: x.created_at,
             reverse=True
-        )
+        )[:5]  # 🔥 LIMITADOR FINAL
 
         data = []
 
