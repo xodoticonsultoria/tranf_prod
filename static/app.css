@@ -1,7 +1,15 @@
+
+*{
+  box-sizing: border-box;
+}
+
+body{
+  overflow-x: hidden;
+}
+
 /* =========================
    BASE
 ========================= */
-
 body{
   margin:0;
   font-family: Inter, system-ui, Arial;
@@ -55,7 +63,8 @@ body{
 
 .x-main{
   flex:1;
-  padding: 22px 40px;
+  padding: 22px 16px;
+  box-sizing: border-box;
 }
 
 /* =========================
@@ -795,6 +804,7 @@ transition:all 0.5s;
 .order-table-wrap{
   display:flex;
   justify-content:center;
+  width:100%;
 }
 
 .order-table{
@@ -1231,14 +1241,9 @@ transition:all 0.5s;
   box-shadow:0 3px 0 rgba(0,0,0,.25);
 }
 
-.order-table-wrap{
-  display:flex;
-  justify-content:center;
-}
-
 .order-table{
-  width:900px;
-  max-width:100%;
+  width:100%;
+  max-width:900px;
   border-collapse:collapse;
   background:#e9e9e9;
   border-radius:10px;
