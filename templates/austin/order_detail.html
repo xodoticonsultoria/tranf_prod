@@ -219,13 +219,11 @@ function atualizarPedido(){
     .then(res => res.json())
     .then(data => {
 
-        // 🔥 atualiza só o faltante
         document.querySelector(".faltante-box").innerHTML =
             data.faltando > 0
             ? `⚠️ Faltam <strong>${data.faltando}</strong> itens`
             : `✅ Pedido completo`;
 
-        // 🔥 atualiza timeline SEM RECARREGAR
         const timeline = document.querySelector(".timeline");
 
         const logsHtml = data.logs.map(log => `
@@ -245,8 +243,6 @@ function atualizarPedido(){
         `;
     });
 }
-
-setInterval(atualizarPedido, 4000);
 </script>
 
 {% endblock %}
