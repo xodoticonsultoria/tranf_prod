@@ -373,7 +373,7 @@ def a_orders_api(request):
     try:
         orders = TransferOrder.objects.exclude(
             status=OrderStatus.DRAFT
-        ).order_by("-created_at")
+        ).order_by("-created_at")[:5]
 
         data = []
 
