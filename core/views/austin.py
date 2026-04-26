@@ -45,16 +45,49 @@ def a_order_detail(request, order_id):
     order = get_object_or_404(TransferOrder, id=order_id)
     items = order.items.select_related("product")
 
+    # 🔥 calcula faltante por item
     for item in items:
         item.missing_qty = max(0, item.qty_requested - item.qty_sent)
 
-    # 🔥 ESSA LINHA FALTAVA
+    # 🔥 LOGS
     logs = order.logs.all().order_by('-created_at')
+
+    # 🔥 DESPACHOS COMPLEMENTARES
+    despachos = order.despachos.filter(is_complementar=True).order_by('created_at')
+
+    contador = 0
+    logs_processados = []
+
+    for log in logs:
+
+        if "Envio complementar despachado" in log.action:
+            contador += 1
+
+            if contador <= len(despachos):
+                despacho = despachos[contador - 1]
+                total = sum(i.qty_sent_now for i in despacho.itens.all())
+
+                log.display_action = (
+                    f"Envio complementar {contador} — {total} itens enviados"
+                )
+            else:
+                log.display_action = f"Envio complementar {contador}"
+
+        else:
+            log.display_action = log.action
+
+        logs_processados.append(log)
+
+    # 🔥 TOTAL GERAL
+    total_pedido = sum(i.qty_requested for i in items)
+    total_enviado = sum(i.qty_sent for i in items)
+    faltando = max(0, total_pedido - total_enviado)
 
     return render(request, "austin/order_detail.html", {
         "order": order,
         "items": items,
-        "logs": logs  # 👈 ESSENCIAL
+        "logs": logs_processados,
+        "faltando": faltando,
     })
 
 

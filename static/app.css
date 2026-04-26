@@ -2267,3 +2267,15 @@ color: white;
   text-align:center;
   opacity:0.8;
 }
+
+
+
+.faltante-box{
+  margin-top:20px;
+  text-align:center;
+  font-weight:900;
+  font-size:14px;
+  padding:10px;
+  border-radius:8px;
+  background:rgba(255,255,255,0.08);
+}

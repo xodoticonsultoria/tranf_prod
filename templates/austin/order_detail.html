@@ -9,16 +9,10 @@
 
 <div class="order-status-box">
   <span class="order-status-label">Status:</span>
-  <span id="order-status-text"
-        class="order-status-badge {{ order.status }}">
+  <span class="order-status-badge {{ order.status }}">
     {{ order.get_status_display|upper }}
   </span>
 </div>
-
-{% if order.status == "PICKING" %}
-<form method="post" action="{% url 'a_dispatch' order.id %}">
-  {% csrf_token %}
-{% endif %}
 
 <div class="order-table-wrap">
   <table class="order-table">
@@ -34,101 +28,36 @@
       {% for it in items %}
       <tr>
         <td class="prod-name">
-          (cod <span class="muted_sku">{{ it.product.sku }}</span>)
-          {{ it.product.name|upper }}
+          (cod {{ it.product.sku }}) {{ it.product.name|upper }}
         </td>
-
         <td>{{ it.qty_requested }}</td>
-
-        <td>
-          {% if order.status == "PICKING" %}
-            <div class="qty-wrapper">
-
-              <button type="button"
-                      class="mais_menos"
-                      onclick="decrease({{ it.id }})">−</button>
-
-              <input type="number"
-                     id="sent_{{ it.id }}"
-                     name="sent_{{ it.id }}"
-                     min="0"
-                     max="{{ it.missing_qty }}"
-                     value="0"
-                     placeholder="Falta: {{ it.missing_qty }}"
-                     class="qty-input">
-
-              <button type="button"
-                      class="mais_menos"
-                      onclick="increase({{ it.id }})">+</button>
-
-            </div>
-
-            {% if it.missing_qty == 0 %}
-              <small style="color: green;">✔ Completo</small>
-            {% endif %}
-
-          {% else %}
-              {{ it.qty_sent }}
-          {% endif %}
-        </td>
+        <td>{{ it.qty_sent }}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
 
-<!-- OBSERVAÇÃO -->
+<!-- ========================= -->
+<!-- 🔥 FALTANTE -->
+<!-- ========================= -->
 
-<div class="order-notes-box">
-  <h3>Observação (Austin)</h3>
-
-  {% if order.status == "PICKING" %}
-      <textarea name="notes_from_austin">
-{{ order.notes_from_austin }}
-      </textarea>
+<div class="faltante-box">
+  {% if faltando > 0 %}
+    ⚠️ Faltam <strong>{{ faltando }}</strong> itens para finalizar
   {% else %}
-      <div class="order-note-display">
-        {{ order.notes_from_austin|default:"(sem observações)" }}
-      </div>
+    ✅ Pedido completo
   {% endif %}
-</div>
-
-<!-- BOTÕES -->
-
-<div style="text-align:center; margin-top:30px;">
-
-  {% if order.status == "SUBMITTED" %}
-    <a href="{% url 'a_start_picking' order.id %}"
-       class="x-save"
-       onclick="return confirm('Iniciar separação?');">
-       INICIAR SEPARAÇÃO
-    </a>
-  {% endif %}
-
-  {% if order.status == "PICKING" %}
-      <button type="submit"
-              class="x-save"
-              onclick="return confirm('Despachar pedido?');">
-          DESPACHAR
-      </button>
-  {% endif %}
-
-</div>
-
-{% if order.status == "PICKING" %}
-</form>
-{% endif %}
-
-<div style="text-align:center; margin-top:20px;">
-  <a href="{% url 'a_orders' %}" class="btn-small">Voltar</a>
 </div>
 
 <!-- ========================= -->
-<!-- 🔥 HISTÓRICO (NOVO) -->
+<!-- 🔥 HISTÓRICO -->
 <!-- ========================= -->
+
 <div class="timeline">
 
   <h3 class="timeline-title">Histórico</h3>
+
   {% if logs %}
     {% for log in logs %}
       <div class="timeline-item">
@@ -147,7 +76,7 @@
           </div>
 
           <div class="timeline-text">
-            <strong>{{ log.user }}</strong> — {{ log.action }}
+            <strong>{{ log.user }}</strong> — {{ log.display_action }}
           </div>
         </div>
 
@@ -161,37 +90,8 @@
 
 </div>
 
-<!-- ========================= -->
-<!-- JS QUANTIDADE -->
-<!-- ========================= -->
-
-<script>
-function increase(id){
-    const input = document.getElementById("sent_" + id);
-    let max = parseInt(input.max || "0");
-    let current = parseInt(input.value || "0");
-
-    if (current < max) {
-        input.value = current + 1;
-    }
-}
-
-function decrease(id){
-    const input = document.getElementById("sent_" + id);
-    let val = parseInt(input.value || "0");
-
-    if (val > 0) {
-        input.value = val - 1;
-    }
-}
-</script>
-
-<!-- ========================= -->
-<!-- POLLING -->
-<!-- ========================= -->
-
-<script>
-    window.CURRENT_ORDER_ID = {{ order.id }};
-</script>
+<div style="text-align:center; margin-top:20px;">
+  <a href="{% url 'a_orders' %}" class="btn-small">Voltar</a>
+</div>
 
 {% endblock %}
