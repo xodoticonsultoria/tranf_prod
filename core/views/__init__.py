@@ -1,8 +1,3 @@
-from .auth import *
-from .queimados import *
-from .austin import *
-from .reports import *
-
 # =====================
 # AUTH
 # =====================
@@ -32,11 +27,10 @@ from .austin import (
     a_order_detail,
     a_start_picking,
     a_dispatch,
-    austin_badge,
 )
 
 # =====================
-# REPORTS (AUSTIN + QUEIMADOS)
+# REPORTS
 # =====================
 from .reports import (
     a_report,
@@ -45,11 +39,4 @@ from .reports import (
     q_report,
     q_report_pdf,
     q_report_pdf_single,
-)
-
-# =====================
-# API
-# =====================
-from .austin import (
-    order_status_poll,
 )
