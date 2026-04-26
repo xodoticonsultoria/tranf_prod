@@ -49,7 +49,7 @@
             </span>
           {% elif item.qty_sent > item.qty_requested %}
             <span class="result-extra">
-              🟢 Enviado a mais {{ item.extra_qty }}
+              🟢 Enviado a mais {{ item.qty_sent|add:"-"|add:item.qty_requested }}
             </span>
           {% endif %}
         </td>
@@ -108,22 +108,7 @@
 
 <!-- TEMPO REAL -->
 <script>
-if ("{{ order.status }}" !== "RECEIVED") {
-
-    setInterval(() => {
-        fetch(`/pedido/{{ order.id }}/poll/`)
-            .then(res => res.json())
-            .then(data => {
-
-                if (data.status !== "{{ order.status }}") {
-                    location.reload();
-                }
-
-            });
-
-    }, 15000); // 🔥 AGORA 15 SEGUNDOS
-
-}
+    window.CURRENT_ORDER_ID = {{ order.id }};
 </script>
 
 {% endblock %}

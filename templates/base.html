@@ -36,21 +36,15 @@
       </div>
 
       {% if request.user.groups.first.name == "QUEIMADOS" %}
-        <a href="{% url 'q_cart' %}" class="menu-btn">
-          Abrir Carrinho
-        </a>
+        <a href="{% url 'q_cart' %}" class="menu-btn">Abrir Carrinho</a>
         <a href="{% url 'q_products' %}" class="menu-btn">Produtos</a>
         <a href="{% url 'q_orders' %}" class="menu-btn">Meus Pedidos</a>
         <a href="{% url 'q_report' %}" class="menu-btn">Relatório</a>
       {% endif %}
 
       {% if request.user.groups.first.name == "AUSTIN" %}
-        <a href="{% url 'a_orders' %}" class="menu-btn">
-          Pedidos Recebidos
-        </a>
-        <a href="{% url 'lista_envio_complementar' %}" class="menu-btn">
-            Envio Complementar
-        </a>
+        <a href="{% url 'a_orders' %}" class="menu-btn">Pedidos Recebidos</a>
+        <a href="{% url 'lista_envio_complementar' %}" class="menu-btn">Envio Complementar</a>
         <a href="{% url 'a_report' %}" class="menu-btn">Relatório</a>
       {% endif %}
 
@@ -98,7 +92,7 @@ document.querySelectorAll(".menu-btn, .menu-exit").forEach(btn=>{
 })
 </script>
 
-<!-- POLLING AUSTIN -->
+<!-- 🔔 POLLING SOM DE NOVO PEDIDO (AUSTIN) -->
 {% if request.user.is_authenticated and request.user.groups.first.name == "AUSTIN" %}
 <script>
 let lastOrderId = parseInt(localStorage.getItem("last_austin_order_id") || 0)
@@ -118,59 +112,99 @@ setInterval(function(){
 </script>
 {% endif %}
 
+<!-- 🔥 WEBSOCKET BLINDADO -->
 <script>
 document.addEventListener("DOMContentLoaded", function(){
 
-    const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+    try {
 
-    const socket = new WebSocket(
-        protocol + window.location.host + "/ws/orders/"
-    );
+        const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
 
-    socket.onopen = function(){
-        console.log("🔥 WebSocket conectado");
-    };
+        const socket = new WebSocket(
+            protocol + window.location.host + "/ws/orders/"
+        );
 
-    socket.onmessage = function(e){
+        socket.onopen = function(){
+            console.log("🔥 WebSocket conectado");
+        };
 
-        const data = JSON.parse(e.data);
-        console.log("📦 EVENTO RECEBIDO:", data);
+        socket.onmessage = function(e){
 
-        // 🔹 Atualiza LISTA
-        const row = document.getElementById("order-row-" + data.order_id);
+            const data = JSON.parse(e.data);
 
-        if (row) {
-            const badge = row.querySelector(".status-badge");
+            console.log("📦 EVENTO:", data);
 
-            if (badge) {
-                badge.innerText = data.status_display.toUpperCase();
+            const row = document.getElementById("order-row-" + data.order_id);
+
+            if (row) {
+                const badge = row.querySelector(".status-badge");
+                if (badge) {
+                    badge.innerText = data.status_display.toUpperCase();
+                }
             }
 
-<!--            if (data.status === "RECEIVED") {-->
-<!--                row.remove();-->
-<!--            }-->
-        }
+            if (
+                typeof window.CURRENT_ORDER_ID !== "undefined" &&
+                String(data.order_id) === String(window.CURRENT_ORDER_ID)
+            ) {
+                const badge = document.getElementById("order-status-text");
 
-        // 🔥 Atualiza DETALHE
-        if (
-            typeof window.CURRENT_ORDER_ID !== "undefined" &&
-            String(data.order_id) === String(window.CURRENT_ORDER_ID)
-        ) {
-            console.log("Recebido:", data.order_id);
-            console.log("Página:", window.CURRENT_ORDER_ID);
-            console.log("Comparação:", String(data.order_id) === String(window.CURRENT_ORDER_ID));
-            const badge = document.getElementById("order-status-text");
+                if (badge) {
+                    badge.innerText = data.status_display.toUpperCase();
+                    badge.className = "order-status-badge " + data.status;
+                }
 
-            if (badge) {
-                badge.innerText = data.status_display.toUpperCase();
-                badge.className = "order-status-badge " + data.status;
+                if (data.status === "RECEIVED") {
+                    location.reload();
+                }
             }
-            if (data.status === "RECEIVED") {
-                location.reload();
-            }
-        }
+        };
 
-    };
+        socket.onerror = function(){
+            console.log("⚠️ WS erro ignorado");
+        };
+
+        socket.onclose = function(){
+            console.log("🔴 WS fechado");
+        };
+
+    } catch (e) {
+        console.log("⚠️ WS desativado");
+    }
+
+});
+</script>
+
+<!-- 🔥 POLLING GLOBAL (STATUS TEMPO REAL) -->
+<script>
+window.addEventListener("load", () => {
+
+    function atualizarStatusGlobal() {
+
+        if (!window.CURRENT_ORDER_ID) return;
+
+        fetch(`/pedido/${window.CURRENT_ORDER_ID}/poll/`)
+            .then(res => res.json())
+            .then(data => {
+
+                const badge = document.querySelector(".order-status-badge");
+
+                if (badge && data.status) {
+
+                    const novo = data.status_display.toUpperCase();
+
+                    if (badge.innerText !== novo) {
+                        badge.innerText = novo;
+                        badge.className = "order-status-badge " + data.status;
+                    }
+
+                }
+
+            })
+            .catch(() => {});
+    }
+
+    setInterval(atualizarStatusGlobal, 3000);
 
 });
 </script>
@@ -182,11 +216,10 @@ document.addEventListener("DOMContentLoaded", function(){
     font-size:16px;
     font-weight:bold;
 ">
-
     © 2026 DTECH SOLUTIONS
     <br>
     <span style="font-size:12px; opacity:0.8;">
-         Sistema de Transferência• Versão 2.0
+         Sistema de Transferência • Versão 3.0
     </span>
 </footer>
 

@@ -163,32 +163,6 @@ function decrease(id){
 </script>
 
 <script>
-function atualizarStatus() {
-    fetch(`/pedido/${window.CURRENT_ORDER_ID}/poll/`)
-        .then(res => res.json())
-        .then(data => {
-
-            const badge = document.querySelector(".order-status-badge");
-
-            if (badge && data.status) {
-
-                const novoStatus = data.status_display.toUpperCase();
-
-                if (badge.innerText !== novoStatus) {
-                    badge.innerText = novoStatus;
-                    badge.className = "order-status-badge " + data.status;
-                }
-
-            }
-
-        })
-        .catch(err => console.log("Erro poll:", err));
-}
-
-setInterval(atualizarStatus, 3000);
-</script>
-
-<script>
     window.CURRENT_ORDER_ID = {{ order.id }};
 </script>
 {% endblock %}
