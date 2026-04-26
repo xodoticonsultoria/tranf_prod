@@ -64,9 +64,8 @@
 
 </div>
 
-
 <!-- ========================= -->
-<!-- 🔥 TEMPO REAL FINAL -->
+<!-- 🔥 TEMPO REAL CORRIGIDO -->
 <!-- ========================= -->
 
 <script>
@@ -83,68 +82,55 @@ function falarPedidoNovo() {
 }
 
 
-// 🔥 ATUALIZAÇÃO REAL
+// 🔥 ATUALIZAÇÃO REAL (VERSÃO CORRETA)
 function atualizarLista() {
 
     fetch("/austin/api/orders/")
         .then(res => res.json())
         .then(data => {
 
-            if (!data.orders || data.orders.length === 0) return;
+            if (!data.orders) return;
 
             const tabela = document.getElementById("orders-body");
 
-            // 🔥 lista atual da tela
-            const idsNaTela = Array.from(
+            // 🔥 guarda IDs antigos
+            const idsAntigos = Array.from(
                 document.querySelectorAll("[id^='order-row-']")
             ).map(el => el.id.replace("order-row-", ""));
 
+            // 🔥 limpa tabela (ESSENCIAL)
+            tabela.innerHTML = "";
+
             data.orders.forEach(order => {
 
-                // 🔥 NOVO PEDIDO
-                if (!idsNaTela.includes(String(order.id))) {
+                const linha = `
+                    <tr id="order-row-${order.id}">
+                        <td class="center"><strong>#${order.id}</strong></td>
 
-                    const novaLinha = `
-                        <tr id="order-row-${order.id}">
-                            <td class="center"><strong>#${order.id}</strong></td>
+                        <td class="center">
+                            <span class="status-badge ${order.status}">
+                                ${order.status_display.toUpperCase()}
+                            </span>
+                        </td>
 
-                            <td class="center">
-                                <span class="status-badge ${order.status}">
-                                    ${order.status_display.toUpperCase()}
-                                </span>
-                            </td>
+                        <td class="center">${order.created_at}</td>
 
-                            <td class="center">${order.created_at}</td>
+                        <td class="center">${order.from_branch}</td>
 
-                            <td class="center">${order.from_branch}</td>
+                        <td class="center">
+                            <a href="/austin/pedidos/${order.id}/"
+                               class="btn-mini btn-mini-sm">
+                               Abrir
+                            </a>
+                        </td>
+                    </tr>
+                `;
 
-                            <td class="center">
-                                <a href="/austin/pedidos/${order.id}/"
-                                   class="btn-mini btn-mini-sm">
-                                   Abrir
-                                </a>
-                            </td>
-                        </tr>
-                    `;
+                tabela.insertAdjacentHTML("beforeend", linha);
 
-                    tabela.insertAdjacentHTML("afterbegin", novaLinha);
-
+                // 🔊 toca som se for novo
+                if (!idsAntigos.includes(String(order.id))) {
                     falarPedidoNovo();
-                }
-
-                // 🔄 ATUALIZA STATUS
-                else {
-
-                    const row = document.getElementById("order-row-" + order.id);
-
-                    if (row) {
-                        const badge = row.querySelector(".status-badge");
-
-                        if (badge) {
-                            badge.innerText = order.status_display.toUpperCase();
-                            badge.className = "status-badge " + order.status;
-                        }
-                    }
                 }
 
             });
