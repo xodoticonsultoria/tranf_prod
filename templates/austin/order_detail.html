@@ -14,6 +14,10 @@
   </span>
 </div>
 
+<!-- ========================= -->
+<!-- 🔥 TABELA -->
+<!-- ========================= -->
+
 <div class="order-table-wrap">
   <table class="order-table">
     <thead>
@@ -50,7 +54,9 @@
   {% endif %}
 </div>
 
-
+<!-- ========================= -->
+<!-- 🔥 AÇÕES (VOLTOU COMPLETO) -->
+<!-- ========================= -->
 
 <div style="text-align:center; margin-top:30px;">
 
@@ -62,10 +68,16 @@
     </a>
   {% endif %}
 
+  {% if order.status == "PICKING" %}
+    <span class="x-save" style="background:#3b82f6;">
+      EM SEPARAÇÃO
+    </span>
+  {% endif %}
+
 </div>
 
 <!-- ========================= -->
-<!-- 🔥 HISTÓRICO -->
+<!-- 🔥 HISTÓRICO MELHORADO -->
 <!-- ========================= -->
 
 <div class="timeline">
@@ -103,6 +115,10 @@
   {% endif %}
 
 </div>
+
+<!-- ========================= -->
+<!-- VOLTAR -->
+<!-- ========================= -->
 
 <div style="text-align:center; margin-top:20px;">
   <a href="{% url 'a_orders' %}" class="btn-small">Voltar</a>
