@@ -245,6 +245,8 @@ def a_orders_api(request):
 # BADGE (VOLTA PRA NÃO QUEBRAR IMPORT)
 # =====================================================
 
+from django.views.decorators.http import require_GET
+
 @require_GET
 def austin_badge(request):
     count = TransferOrder.objects.filter(
