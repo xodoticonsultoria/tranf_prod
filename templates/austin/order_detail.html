@@ -126,23 +126,39 @@
 <!-- ========================= -->
 <!-- 🔥 HISTÓRICO (NOVO) -->
 <!-- ========================= -->
+<div class="timeline">
 
-<div style="margin-top:40px; color:white; text-align:center;">
-  <h3>Histórico</h3>
-
+  <h3 class="timeline-title">Histórico</h3>
   {% if logs %}
-    <div style="max-width:700px; margin:auto; text-align:left;">
-      {% for log in logs %}
-        <div style="margin-bottom:6px;">
-          {{ log.created_at|date:"d/m/Y H:i:s" }} •
-          <strong>{{ log.user }}</strong> •
-          {{ log.action }}
+    {% for log in logs %}
+      <div class="timeline-item">
+
+        <div class="timeline-dot
+          {% if "Despachou" in log.action %}done
+          {% elif "Iniciou" in log.action %}working
+          {% elif "Enviou" in log.action %}sent
+          {% else %}default
+          {% endif %}
+        "></div>
+
+        <div class="timeline-content">
+          <div class="timeline-time">
+            {{ log.created_at|date:"d/m/Y H:i:s" }}
+          </div>
+
+          <div class="timeline-text">
+            <strong>{{ log.user }}</strong> — {{ log.action }}
+          </div>
         </div>
-      {% endfor %}
-    </div>
+
+      </div>
+    {% endfor %}
   {% else %}
-    <div>Nenhum histórico disponível.</div>
+    <div class="timeline-empty">
+      Nenhum histórico disponível.
+    </div>
   {% endif %}
+
 </div>
 
 <!-- ========================= -->
