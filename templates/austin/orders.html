@@ -23,7 +23,6 @@
 
     <tbody id="orders-body">
       {% for o in orders %}
-        {% if o.status == "SUBMITTED" or o.status == "PICKING" %}
         <tr id="order-row-{{ o.id }}">
 
           <td class="center">
@@ -52,7 +51,6 @@
           </td>
 
         </tr>
-        {% endif %}
       {% empty %}
         <tr>
           <td colspan="5" class="center muted">
@@ -68,130 +66,87 @@
 
 
 <!-- ========================= -->
-<!-- 🔥 TEMPO REAL COMPLETO -->
+<!-- 🔥 TEMPO REAL CORRIGIDO -->
 <!-- ========================= -->
 
 <script>
-let websocketOk = false;
 
-// =========================
-// 🔊 VOZ "PEDIDO NOVO"
-// =========================
+// 🔊 VOZ
 function falarPedidoNovo() {
     try {
         const msg = new SpeechSynthesisUtterance("Pedido novo");
         msg.lang = "pt-BR";
         speechSynthesis.speak(msg);
     } catch (e) {
-        const audio = new Audio("/static/ding.mp3");
-        audio.play().catch(() => {});
+        console.log("erro voz");
     }
 }
 
-// =========================
-// 🔥 WEBSOCKET
-// =========================
-try {
-    const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
-
-    const socket = new WebSocket(
-        protocol + window.location.host + "/ws/orders/"
-    );
-
-    socket.onopen = function() {
-        console.log("🔥 WS conectado");
-        websocketOk = true;
-    };
-
-    socket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
-        const row = document.getElementById("order-row-" + data.order_id);
-
-        if (row) {
-            const badge = row.querySelector(".status-badge");
-
-            if (badge) {
-                badge.innerText = data.status_display.toUpperCase();
-                badge.className = "status-badge " + data.status;
-            }
-
-            row.classList.add("pulse-row");
-
-            setTimeout(() => {
-                row.classList.remove("pulse-row");
-            }, 2000);
-
-        } else {
-            falarPedidoNovo();
-            location.reload();
-        }
-    };
-
-} catch (e) {
-    console.log("⚠️ WS desativado");
-}
-
-
-// =========================
-// 🔥 FALLBACK (POLLING)
-// =========================
+// 🔥 ATUALIZAÇÃO SEM QUEBRAR TABELA
 function atualizarLista() {
 
     fetch("/austin/api/orders/")
         .then(res => res.json())
         .then(data => {
 
-            const tabela = document.getElementById("orders-body");
-            if (!tabela) return;
-
-            // 🔥 PROTEÇÃO — NÃO APAGA SE VIER VAZIO
-            if (!data.orders || data.orders.length === 0) {
-                console.log("⚠️ API vazia — mantendo tabela atual");
-                return;
-            }
-
-            tabela.innerHTML = "";
+            if (!data.orders) return;
 
             data.orders.forEach(order => {
-                tabela.innerHTML += `
-                    <tr id="order-row-${order.id}">
-                        <td class="center"><strong>#${order.id}</strong></td>
 
-                        <td class="center">
-                            <span class="status-badge ${order.status}">
-                                ${order.status_display.toUpperCase()}
-                            </span>
-                        </td>
+                let row = document.getElementById("order-row-" + order.id);
 
-                        <td class="center">${order.created_at}</td>
+                // ✔ ATUALIZA EXISTENTE
+                if (row) {
 
-                        <td class="center">${order.from_branch}</td>
+                    const badge = row.querySelector(".status-badge");
 
-                        <td class="center">
-                            <a href="/austin/pedidos/${order.id}/"
-                               class="btn-mini btn-mini-sm">
-                               Abrir
-                            </a>
-                        </td>
-                    </tr>
-                `;
+                    if (badge) {
+                        badge.innerText = order.status_display.toUpperCase();
+                        badge.className = "status-badge " + order.status;
+                    }
+
+                } else {
+
+                    // 🔥 NOVO PEDIDO
+                    const tabela = document.getElementById("orders-body");
+
+                    const novaLinha = `
+                        <tr id="order-row-${order.id}">
+                            <td class="center"><strong>#${order.id}</strong></td>
+
+                            <td class="center">
+                                <span class="status-badge ${order.status}">
+                                    ${order.status_display.toUpperCase()}
+                                </span>
+                            </td>
+
+                            <td class="center">${order.created_at}</td>
+
+                            <td class="center">${order.from_branch}</td>
+
+                            <td class="center">
+                                <a href="/austin/pedidos/${order.id}/"
+                                   class="btn-mini btn-mini-sm">
+                                   Abrir
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+
+                    tabela.insertAdjacentHTML("afterbegin", novaLinha);
+
+                    falarPedidoNovo();
+                }
+
             });
 
         })
         .catch(err => console.log("Erro polling:", err));
 }
 
+// 🔥 RODA AUTOMÁTICO
+setInterval(atualizarLista, 3000);
 
-// =========================
-// 🔥 ATIVA POLLING
-// =========================
-setInterval(() => {
-
-    if (!websocketOk) {
-        atualizarLista();
-    }
-
-}, 3000);
 </script>
 
 {% endblock %}
