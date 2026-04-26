@@ -40,22 +40,33 @@ def a_orders(request):
 # =====================================================
 # DETALHE DO PEDIDO
 # =====================================================
+from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
+
 @require_austin
 def a_order_detail(request, order_id):
     order = get_object_or_404(TransferOrder, id=order_id)
+
+    # 🔥 ITENS
     items = order.items.select_related("product")
 
-    # 🔥 calcula faltante por item
     for item in items:
         item.missing_qty = max(0, item.qty_requested - item.qty_sent)
 
-    # 🔥 LOGS
-    logs = order.logs.all().order_by('-created_at')
+    # 🔥 TOTAL GERAL
+    total_pedido = sum(i.qty_requested for i in items)
+    total_enviado_total = sum(i.qty_sent for i in items)
+    faltando_total = max(0, total_pedido - total_enviado_total)
+
+    # 🔥 LOGS (ORDEM CORRETA PARA CÁLCULO)
+    logs = order.logs.all().order_by('created_at')
 
     # 🔥 DESPACHOS COMPLEMENTARES
     despachos = order.despachos.filter(is_complementar=True).order_by('created_at')
 
     contador = 0
+    enviado_acumulado = 0
+
     logs_processados = []
 
     for log in logs:
@@ -65,29 +76,44 @@ def a_order_detail(request, order_id):
 
             if contador <= len(despachos):
                 despacho = despachos[contador - 1]
-                total = sum(i.qty_sent_now for i in despacho.itens.all())
+
+                # 🔥 quantidade enviada nesse envio
+                total_envio = sum(i.qty_sent_now for i in despacho.itens.all())
+
+                enviado_acumulado += total_envio
+
+                faltante = max(0, total_pedido - enviado_acumulado)
+
+                progresso = int((enviado_acumulado / total_pedido) * 100) if total_pedido else 0
 
                 log.display_action = (
-                    f"Envio complementar {contador} — {total} itens enviados"
+                    f"Envio complementar {contador} — {total_envio} itens enviados"
                 )
+
+                log.faltante = faltante
+                log.progresso = progresso
+
             else:
                 log.display_action = f"Envio complementar {contador}"
+                log.faltante = 0
+                log.progresso = 100
 
         else:
+            # 🔥 mantém logs normais
             log.display_action = log.action
+            log.faltante = None
+            log.progresso = None
 
         logs_processados.append(log)
 
-    # 🔥 TOTAL GERAL
-    total_pedido = sum(i.qty_requested for i in items)
-    total_enviado = sum(i.qty_sent for i in items)
-    faltando = max(0, total_pedido - total_enviado)
+    # 🔥 INVERTE PARA EXIBIÇÃO (MAIS NOVO EM CIMA)
+    logs_processados = list(reversed(logs_processados))
 
     return render(request, "austin/order_detail.html", {
         "order": order,
         "items": items,
         "logs": logs_processados,
-        "faltando": faltando,
+        "faltando": faltando_total,
     })
 
 

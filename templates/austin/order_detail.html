@@ -150,8 +150,22 @@
           </div>
 
           <div class="timeline-text">
-            <strong>{{ log.user }}</strong> — {{ log.display_action }}
-          </div>
+              <strong>{{ log.user }}</strong> — {{ log.display_action }}
+
+              {% if log.faltante != None %}
+                <div class="timeline-extra">
+                  {% if log.faltante > 0 %}
+                    Faltam {{ log.faltante }} itens
+                  {% else %}
+                    ✔ Completo
+                  {% endif %}
+                </div>
+
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: {{ log.progresso }}%"></div>
+                </div>
+              {% endif %}
+            </div>
         </div>
 
       </div>
