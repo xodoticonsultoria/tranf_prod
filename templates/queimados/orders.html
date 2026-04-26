@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Meus Pedidos{% endblock %}
+
 {% block content %}
 
 <h2 class="area-title">
-  MEUS PEDIDOS
+  Meus Pedidos
 </h2>
 
 <div class="order-table-wrap">
@@ -19,28 +20,31 @@
       </tr>
     </thead>
 
-    <tbody>
+    <tbody id="orders-body">
       {% for o in orders %}
       <tr id="order-row-{{ o.id }}" class="order-row">
+
         <td class="prod-name">
-          #{{ o.id }}
+          <strong>#{{ o.id }}</strong>
         </td>
 
-        <td>
-          <span class="status-badge">
-            {{ o.get_status_display|upper }}
+        <td class="center">
+          <!-- 🔥 CORREÇÃO AQUI -->
+          <span class="status-badge {{ o.status }}">
+              {{ o.get_status_display }}
           </span>
         </td>
 
-        <td>
+        <td class="center">
           {{ o.created_at|date:"d/m/Y H:i" }}
         </td>
 
-        <td>
+        <td class="center">
           <a href="{% url 'q_order_detail' o.id %}" class="btn-mini btn-mini-sm">
             Abrir
           </a>
         </td>
+
       </tr>
       {% empty %}
       <tr>
@@ -72,7 +76,15 @@ socket.onmessage = function(e) {
         const badge = orderRow.querySelector(".status-badge");
 
         if (badge) {
+
+            // 🔥 texto
             badge.innerText = data.status_display.toUpperCase();
+
+            // 🔥 remove todas classes
+            badge.className = "status-badge";
+
+            // 🔥 aplica classe correta (AGORA COMPATÍVEL COM CSS)
+            badge.classList.add(data.status);
         }
 
         if (data.status === "RECEIVED") {
