@@ -54,7 +54,7 @@ urlpatterns = [
     path("austin/relatorio/pdf/", views.a_report_pdf, name="a_report_pdf"),
     path("austin/relatorio/pdf/<int:order_id>/", views.a_report_pdf_single, name="a_report_pdf_single"),
 
-    path("pedido/<int:order_id>/historico/", views.historico_despacho, name="historico_despacho"),
+    # path("pedido/<int:order_id>/historico/", views.historico_despacho, name="historico_despacho"),
 
     # ENVIO COMPLEMENTAR
     path("austin/envio-complementar/", views.lista_envio_complementar, name="lista_envio_complementar"),
