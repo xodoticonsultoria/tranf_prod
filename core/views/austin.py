@@ -21,16 +21,20 @@ from core.permissions import require_austin
 
 
 # =====================================================
-# LISTA DE PEDIDOS
+# LISTA DE PEDIDOS (CORRIGIDA)
 # =====================================================
 
 @require_austin
 def a_orders(request):
-    orders = TransferOrder.objects.filter(
-        status__in=[OrderStatus.SUBMITTED, OrderStatus.PICKING]
+
+    # 🔥 MESMA REGRA DA API (ESSENCIAL)
+    orders = TransferOrder.objects.exclude(
+        status=OrderStatus.DRAFT
     ).order_by("-created_at")
 
-    return render(request, "austin/orders.html", {"orders": orders})
+    return render(request, "austin/orders.html", {
+        "orders": orders
+    })
 
 
 # =====================================================
@@ -305,8 +309,8 @@ def order_status_poll(request, order_id):
 
 @login_required
 def a_orders_api(request):
-    orders = TransferOrder.objects.filter(
-        status__in=[OrderStatus.SUBMITTED, OrderStatus.PICKING]
+    orders = TransferOrder.objects.exclude(
+        status=OrderStatus.DRAFT
     ).order_by("-created_at")
 
     data = [

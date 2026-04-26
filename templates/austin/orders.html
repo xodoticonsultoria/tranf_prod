@@ -81,9 +81,6 @@ function falarPedidoNovo() {
     try {
         const msg = new SpeechSynthesisUtterance("Pedido novo");
         msg.lang = "pt-BR";
-        msg.rate = 1;
-        msg.pitch = 1;
-        msg.volume = 1;
         speechSynthesis.speak(msg);
     } catch (e) {
         const audio = new Audio("/static/ding.mp3");
@@ -95,7 +92,6 @@ function falarPedidoNovo() {
 // 🔥 WEBSOCKET
 // =========================
 try {
-
     const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
 
     const socket = new WebSocket(
@@ -108,13 +104,10 @@ try {
     };
 
     socket.onmessage = function(e) {
-
         const data = JSON.parse(e.data);
-
         const row = document.getElementById("order-row-" + data.order_id);
 
         if (row) {
-
             const badge = row.querySelector(".status-badge");
 
             if (badge) {
@@ -129,21 +122,9 @@ try {
             }, 2000);
 
         } else {
-
-            // 🔊 FALA "PEDIDO NOVO"
             falarPedidoNovo();
-
-            // 🔄 recarrega para aparecer novo pedido
             location.reload();
         }
-    };
-
-    socket.onerror = function() {
-        console.log("⚠️ WS erro");
-    };
-
-    socket.onclose = function() {
-        console.log("🔴 WS fechado");
     };
 
 } catch (e) {
@@ -161,13 +142,17 @@ function atualizarLista() {
         .then(data => {
 
             const tabela = document.getElementById("orders-body");
-
             if (!tabela) return;
+
+            // 🔥 PROTEÇÃO — NÃO APAGA SE VIER VAZIO
+            if (!data.orders || data.orders.length === 0) {
+                console.log("⚠️ API vazia — mantendo tabela atual");
+                return;
+            }
 
             tabela.innerHTML = "";
 
             data.orders.forEach(order => {
-
                 tabela.innerHTML += `
                     <tr id="order-row-${order.id}">
                         <td class="center"><strong>#${order.id}</strong></td>
@@ -202,14 +187,11 @@ function atualizarLista() {
 // =========================
 setInterval(() => {
 
-    // usa polling só se websocket falhar
     if (!websocketOk) {
-        console.log("🔥 usando polling fallback");
         atualizarLista();
     }
 
 }, 3000);
-
 </script>
 
 {% endblock %}
