@@ -240,19 +240,6 @@ def a_orders_api(request):
         return JsonResponse({"error": str(e)}, status=500)
 
 
-
-
-# =====================================================
-# BADGE (VOLTA PRA NÃO QUEBRAR IMPORT)
-# =====================================================
-# =====================================================
-# POLL STATUS (NECESSÁRIO PRO IMPORT)
-# =====================================================
-
-# =====================================================
-# BADGE (NECESSÁRIO PRO IMPORT)
-# =====================================================
-
 from django.views.decorators.http import require_GET
 
 @require_GET
@@ -263,4 +250,18 @@ def austin_badge(request):
 
     return JsonResponse({
         "count": count
+    })
+
+
+# =====================================================
+# POLL STATUS (NECESSÁRIO PRO URL)
+# =====================================================
+
+@require_austin
+def order_status_poll(request, order_id):
+    order = get_object_or_404(TransferOrder, id=order_id)
+
+    return JsonResponse({
+        "status": order.status,
+        "status_display": order.get_status_display(),
     })

@@ -21,6 +21,7 @@ from .queimados import (
     q_add_product,
     q_update_item,
     q_remove_item_api,
+
 )
 # =====================
 # AUSTIN
@@ -30,8 +31,9 @@ from .austin import (
     a_order_detail,
     a_start_picking,
     a_dispatch,
+    austin_badge,        # 🔥 adiciona
+    order_status_poll,   # 🔥 adiciona
 )
-
 # =====================
 # REPORTS
 # =====================
