@@ -237,3 +237,18 @@ def a_orders_api(request):
     except Exception as e:
         print("🔥 ERRO API:", e)
         return JsonResponse({"error": str(e)}, status=500)
+
+
+
+
+# =====================================================
+# BADGE (VOLTA PRA NÃO QUEBRAR IMPORT)
+# =====================================================
+
+@require_GET
+def austin_badge(request):
+    count = TransferOrder.objects.filter(
+        status=OrderStatus.SUBMITTED
+    ).count()
+
+    return JsonResponse({"count": count})
