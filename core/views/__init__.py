@@ -17,9 +17,11 @@ from .queimados import (
     q_orders,
     q_order_detail,
     q_receive_order,
-    q_remove_item,
+    q_remove_item,        # 🔥 ADICIONA ISSO
+    q_add_product,
+    q_update_item,
+    q_remove_item_api,
 )
-
 # =====================
 # AUSTIN
 # =====================
