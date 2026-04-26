@@ -391,3 +391,38 @@ def a_orders_api(request):
     except Exception as e:
         print("🔥 ERRO API:", e)
         return JsonResponse({"error": str(e)}, status=500)
+
+
+
+@login_required
+def a_order_detail_api(request, order_id):
+
+    try:
+        order = get_object_or_404(TransferOrder, id=order_id)
+
+        items = order.items.all()
+
+        total_pedido = sum(i.qty_requested for i in items)
+        total_enviado = sum(i.qty_sent for i in items)
+        faltando = max(0, total_pedido - total_enviado)
+
+        # 🔥 logs
+        logs = order.logs.all().order_by('-created_at')[:10]
+
+        logs_data = []
+
+        for log in logs:
+            logs_data.append({
+                "user": log.user.username if log.user else "Sistema",
+                "action": getattr(log, "display_action", log.action),
+                "time": log.created_at.strftime("%d/%m/%Y %H:%M:%S")
+            })
+
+        return JsonResponse({
+            "faltando": faltando,
+            "logs": logs_data
+        })
+
+    except Exception as e:
+        print("🔥 ERRO API DETALHE:", e)
+        return JsonResponse({"error": str(e)}, status=500)

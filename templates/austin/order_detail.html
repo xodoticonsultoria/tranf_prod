@@ -211,4 +211,25 @@ function decrease(id){
 }
 </script>
 
+
+<script>
+function atualizarPedido(){
+    fetch("/austin/api/order/{{ order.id }}/")
+    .then(res => res.json())
+    .then(data => {
+
+        // 🔥 atualizar faltante
+        document.querySelector(".faltante-box").innerHTML =
+            data.faltando > 0
+            ? `⚠️ Faltam <strong>${data.faltando}</strong> itens`
+            : `✅ Pedido completo`;
+
+        // 🔥 atualizar histórico (simples reload parcial)
+        location.reload();
+    });
+}
+
+setInterval(atualizarPedido, 4000);
+</script>
+
 {% endblock %}

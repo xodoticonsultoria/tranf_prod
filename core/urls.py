@@ -2,7 +2,8 @@ from django.shortcuts import render
 from django.urls import path
 from django.http import HttpResponse
 from . import views
-from .views import envio_complementar, lista_envio_complementar
+from .views import envio_complementar, lista_envio_complementar, a_order_detail_api
+
 
 # 🔥 TESTE DE VIDA
 def teste(request):
@@ -40,6 +41,7 @@ urlpatterns = [
     path("q/update-item/", views.q_update_item),
     path("q/remove-item/", views.q_remove_item_api),
     path("austin/api/orders/", views.a_orders_api, name="a_orders_api"),
+    path("austin/api/order/<int:order_id>/", a_order_detail_api, name="a_order_detail_api"),
 
 
 
