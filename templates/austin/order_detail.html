@@ -50,6 +50,20 @@
   {% endif %}
 </div>
 
+
+
+<div style="text-align:center; margin-top:30px;">
+
+  {% if order.status == "SUBMITTED" %}
+    <a href="{% url 'a_start_picking' order.id %}"
+       class="x-save"
+       onclick="return confirm('Iniciar separação?');">
+       INICIAR SEPARAÇÃO
+    </a>
+  {% endif %}
+
+</div>
+
 <!-- ========================= -->
 <!-- 🔥 HISTÓRICO -->
 <!-- ========================= -->
