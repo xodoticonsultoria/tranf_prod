@@ -40,7 +40,6 @@ def a_orders(request):
 # =====================================================
 # DETALHE DO PEDIDO
 # =====================================================
-
 @require_austin
 def a_order_detail(request, order_id):
     order = get_object_or_404(TransferOrder, id=order_id)
@@ -50,9 +49,13 @@ def a_order_detail(request, order_id):
     for item in items:
         item.missing_qty = max(0, item.qty_requested - item.qty_sent)
 
+    # 🔥 AQUI ESTÁ A CHAVE
+    logs = order.orderlog_set.all().order_by('-created_at')
+
     return render(request, "austin/order_detail.html", {
         "order": order,
-        "items": items
+        "items": items,
+        "logs": logs   # 👈 ESSENCIAL
     })
 
 

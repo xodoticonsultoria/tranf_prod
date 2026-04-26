@@ -34,7 +34,7 @@
       {% for it in items %}
       <tr>
         <td class="prod-name">
-          (cod <span class="muted_sku">{{ it.product.sku }})</span>
+          (cod <span class="muted_sku">{{ it.product.sku }}</span>)
           {{ it.product.name|upper }}
         </td>
 
@@ -46,13 +46,9 @@
 
               <button type="button"
                       class="mais_menos"
-                      onclick="decrease({{ it.id }})">
-                −
-              </button>
+                      onclick="decrease({{ it.id }})">−</button>
 
               <input type="number"
-                     inputmode="numeric"
-                     pattern="[0-9]*"
                      id="sent_{{ it.id }}"
                      name="sent_{{ it.id }}"
                      min="0"
@@ -63,9 +59,7 @@
 
               <button type="button"
                       class="mais_menos"
-                      onclick="increase({{ it.id }})">
-                +
-              </button>
+                      onclick="increase({{ it.id }})">+</button>
 
             </div>
 
@@ -89,8 +83,7 @@
   <h3>Observação (Austin)</h3>
 
   {% if order.status == "PICKING" %}
-      <textarea name="notes_from_austin"
-                placeholder="Ex: faltou rosquinha, enviando 3...">
+      <textarea name="notes_from_austin">
 {{ order.notes_from_austin }}
       </textarea>
   {% else %}
@@ -131,18 +124,34 @@
 </div>
 
 <!-- ========================= -->
+<!-- 🔥 HISTÓRICO (NOVO) -->
+<!-- ========================= -->
+
+<div style="margin-top:40px; color:white; text-align:center;">
+  <h3>Histórico</h3>
+
+  {% if logs %}
+    <div style="max-width:700px; margin:auto; text-align:left;">
+      {% for log in logs %}
+        <div style="margin-bottom:6px;">
+          {{ log.created_at|date:"d/m/Y H:i:s" }} •
+          <strong>{{ log.user }}</strong> •
+          {{ log.action }}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div>Nenhum histórico disponível.</div>
+  {% endif %}
+</div>
+
+<!-- ========================= -->
 <!-- JS QUANTIDADE -->
 <!-- ========================= -->
 
 <script>
 function increase(id){
     const input = document.getElementById("sent_" + id);
-
-    if (!input) {
-        console.error("Input não encontrado:", id);
-        return;
-    }
-
     let max = parseInt(input.max || "0");
     let current = parseInt(input.value || "0");
 
@@ -153,12 +162,6 @@ function increase(id){
 
 function decrease(id){
     const input = document.getElementById("sent_" + id);
-
-    if (!input) {
-        console.error("Input não encontrado:", id);
-        return;
-    }
-
     let val = parseInt(input.value || "0");
 
     if (val > 0) {
@@ -168,7 +171,7 @@ function decrease(id){
 </script>
 
 <!-- ========================= -->
-<!-- 🔥 ATIVA POLLING GLOBAL -->
+<!-- POLLING -->
 <!-- ========================= -->
 
 <script>
