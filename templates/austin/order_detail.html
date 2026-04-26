@@ -9,7 +9,8 @@
 
 <div class="order-status-box">
   <span class="order-status-label">Status:</span>
-  <span class="order-status-badge {{ order.status }}">
+  <span id="order-status-text"
+      class="order-status-badge {{ order.status }}">
     {{ order.get_status_display|upper }}
   </span>
 </div>

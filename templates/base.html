@@ -176,7 +176,6 @@ document.addEventListener("DOMContentLoaded", function(){
 </script>
 
 <!-- 🔥 POLLING GLOBAL (STATUS TEMPO REAL) -->
-<script>
 window.addEventListener("load", () => {
 
     function atualizarStatusGlobal() {
@@ -187,7 +186,9 @@ window.addEventListener("load", () => {
             .then(res => res.json())
             .then(data => {
 
-                const badge = document.querySelector(".order-status-badge");
+                const badge =
+                    document.getElementById("order-status-text") ||
+                    document.querySelector(".order-status-badge");
 
                 if (badge && data.status) {
 
@@ -196,18 +197,19 @@ window.addEventListener("load", () => {
                     if (badge.innerText !== novo) {
                         badge.innerText = novo;
                         badge.className = "order-status-badge " + data.status;
+
+                        console.log("🔥 STATUS ATUALIZADO:", novo);
                     }
 
                 }
 
             })
-            .catch(() => {});
+            .catch(err => console.log("Erro poll:", err));
     }
 
     setInterval(atualizarStatusGlobal, 3000);
 
 });
-</script>
 
 <footer style="
     text-align:center;
