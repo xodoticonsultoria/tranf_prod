@@ -66,7 +66,7 @@
 
 
 <!-- ========================= -->
-<!-- 🔥 TEMPO REAL CORRIGIDO -->
+<!-- 🔥 TEMPO REAL FINAL -->
 <!-- ========================= -->
 
 <script>
@@ -82,33 +82,27 @@ function falarPedidoNovo() {
     }
 }
 
-// 🔥 ATUALIZAÇÃO SEM QUEBRAR TABELA
+
+// 🔥 ATUALIZAÇÃO REAL
 function atualizarLista() {
 
     fetch("/austin/api/orders/")
         .then(res => res.json())
         .then(data => {
 
-            if (!data.orders) return;
+            if (!data.orders || data.orders.length === 0) return;
+
+            const tabela = document.getElementById("orders-body");
+
+            // 🔥 lista atual da tela
+            const idsNaTela = Array.from(
+                document.querySelectorAll("[id^='order-row-']")
+            ).map(el => el.id.replace("order-row-", ""));
 
             data.orders.forEach(order => {
 
-                let row = document.getElementById("order-row-" + order.id);
-
-                // ✔ ATUALIZA EXISTENTE
-                if (row) {
-
-                    const badge = row.querySelector(".status-badge");
-
-                    if (badge) {
-                        badge.innerText = order.status_display.toUpperCase();
-                        badge.className = "status-badge " + order.status;
-                    }
-
-                } else {
-
-                    // 🔥 NOVO PEDIDO
-                    const tabela = document.getElementById("orders-body");
+                // 🔥 NOVO PEDIDO
+                if (!idsNaTela.includes(String(order.id))) {
 
                     const novaLinha = `
                         <tr id="order-row-${order.id}">
@@ -138,13 +132,29 @@ function atualizarLista() {
                     falarPedidoNovo();
                 }
 
+                // 🔄 ATUALIZA STATUS
+                else {
+
+                    const row = document.getElementById("order-row-" + order.id);
+
+                    if (row) {
+                        const badge = row.querySelector(".status-badge");
+
+                        if (badge) {
+                            badge.innerText = order.status_display.toUpperCase();
+                            badge.className = "status-badge " + order.status;
+                        }
+                    }
+                }
+
             });
 
         })
         .catch(err => console.log("Erro polling:", err));
 }
 
-// 🔥 RODA AUTOMÁTICO
+
+// 🔥 RODA A CADA 3 SEGUNDOS
 setInterval(atualizarLista, 3000);
 
 </script>
