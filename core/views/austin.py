@@ -306,22 +306,27 @@ def order_status_poll(request, order_id):
 # =====================================================
 # API LISTA AUSTIN (TEMPO REAL)
 # =====================================================
-
 @login_required
 def a_orders_api(request):
-    orders = TransferOrder.objects.exclude(
-        status=OrderStatus.DRAFT
-    ).order_by("-created_at")
 
-    data = [
-        {
-            "id": o.id,
-            "status": o.status,
-            "status_display": o.get_status_display(),
-            "created_at": o.created_at.strftime("%d/%m/%Y %H:%M"),
-            "from_branch": o.from_branch.name if o.from_branch else "-"
-        }
-        for o in orders
-    ]
+    try:
+        orders = TransferOrder.objects.exclude(
+            status=OrderStatus.DRAFT
+        ).order_by("-created_at")
 
-    return JsonResponse({"orders": data})
+        data = []
+
+        for o in orders:
+            data.append({
+                "id": o.id,
+                "status": o.status,
+                "status_display": o.get_status_display(),
+                "created_at": o.created_at.strftime("%d/%m/%Y %H:%M"),
+                "from_branch": str(o.from_branch) if o.from_branch else "-"
+            })
+
+        return JsonResponse({"orders": data})
+
+    except Exception as e:
+        print("🔥 ERRO API:", e)
+        return JsonResponse({"error": str(e)}, status=500)
