@@ -27,15 +27,25 @@ from core.permissions import require_austin
 @require_austin
 def a_orders(request):
 
-    # 🔥 MESMA REGRA DA API (ESSENCIAL)
-    orders = TransferOrder.objects.exclude(
+    base = TransferOrder.objects.exclude(
         status=OrderStatus.DRAFT
     ).order_by("-created_at")
+
+    ativos = base.exclude(status=OrderStatus.RECEIVED)
+
+    recebidos = base.filter(
+        status=OrderStatus.RECEIVED
+    )[:5]
+
+    orders = sorted(
+        list(ativos) + list(recebidos),
+        key=lambda x: x.created_at,
+        reverse=True
+    )
 
     return render(request, "austin/orders.html", {
         "orders": orders
     })
-
 
 # =====================================================
 # DETALHE DO PEDIDO
@@ -371,10 +381,21 @@ def order_status_poll(request, order_id):
 def a_orders_api(request):
 
     try:
-        # 🔥 pega só 5 mais recentes (simples e estável)
-        orders = TransferOrder.objects.exclude(
+        base = TransferOrder.objects.exclude(
             status=OrderStatus.DRAFT
-        ).order_by("-created_at")[:5]
+        ).order_by("-created_at")
+
+        ativos = base.exclude(status=OrderStatus.RECEIVED)
+
+        recebidos = base.filter(
+            status=OrderStatus.RECEIVED
+        )[:5]
+
+        orders = sorted(
+            list(ativos) + list(recebidos),
+            key=lambda x: x.created_at,
+            reverse=True
+        )
 
         data = []
 
