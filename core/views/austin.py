@@ -1,6 +1,5 @@
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
@@ -19,8 +18,7 @@ from core.models import (
 )
 
 from core.permissions import require_austin
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+
 
 # =====================================================
 # LISTA DE PEDIDOS (CORRIGIDA)
@@ -32,7 +30,7 @@ def a_orders(request):
     # 🔥 MESMA REGRA DA API (ESSENCIAL)
     orders = TransferOrder.objects.exclude(
         status=OrderStatus.DRAFT
-    ).select_related("from_branch").order_by("-created_at")[:5]
+    ).order_by("-created_at")
 
     return render(request, "austin/orders.html", {
         "orders": orders
@@ -42,29 +40,33 @@ def a_orders(request):
 # =====================================================
 # DETALHE DO PEDIDO
 # =====================================================
+from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
 
 @require_austin
 def a_order_detail(request, order_id):
     order = get_object_or_404(TransferOrder, id=order_id)
 
+    # 🔥 ITENS
     items = order.items.select_related("product")
 
     for item in items:
         item.missing_qty = max(0, item.qty_requested - item.qty_sent)
 
+    # 🔥 TOTAL GERAL
     total_pedido = sum(i.qty_requested for i in items)
     total_enviado_total = sum(i.qty_sent for i in items)
     faltando_total = max(0, total_pedido - total_enviado_total)
 
+    # 🔥 LOGS (ORDEM CORRETA PARA CÁLCULO)
     logs = order.logs.all().order_by('created_at')
 
-    # 🔥 MELHORADO
-    despachos = order.despachos.filter(
-        is_complementar=True
-    ).prefetch_related("itens")
+    # 🔥 DESPACHOS COMPLEMENTARES
+    despachos = order.despachos.filter(is_complementar=True).order_by('created_at')
 
     contador = 0
     enviado_acumulado = 0
+
     logs_processados = []
 
     for log in logs:
@@ -75,13 +77,19 @@ def a_order_detail(request, order_id):
             if contador <= len(despachos):
                 despacho = despachos[contador - 1]
 
+                # 🔥 quantidade enviada nesse envio
                 total_envio = sum(i.qty_sent_now for i in despacho.itens.all())
+
                 enviado_acumulado += total_envio
 
                 faltante = max(0, total_pedido - enviado_acumulado)
+
                 progresso = int((enviado_acumulado / total_pedido) * 100) if total_pedido else 0
 
-                log.display_action = f"Envio complementar {contador} — {total_envio} itens enviados"
+                log.display_action = (
+                    f"Envio complementar {contador} — {total_envio} itens enviados"
+                )
+
                 log.faltante = faltante
                 log.progresso = progresso
 
@@ -91,12 +99,14 @@ def a_order_detail(request, order_id):
                 log.progresso = 100
 
         else:
+            # 🔥 mantém logs normais
             log.display_action = log.action
             log.faltante = None
             log.progresso = None
 
         logs_processados.append(log)
 
+    # 🔥 INVERTE PARA EXIBIÇÃO (MAIS NOVO EM CIMA)
     logs_processados = list(reversed(logs_processados))
 
     return render(request, "austin/order_detail.html", {
@@ -134,9 +144,8 @@ def a_start_picking(request, order_id):
 
 
 # =====================================================
-# DESPACHO PRINCIPAL
+# DESPACHO PRINCIPAL (CORRETO)
 # =====================================================
-
 @require_austin
 def a_dispatch(request, order_id):
 
@@ -153,8 +162,10 @@ def a_dispatch(request, order_id):
     itens_enviados = []
 
     for item in items:
+        field = f"sent_{item.id}"
+
         try:
-            enviar = int(request.POST.get(f"sent_{item.id}", 0))
+            enviar = int(request.POST.get(field, 0))
         except:
             continue
 
@@ -208,30 +219,173 @@ def a_dispatch(request, order_id):
 
 
 # =====================================================
-# API LISTA AUSTIN (TEMPO REAL)
+# LISTA DE ENVIO COMPLEMENTAR
+# =====================================================
+
+# 🔥 SOMENTE ALTERAÇÃO: remove return duplicado
+
+@require_austin
+def lista_envio_complementar(request):
+
+    pedidos = TransferOrder.objects.filter(
+        status__in=[OrderStatus.DISPATCHED, OrderStatus.RECEIVED]
+    ).prefetch_related("items").order_by("-id")
+
+    pedidos_com_info = []
+
+    for pedido in pedidos:
+        total = sum(i.qty_requested for i in pedido.items.all())
+        enviado = sum(i.qty_sent for i in pedido.items.all())
+
+        if total == 0:
+            continue
+
+        if enviado < total:
+            progresso = int((enviado / total) * 100)
+
+            pedidos_com_info.append({
+                "pedido": pedido,
+                "total": total,
+                "enviado": enviado,
+                "progresso": progresso,
+                "faltando": total - enviado
+            })
+
+    return render(request, "austin/lista_envio_complementar.html", {
+        "pedidos": pedidos_com_info
+    })
+
+# =====================================================
+# ENVIO COMPLEMENTAR (CORRETO)
 # =====================================================
 
 @require_austin
+def envio_complementar(request, order_id):
+
+    order = get_object_or_404(TransferOrder, id=order_id)
+
+    items = order.items.filter(
+        qty_requested__gt=F("qty_sent")
+    ).select_related("product")
+
+    for item in items:
+        item.faltando = item.qty_requested - item.qty_sent
+
+    if request.method == "POST":
+
+        with transaction.atomic():
+
+            despacho = Despacho.objects.create(
+                order=order,
+                created_by=request.user,
+                is_complementar=True
+            )
+
+            for item in items:
+
+                try:
+                    enviar = int(request.POST.get(f"qty_{item.id}", 0))
+                except:
+                    continue
+
+                if enviar <= 0:
+                    continue
+
+                enviar = min(enviar, item.faltando)
+
+                if enviar > 0:
+                    DespachoItem.objects.create(
+                        despacho=despacho,
+                        order_item=item,
+                        qty_sent_now=enviar
+                    )
+
+        order.status = OrderStatus.DISPATCHED
+        order.dispatched_at = timezone.now()
+        order.save(update_fields=["status", "dispatched_at"])
+
+        OrderLog.objects.create(
+            order=order,
+            user=request.user,
+            action="Envio complementar despachado"
+        )
+
+        messages.success(request, "Envio complementar realizado.")
+        return redirect("lista_envio_complementar")
+
+    return render(request, "austin/envio_complementar.html", {
+        "order": order,
+        "items": items
+    })
+
+
+# =====================================================
+# HISTÓRICO
+# =====================================================
+
+@require_austin
+def historico_despacho(request, order_id):
+    order = get_object_or_404(TransferOrder, id=order_id)
+
+    despachos = order.despachos.prefetch_related(
+        "itens__order_item__product"
+    )
+
+    return render(request, "austin/historico_despacho.html", {
+        "order": order,
+        "despachos": despachos
+    })
+
+
+# =====================================================
+# BADGE
+# =====================================================
+
+@require_GET
+def austin_badge(request):
+    count = TransferOrder.objects.filter(
+        status=OrderStatus.SUBMITTED
+    ).count()
+
+    return JsonResponse({"count": count})
+
+
+# =====================================================
+# POLL STATUS
+# =====================================================
+
+@login_required
+def order_status_poll(request, order_id):
+    order = get_object_or_404(TransferOrder, id=order_id)
+
+    return JsonResponse({
+        "status": order.status,
+        "status_display": order.get_status_display(),
+    })
+
+
+# =====================================================
+# API LISTA AUSTIN (TEMPO REAL)
+# =====================================================
+@login_required
 def a_orders_api(request):
 
     try:
-        orders = (
-            TransferOrder.objects
-            .exclude(status=OrderStatus.DRAFT)
-            .select_related("from_branch")
-            .order_by("-created_at")[:5]
-        )
+        # 🔥 pega só 5 mais recentes (simples e estável)
+        orders = TransferOrder.objects.exclude(
+            status=OrderStatus.DRAFT
+        ).order_by("-created_at")[:5]
 
-        data = [
-            {
+        data = []
+
+        for o in orders:
+            data.append({
                 "id": o.id,
                 "status": o.status,
                 "status_display": o.get_status_display(),
                 "created_at": o.created_at.strftime("%d/%m/%Y %H:%M"),
                 "from_branch": str(o.from_branch) if o.from_branch else "-"
-            }
-            for o in orders
-        ]
+            })
 
         return JsonResponse({"orders": data})
 
@@ -240,28 +394,36 @@ def a_orders_api(request):
         return JsonResponse({"error": str(e)}, status=500)
 
 
-from django.views.decorators.http import require_GET
 
-@require_GET
-def austin_badge(request):
-    count = TransferOrder.objects.filter(
-        status=OrderStatus.SUBMITTED
-    ).count()
+@login_required
+def a_order_detail_api(request, order_id):
 
-    return JsonResponse({
-        "count": count
-    })
+    try:
+        order = get_object_or_404(TransferOrder, id=order_id)
 
+        items = order.items.all()
 
-# =====================================================
-# POLL STATUS (NECESSÁRIO PRO URL)
-# =====================================================
+        total_pedido = sum(i.qty_requested for i in items)
+        total_enviado = sum(i.qty_sent for i in items)
+        faltando = max(0, total_pedido - total_enviado)
 
-@require_austin
-def order_status_poll(request, order_id):
-    order = get_object_or_404(TransferOrder, id=order_id)
+        # 🔥 logs
+        logs = order.logs.all().order_by('-created_at')[:10]
 
-    return JsonResponse({
-        "status": order.status,
-        "status_display": order.get_status_display(),
-    })
+        logs_data = []
+
+        for log in logs:
+            logs_data.append({
+                "user": log.user.username if log.user else "Sistema",
+                "action": getattr(log, "display_action", log.action),
+                "time": log.created_at.strftime("%d/%m/%Y %H:%M:%S")
+            })
+
+        return JsonResponse({
+            "faltando": faltando,
+            "logs": logs_data
+        })
+
+    except Exception as e:
+        print("🔥 ERRO API DETALHE:", e)
+        return JsonResponse({"error": str(e)}, status=500)
