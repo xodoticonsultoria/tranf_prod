@@ -1,3 +1,8 @@
+from .auth import *
+from .queimados import *
+from .austin import *
+from .reports import *
+
 # =====================
 # AUTH
 # =====================
@@ -17,12 +22,8 @@ from .queimados import (
     q_orders,
     q_order_detail,
     q_receive_order,
-    q_remove_item,        # 🔥 ADICIONA ISSO
-    q_add_product,
-    q_update_item,
-    q_remove_item_api,
-
 )
+
 # =====================
 # AUSTIN
 # =====================
@@ -31,11 +32,11 @@ from .austin import (
     a_order_detail,
     a_start_picking,
     a_dispatch,
-    austin_badge,        # 🔥 adiciona
-    order_status_poll,   # 🔥 adiciona
+    austin_badge,
 )
+
 # =====================
-# REPORTS
+# REPORTS (AUSTIN + QUEIMADOS)
 # =====================
 from .reports import (
     a_report,
@@ -44,4 +45,11 @@ from .reports import (
     q_report,
     q_report_pdf,
     q_report_pdf_single,
+)
+
+# =====================
+# API
+# =====================
+from .austin import (
+    order_status_poll,
 )
